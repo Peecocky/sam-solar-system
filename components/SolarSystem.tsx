@@ -116,7 +116,7 @@ export default function SolarSystem({
         timeScale={timeScale}
         onHoverIn={() => {
           targetTimeScale.current = 0.15
-          setHoverText('Mini Game')
+          setHoverText('Mini Game!!!')
         }}
         onHoverOut={() => {
           targetTimeScale.current = 1

@@ -1,15 +1,25 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function LotteryPage() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const router = useRouter()
 
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [infiniteUnlocked, setInfiniteUnlocked] = useState(false)
+
+  const unlockRef = useRef<() => void>(() => {})
+  const removeBallsRef = useRef<() => void>(() => {})
+
   useEffect(() => {
     const canvas = canvasRef.current!
     const ctx = canvas.getContext('2d')!
+
+    /* ===== Sam 贴图 ===== */
+    const samImg = new Image()
+    samImg.src = '/avatar.jpg'
 
     type State = {
       w: number
@@ -20,6 +30,7 @@ export default function LotteryPage() {
       mouseX: number
       mouseY: number
       hasGlobalDrawn: boolean
+      infiniteChance: boolean
     }
 
     const state: State = {
@@ -31,9 +42,21 @@ export default function LotteryPage() {
       mouseX: 0,
       mouseY: 0,
       hasGlobalDrawn: false,
+      infiniteChance: false,
     }
 
-    function resize(): void {
+    unlockRef.current = () => {
+      state.infiniteChance = true
+      state.hasGlobalDrawn = false
+      state.balls.forEach(b => (b.hasDrawn = false))
+      localStorage.setItem('infinite-lottery', 'true')
+    }
+
+    removeBallsRef.current = () => {
+      state.balls.splice(0, 5)
+    }
+
+    function resize() {
       state.w = window.innerWidth
       state.h = window.innerHeight
       canvas.width = state.w
@@ -42,11 +65,8 @@ export default function LotteryPage() {
     resize()
     window.addEventListener('resize', resize)
 
-    const rand = (a: number, b: number): number =>
-      a + Math.random() * (b - a)
-
-    const randomColor = (): string =>
-      `hsl(${Math.random() * 360}, 70%, 60%)`
+    const rand = (a: number, b: number) => a + Math.random() * (b - a)
+    const randomColor = () => `hsl(${Math.random() * 360},70%,60%)`
 
     class Ball {
       x: number
@@ -63,6 +83,10 @@ export default function LotteryPage() {
       isWinner = false
       isLoser = false
       hasDrawn = false
+
+      /* ⭐ Sam 球标记 */
+      isSam = false
+
       hue = Math.random() * 360
       flash = 0
 
@@ -72,7 +96,8 @@ export default function LotteryPage() {
         r: number,
         color: string,
         vx: number,
-        vy: number
+        vy: number,
+        isSam = false
       ) {
         this.x = x
         this.y = y
@@ -83,23 +108,42 @@ export default function LotteryPage() {
         this.baseColor = color
         this.color = color
         this.mass = r * r
+        this.isSam = isSam
       }
 
-      contains(mx: number, my: number): boolean {
-        const dx = this.x - mx
-        const dy = this.y - my
-        return Math.hypot(dx, dy) <= this.r
+      contains(mx: number, my: number) {
+        return Math.hypot(this.x - mx, this.y - my) <= this.r
       }
 
-      update(): void {
+      update() {
+        this.flash++
+
+        /* ===== Sam 球：只物理，不抽奖 ===== */
+        if (this.isSam) {
+          this.vy += state.gravity * 0.6
+          this.x += this.vx
+          this.y += this.vy
+
+          if (this.y + this.r > state.h) {
+            this.y = state.h - this.r
+            this.vy *= -state.friction
+          }
+          if (this.x + this.r > state.w || this.x - this.r < 0) {
+            this.vx *= -state.friction
+          }
+
+          this.drawSam()
+          return
+        }
+
+        /* ===== 原有逻辑 ===== */
         this.flash++
 
         if (this.isHovered && !this.hasDrawn) {
           this.x = state.mouseX
           this.y = state.mouseY
           this.color = this.flash % 30 < 15 ? '#aaa' : '#777'
-          this.r =
-            this.baseR * (1 + Math.sin(this.flash * 0.3) * 0.15)
+          this.r = this.baseR * (1 + Math.sin(this.flash * 0.3) * 0.15)
           this.draw()
           return
         }
@@ -122,150 +166,181 @@ export default function LotteryPage() {
 
         if (this.y + this.r > state.h) {
           this.y = state.h - this.r
-          this.vy =
-            Math.abs(this.vy) < 1 ? 0 : -this.vy * state.friction
+          this.vy = Math.abs(this.vy) < 1 ? 0 : -this.vy * state.friction
         }
 
-        if (this.x + this.r > state.w) {
-          this.x = state.w - this.r
-          this.vx = -this.vx * state.friction
-        }
-        if (this.x - this.r < 0) {
-          this.x = this.r
+        if (this.x + this.r > state.w || this.x - this.r < 0) {
           this.vx = -this.vx * state.friction
         }
 
         this.draw()
       }
 
-      draw(): void {
+      draw() {
         ctx.beginPath()
         ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2)
         ctx.fillStyle = this.color
         ctx.fill()
       }
-    }
 
-    function resolveCollision(b1: Ball, b2: Ball): void {
-      const dx = b2.x - b1.x
-      const dy = b2.y - b1.y
-      const dist = Math.hypot(dx, dy) || 0.001
-      const min = b1.r + b2.r
-      if (dist >= min) return
-
-      const nx = dx / dist
-      const ny = dy / dist
-      const overlap = min - dist
-      const total = b1.mass + b2.mass
-
-      b1.x -= nx * overlap * (b2.mass / total)
-      b1.y -= ny * overlap * (b2.mass / total)
-      b2.x += nx * overlap * (b1.mass / total)
-      b2.y += ny * overlap * (b1.mass / total)
-
-      const rvx = b2.vx - b1.vx
-      const rvy = b2.vy - b1.vy
-      const vel = rvx * nx + rvy * ny
-      if (vel > 0) return
-
-      const j = -(1.1 * vel) / (1 / b1.mass + 1 / b2.mass)
-      b1.vx -= (j * nx) / b1.mass
-      b1.vy -= (j * ny) / b1.mass
-      b2.vx += (j * nx) / b2.mass
-      b2.vy += (j * ny) / b2.mass
-    }
-
-    function animate(): void {
-      ctx.clearRect(0, 0, state.w, state.h)
-      for (let i = 0; i < state.balls.length; i++) {
-        for (let j = i + 1; j < state.balls.length; j++) {
-          resolveCollision(state.balls[i], state.balls[j])
-        }
+      drawSam() {
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2)
+        ctx.clip()
+        ctx.drawImage(
+          samImg,
+          this.x - this.r,
+          this.y - this.r,
+          this.r * 2,
+          this.r * 2
+        )
+        ctx.restore()
       }
-      state.balls.forEach((b: Ball) => b.update())
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, state.w, state.h)
+      state.balls.forEach(b => b.update())
       requestAnimationFrame(animate)
     }
     animate()
 
-    function addBalls(n: number): void {
+    function addBalls(n: number) {
       for (let i = 0; i < n; i++) {
-        const r = rand(14, 34)
-        state.balls.push(
-          new Ball(
-            rand(r, state.w - r),
-            -rand(50, 150),
-            r,
-            randomColor(),
-            rand(-6, 6),
-            rand(-10, 2)
+        /* ⭐ 1% Sam 球 */
+        const isSam = Math.random() < 0.05
+
+        if (isSam) {
+          state.balls.push(
+            new Ball(
+              rand(100, state.w - 100),
+              -200,
+              90,
+              '#fff',
+              rand(-4, 4),
+              rand(-6, 0),
+              true
+            )
           )
-        )
+        } else {
+          const r = rand(14, 34)
+          state.balls.push(
+            new Ball(
+              rand(r, state.w - r),
+              -rand(50, 150),
+              r,
+              randomColor(),
+              rand(-6, 6),
+              rand(-10, 2)
+            )
+          )
+        }
       }
     }
 
-    function onMouseMove(e: MouseEvent): void {
+    function onMouseMove(e: MouseEvent) {
       const rect = canvas.getBoundingClientRect()
       state.mouseX = e.clientX - rect.left
       state.mouseY = e.clientY - rect.top
-      state.balls.forEach((b: Ball) => {
+
+      state.balls.forEach(b => {
         b.isHovered =
-          !state.hasGlobalDrawn &&
+          !b.isSam &&
+          (!state.hasGlobalDrawn || state.infiniteChance) &&
           !b.hasDrawn &&
           b.contains(state.mouseX, state.mouseY)
       })
     }
 
-    function onCanvasClick(): void {
-      if (state.hasGlobalDrawn) return
+    function onCanvasClick() {
       for (const b of state.balls) {
-        if (b.isHovered && !b.hasDrawn) {
+        /* ⭐ Sam 球点击 */
+        if (b.isSam && b.contains(state.mouseX, state.mouseY)) {
+          window.open('https://www.youtube.com/watch?v=j51rWeuByEM', '_blank')
+          return
+        }
+
+        if (
+          !b.isSam &&
+          b.isHovered &&
+          !b.hasDrawn &&
+          (!state.hasGlobalDrawn || state.infiniteChance)
+        ) {
           b.hasDrawn = true
-          state.hasGlobalDrawn = true
+          if (!state.infiniteChance) state.hasGlobalDrawn = true
+
           if (Math.random() < 0.3) {
-            alert('恭喜你中奖了！')
             b.isWinner = true
-            const k = 30 + Math.random() * 20
-            b.vx += (Math.random() - 0.5) * k
-            b.vy -= 20 + Math.random() * 20
+            setTimeout(() => router.push('/prize'), 600)
           } else {
-            alert('运气太差,球球生气了！')
+            alert(
+              'you lose and now succumb to the glory of omnipotent Sam! 67 67 67'
+            )
             b.isLoser = true
             b.mass *= 3.5
             b.vx *= 0.1
             b.vy = 30
           }
-          break
+          return
         }
       }
     }
 
-    function onButtonClick(): void {
-      addBalls(6)
-    }
-
-    function onKeyDown(e: KeyboardEvent): void {
-      if (e.key === 'x' || e.key === 'X') {
-        state.balls.splice(0, 5)
-      }
-    }
-
-    document
-      .getElementById('lottery-btn')
-      ?.addEventListener('click', onButtonClick)
+    document.getElementById('lottery-btn')?.addEventListener('click', () => addBalls(6))
     canvas.addEventListener('mousemove', onMouseMove)
     canvas.addEventListener('click', onCanvasClick)
-    window.addEventListener('keydown', onKeyDown)
 
     return () => {
       window.removeEventListener('resize', resize)
       canvas.removeEventListener('mousemove', onMouseMove)
       canvas.removeEventListener('click', onCanvasClick)
-      window.removeEventListener('keydown', onKeyDown)
     }
-  }, [])
+  }, [router])
 
   return (
     <div style={{ margin: 0, overflow: 'hidden' }}>
+      {/* ===== Menu ===== */}
+      <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 200 }}>
+        <button onClick={() => setMenuOpen(!menuOpen)}>☰ Menu</button>
+
+        {menuOpen && (
+          <div
+            style={{
+              background: '#111',
+              color: '#fff',
+              padding: 12,
+              borderRadius: 6,
+              minWidth: 180,
+            }}
+          >
+            <div
+              onClick={() => {
+                if (!infiniteUnlocked) {
+                  unlockRef.current()
+                  setInfiniteUnlocked(true)
+                }
+              }}
+              style={{
+                cursor: infiniteUnlocked ? 'default' : 'pointer',
+                opacity: infiniteUnlocked ? 0.6 : 1,
+                marginBottom: 10,
+              }}
+            >
+              ☉ Infinite Lottery
+            </div>
+
+            <div
+              onClick={() => removeBallsRef.current()}
+              style={{ cursor: 'pointer' }}
+            >
+              −5 Balls
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ===== Click Me + Sam ===== */}
       <div
         style={{
           position: 'absolute',
@@ -279,22 +354,22 @@ export default function LotteryPage() {
         <button
           id="lottery-btn"
           style={{
-            padding: '10px 20px',
-            fontSize: 16,
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: 18,
+            color: '#000',
             background: '#47e1d4',
-            borderRadius: 5,
-            border: '2px solid aqua',
-            boxShadow: '5px 5px 10px skyblue',
+            border: '3px solid #000',
+            padding: '12px 20px',
             cursor: 'pointer',
           }}
         >
-          Click Me (+6)
+          CLICK ME +6
         </button>
 
         <div
           onClick={() => router.push('/sam')}
           style={{
-            marginTop: 6,
+            marginTop: 8,
             fontSize: 14,
             cursor: 'pointer',
             textDecoration: 'underline',
@@ -304,10 +379,7 @@ export default function LotteryPage() {
         </div>
       </div>
 
-      <canvas
-        ref={canvasRef}
-        style={{ display: 'block', background: '#fff' }}
-      />
+      <canvas ref={canvasRef} style={{ display: 'block', background: '#fff' }} />
     </div>
   )
 }
