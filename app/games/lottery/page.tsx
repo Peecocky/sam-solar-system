@@ -11,18 +11,29 @@ export default function LotteryPage() {
     const canvas = canvasRef.current!
     const ctx = canvas.getContext('2d')!
 
-    const state = {
+    type State = {
+      w: number
+      h: number
+      gravity: number
+      friction: number
+      balls: Ball[]
+      mouseX: number
+      mouseY: number
+      hasGlobalDrawn: boolean
+    }
+
+    const state: State = {
       w: window.innerWidth,
       h: window.innerHeight,
-      gravity: 0.35,        // ⬆ 更爽
-      friction: 0.985,      // ⬆ 弹得久
-      balls: [] as Ball[],
+      gravity: 0.35,
+      friction: 0.985,
+      balls: [],
       mouseX: 0,
       mouseY: 0,
       hasGlobalDrawn: false,
     }
 
-    function resize() {
+    function resize(): void {
       state.w = window.innerWidth
       state.h = window.innerHeight
       canvas.width = state.w
@@ -31,8 +42,10 @@ export default function LotteryPage() {
     resize()
     window.addEventListener('resize', resize)
 
-    const rand = (a: number, b: number) => a + Math.random() * (b - a)
-    const randomColor = () =>
+    const rand = (a: number, b: number): number =>
+      a + Math.random() * (b - a)
+
+    const randomColor = (): string =>
       `hsl(${Math.random() * 360}, 70%, 60%)`
 
     class Ball {
@@ -45,6 +58,7 @@ export default function LotteryPage() {
       mass: number
       color: string
       baseColor: string
+
       isHovered = false
       isWinner = false
       isLoser = false
@@ -52,25 +66,32 @@ export default function LotteryPage() {
       hue = Math.random() * 360
       flash = 0
 
-      constructor(x, y, r, color, vx, vy) {
+      constructor(
+        x: number,
+        y: number,
+        r: number,
+        color: string,
+        vx: number,
+        vy: number
+      ) {
         this.x = x
         this.y = y
         this.r = r
         this.baseR = r
         this.vx = vx
         this.vy = vy
-        this.mass = r * r
-        this.color = color
         this.baseColor = color
+        this.color = color
+        this.mass = r * r
       }
 
-      contains(mx, my) {
+      contains(mx: number, my: number): boolean {
         const dx = this.x - mx
         const dy = this.y - my
         return Math.hypot(dx, dy) <= this.r
       }
 
-      update() {
+      update(): void {
         this.flash++
 
         if (this.isHovered && !this.hasDrawn) {
@@ -101,7 +122,8 @@ export default function LotteryPage() {
 
         if (this.y + this.r > state.h) {
           this.y = state.h - this.r
-          this.vy = Math.abs(this.vy) < 1 ? 0 : -this.vy * state.friction
+          this.vy =
+            Math.abs(this.vy) < 1 ? 0 : -this.vy * state.friction
         }
 
         if (this.x + this.r > state.w) {
@@ -116,7 +138,7 @@ export default function LotteryPage() {
         this.draw()
       }
 
-      draw() {
+      draw(): void {
         ctx.beginPath()
         ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2)
         ctx.fillStyle = this.color
@@ -124,7 +146,7 @@ export default function LotteryPage() {
       }
     }
 
-    function resolveCollision(b1: Ball, b2: Ball) {
+    function resolveCollision(b1: Ball, b2: Ball): void {
       const dx = b2.x - b1.x
       const dy = b2.y - b1.y
       const dist = Math.hypot(dx, dy) || 0.001
@@ -153,19 +175,19 @@ export default function LotteryPage() {
       b2.vy += (j * ny) / b2.mass
     }
 
-    function animate() {
+    function animate(): void {
       ctx.clearRect(0, 0, state.w, state.h)
       for (let i = 0; i < state.balls.length; i++) {
         for (let j = i + 1; j < state.balls.length; j++) {
           resolveCollision(state.balls[i], state.balls[j])
         }
       }
-      state.balls.forEach(b => b.update())
+      state.balls.forEach((b: Ball) => b.update())
       requestAnimationFrame(animate)
     }
     animate()
 
-    function addBalls(n: number) {
+    function addBalls(n: number): void {
       for (let i = 0; i < n; i++) {
         const r = rand(14, 34)
         state.balls.push(
@@ -181,20 +203,19 @@ export default function LotteryPage() {
       }
     }
 
-    function onMouseMove(e: MouseEvent) {
+    function onMouseMove(e: MouseEvent): void {
       const rect = canvas.getBoundingClientRect()
       state.mouseX = e.clientX - rect.left
       state.mouseY = e.clientY - rect.top
-      state.balls.forEach(
-        b =>
-          (b.isHovered =
-            !state.hasGlobalDrawn &&
-            !b.hasDrawn &&
-            b.contains(state.mouseX, state.mouseY))
-      )
+      state.balls.forEach((b: Ball) => {
+        b.isHovered =
+          !state.hasGlobalDrawn &&
+          !b.hasDrawn &&
+          b.contains(state.mouseX, state.mouseY)
+      })
     }
 
-    function onCanvasClick() {
+    function onCanvasClick(): void {
       if (state.hasGlobalDrawn) return
       for (const b of state.balls) {
         if (b.isHovered && !b.hasDrawn) {
@@ -218,11 +239,11 @@ export default function LotteryPage() {
       }
     }
 
-    function onButtonClick() {
+    function onButtonClick(): void {
       addBalls(6)
     }
 
-    function onKeyDown(e: KeyboardEvent) {
+    function onKeyDown(e: KeyboardEvent): void {
       if (e.key === 'x' || e.key === 'X') {
         state.balls.splice(0, 5)
       }
