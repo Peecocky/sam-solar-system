@@ -84,7 +84,6 @@ export default function LotteryPage() {
       isLoser = false
       hasDrawn = false
 
-      /* ⭐ Sam 球标记 */
       isSam = false
 
       hue = Math.random() * 360
@@ -118,7 +117,6 @@ export default function LotteryPage() {
       update() {
         this.flash++
 
-        /* ===== Sam 球：只物理，不抽奖 ===== */
         if (this.isSam) {
           this.vy += state.gravity * 0.6
           this.x += this.vx
@@ -136,7 +134,6 @@ export default function LotteryPage() {
           return
         }
 
-        /* ===== 原有逻辑 ===== */
         this.flash++
 
         if (this.isHovered && !this.hasDrawn) {
@@ -208,7 +205,6 @@ export default function LotteryPage() {
 
     function addBalls(n: number) {
       for (let i = 0; i < n; i++) {
-        /* ⭐ 1% Sam 球 */
         const isSam = Math.random() < 0.05
 
         if (isSam) {
@@ -255,7 +251,6 @@ export default function LotteryPage() {
 
     function onCanvasClick() {
       for (const b of state.balls) {
-        /* ⭐ Sam 球点击 */
         if (b.isSam && b.contains(state.mouseX, state.mouseY)) {
           window.open('https://www.youtube.com/watch?v=j51rWeuByEM', '_blank')
           return
@@ -300,6 +295,26 @@ export default function LotteryPage() {
 
   return (
     <div style={{ margin: 0, overflow: 'hidden' }}>
+      {/* ===== Back ===== */}
+      <button
+        onClick={() => router.push('/')}
+        style={{
+          position: 'absolute',
+          top: 12,
+          left: 12,
+          zIndex: 200,
+          background: 'rgba(0,0,0,0.5)',
+          color: '#fff',
+          border: '1px solid rgba(255,255,255,0.3)',
+          padding: '6px 14px',
+          borderRadius: 4,
+          cursor: 'pointer',
+          fontSize: 13,
+        }}
+      >
+        ← Back
+      </button>
+
       {/* ===== Menu ===== */}
       <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 200 }}>
         <button onClick={() => setMenuOpen(!menuOpen)}>☰ Menu</button>

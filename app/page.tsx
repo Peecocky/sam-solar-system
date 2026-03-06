@@ -1,69 +1,236 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Stars, OrbitControls } from '@react-three/drei'
 import SolarSystem from '@/components/SolarSystem'
 
+/* ===== Notifications ===== */
+const NOTIFICATIONS = [
+  { id: 'v1-notice', text: 'New: Notification system added.' },
+  { id: 'v1-kitchen', text: "Sam's Kitchen is still under construction." },
+  { id: 'v1-art', text: 'Art Gallery is still under construction.' },
+]
+
 export default function Home() {
   const [hoverText, setHoverText] = useState<string | null>(null)
+  const [showNotice, setShowNotice] = useState(false)
+
+  useEffect(() => {
+    const seen = localStorage.getItem('sam-notices-seen')
+    if (!seen) {
+      setShowNotice(true)
+    }
+  }, [])
+
+  function dismissNotice() {
+    localStorage.setItem('sam-notices-seen', 'true')
+    setShowNotice(false)
+  }
 
   return (
     <div
       style={{
         width: '100vw',
         height: '100vh',
-        background: 'black',
+        background: '#010108',
         position: 'relative',
         overflow: 'hidden',
       }}
     >
-      {/* 🧭 HUD */}
+      {/* ===== HUD ===== */}
       <div
         style={{
           position: 'fixed',
-          top: 28,
+          top: 32,
           left: '50%',
           transform: 'translateX(-50%)',
-          fontSize: 36,
-          fontWeight: 600,
-          letterSpacing: 3,
-          color: 'white',
+          fontSize: 28,
+          fontWeight: 300,
+          letterSpacing: 8,
+          fontFamily: "'Courier New', monospace",
+          color: 'rgba(255,255,255,0.9)',
           pointerEvents: 'none',
           opacity: hoverText ? 1 : 0,
-          transition: 'opacity 0.25s ease',
-          textShadow: '0 6px 24px rgba(0,0,0,0.65)',
+          transition: 'opacity 0.35s ease',
+          textShadow:
+            '0 0 20px rgba(100,150,255,0.4), 0 0 60px rgba(80,120,255,0.15)',
           zIndex: 999,
+          textTransform: 'uppercase',
         }}
       >
         {hoverText}
       </div>
 
-      <Canvas camera={{ position: [0, 10, 30], fov: 50 }}>
-        <ambientLight intensity={0.4} />
-        <pointLight position={[0, 0, 0]} intensity={2} />
+      {/* ===== Vignette ===== */}
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          pointerEvents: 'none',
+          background:
+            'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,10,0.6) 100%)',
+          zIndex: 10,
+        }}
+      />
 
-        {/* 🌌 宇宙背景 */}
+      <Canvas camera={{ position: [0, 12, 35], fov: 45 }}>
+        <ambientLight intensity={0.25} />
+        <pointLight position={[0, 0, 0]} intensity={2.5} color="#ffddaa" />
+        <pointLight position={[0, 20, 0]} intensity={0.3} color="#4466ff" />
+
         <Stars
-          radius={300}
-          depth={60}
-          count={20000}
-          factor={7}
-          saturation={0}
+          radius={400}
+          depth={80}
+          count={15000}
+          factor={5}
+          saturation={0.2}
           fade
-          speed={1}
+          speed={0.5}
         />
 
-        {/* 🎥 相机控制 */}
         <OrbitControls
-          enablePan={false}
+          enablePan
           enableZoom
-          minDistance={15}
-          maxDistance={60}
+          enableRotate
+          enableDamping
+          dampingFactor={0.05}
+          minDistance={10}
+          maxDistance={80}
+          maxPolarAngle={Math.PI * 0.85}
+          panSpeed={0.5}
+          rotateSpeed={0.6}
         />
 
         <SolarSystem setHoverText={setHoverText} />
       </Canvas>
+
+      {/* ===== Notification Overlay ===== */}
+      {showNotice && (
+        <>
+          <style jsx global>{`
+            @keyframes noticeFadeIn {
+              from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+              to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            }
+            @keyframes blink {
+              0%, 100% { opacity: 1; }
+              50% { opacity: 0.3; }
+            }
+            @keyframes borderPulse {
+              0%, 100% { border-color: rgba(255,255,255,0.12); }
+              50% { border-color: rgba(255,255,255,0.3); }
+            }
+          `}</style>
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 2000,
+              background: 'rgba(0,0,0,0.65)',
+              backdropFilter: 'blur(6px)',
+            }}
+            onClick={dismissNotice}
+          />
+          <div
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 2001,
+              background: 'rgba(8,8,16,0.95)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: 2,
+              padding: '36px 44px',
+              maxWidth: 420,
+              width: '90vw',
+              animation: 'noticeFadeIn 0.3s ease, borderPulse 3s ease-in-out infinite',
+            }}
+          >
+            {/* Header */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                marginBottom: 24,
+              }}
+            >
+              <div
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  background: '#fff',
+                  animation: 'blink 1.5s ease-in-out infinite',
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: 'monospace',
+                  fontSize: 11,
+                  letterSpacing: 4,
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.5)',
+                }}
+              >
+                Notice
+              </span>
+            </div>
+
+            {/* Messages */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {NOTIFICATIONS.map((n, i) => (
+                <div
+                  key={n.id}
+                  style={{
+                    fontFamily: 'monospace',
+                    fontSize: 13,
+                    color: 'rgba(255,255,255,0.7)',
+                    lineHeight: 1.7,
+                    paddingLeft: 16,
+                    borderLeft: '1px solid rgba(255,255,255,0.08)',
+                    animationDelay: `${i * 0.15}s`,
+                  }}
+                >
+                  {n.text}
+                </div>
+              ))}
+            </div>
+
+            {/* Dismiss */}
+            <button
+              onClick={dismissNotice}
+              style={{
+                display: 'block',
+                margin: '28px auto 0',
+                background: 'none',
+                border: '1px solid rgba(255,255,255,0.12)',
+                color: 'rgba(255,255,255,0.4)',
+                padding: '8px 28px',
+                fontFamily: 'monospace',
+                fontSize: 11,
+                letterSpacing: 3,
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                borderRadius: 2,
+                transition: 'all 0.3s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)'
+                e.currentTarget.style.color = 'rgba(255,255,255,0.7)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
+                e.currentTarget.style.color = 'rgba(255,255,255,0.4)'
+              }}
+            >
+              Enter
+            </button>
+          </div>
+        </>
+      )}
     </div>
   )
 }
