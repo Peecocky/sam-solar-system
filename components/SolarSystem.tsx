@@ -124,6 +124,24 @@ export default function SolarSystem({
         }}
         onClick={() => router.push('/games/lottery')}
       />
+    {/* ===== 行星 4：留言墙 ===== */}
+    <Planet
+      textureUrl="/planet4.jpg"   // 或复用 planet1.jpg 也行
+      size={1.2}
+      a={20}
+      b={10}
+      speed={0.09}
+      timeScale={timeScale}
+      onHoverIn={() => {
+        targetTimeScale.current = 0.15
+        setHoverText('Message Wall')
+      }}
+      onHoverOut={() => {
+        targetTimeScale.current = 1
+        setHoverText(null)
+      }}
+      onClick={() => router.push('/interactive')}
+    />
     </>
   )
 }
