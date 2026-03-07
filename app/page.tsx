@@ -130,7 +130,10 @@ export default function Home() {
               background: 'rgba(0,0,0,0.65)',
               backdropFilter: 'blur(6px)',
             }}
-            onClick={dismissNotice}
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('sam-music-choice', { detail: 'off' }))
+              dismissNotice()
+            }}
           />
           <div
             style={{
@@ -199,35 +202,82 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Dismiss */}
-            <button
-              onClick={dismissNotice}
-              style={{
-                display: 'block',
-                margin: '28px auto 0',
-                background: 'none',
-                border: '1px solid rgba(255,255,255,0.12)',
-                color: 'rgba(255,255,255,0.4)',
-                padding: '8px 28px',
+            {/* Music choice + Enter */}
+            <div style={{
+              marginTop: 28,
+              borderTop: '1px solid rgba(255,255,255,0.04)',
+              paddingTop: 20,
+            }}>
+              <div style={{
                 fontFamily: 'monospace',
-                fontSize: 11,
+                fontSize: 10,
                 letterSpacing: 3,
+                color: 'rgba(255,255,255,0.15)',
+                textAlign: 'center',
+                marginBottom: 14,
                 textTransform: 'uppercase',
-                cursor: 'pointer',
-                borderRadius: 2,
-                transition: 'all 0.3s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)'
-                e.currentTarget.style.color = 'rgba(255,255,255,0.7)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
-                e.currentTarget.style.color = 'rgba(255,255,255,0.4)'
-              }}
-            >
-              Enter
-            </button>
+              }}>
+                background music?
+              </div>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                <button
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('sam-music-choice', { detail: 'on' }))
+                    dismissNotice()
+                  }}
+                  style={{
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    color: 'rgba(255,255,255,0.5)',
+                    padding: '8px 24px',
+                    fontFamily: 'monospace',
+                    fontSize: 11,
+                    letterSpacing: 2,
+                    cursor: 'pointer',
+                    borderRadius: 2,
+                    transition: 'all 0.3s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)'
+                    e.currentTarget.style.color = 'rgba(255,255,255,0.7)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
+                    e.currentTarget.style.color = 'rgba(255,255,255,0.5)'
+                  }}
+                >
+                  ♪ Enter
+                </button>
+                <button
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('sam-music-choice', { detail: 'off' }))
+                    dismissNotice()
+                  }}
+                  style={{
+                    background: 'none',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    color: 'rgba(255,255,255,0.2)',
+                    padding: '8px 24px',
+                    fontFamily: 'monospace',
+                    fontSize: 11,
+                    letterSpacing: 2,
+                    cursor: 'pointer',
+                    borderRadius: 2,
+                    transition: 'all 0.3s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'
+                    e.currentTarget.style.color = 'rgba(255,255,255,0.4)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
+                    e.currentTarget.style.color = 'rgba(255,255,255,0.2)'
+                  }}
+                >
+                  Silent
+                </button>
+              </div>
+            </div>
           </div>
         </>
       )}
