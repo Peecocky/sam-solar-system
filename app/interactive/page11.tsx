@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 
 // ─────────────────────────────────────────────────────────────
 // CONFIG
@@ -11,12 +10,13 @@ const COLS      = 12
 const CELL      = 46
 const VISIBLE_R = 14
 const TOTAL_R   = 60
-const BW        = COLS * CELL
-const VH        = VISIBLE_R * CELL
+const BW        = COLS * CELL        // 552px board width
+const VH        = VISIBLE_R * CELL   // 644px visible height
 const DROP_TICK = 46
 const ADMIN_PW  = 'sam2024'
-const GOL_SZ    = 9
-const GOL_MS    = 140
+const LS_KEY    = 'sam-wall-v3'
+const GOL_SZ    = 9                  // game-of-life cell pixel size
+const GOL_MS    = 140                // ms between GoL steps
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -32,38 +32,6 @@ interface Msg {
   ua: string
   delReq: boolean
   del: boolean
-}
-
-// DB row → Msg
-function rowToMsg(row: any): Msg {
-  return {
-    id: row.id,
-    nick: row.nick,
-    body: row.body,
-    ts: row.ts,
-    shape: row.shape,
-    col: row.col,
-    cells: typeof row.cells === 'string' ? JSON.parse(row.cells) : row.cells,
-    ua: row.ua ?? '',
-    delReq: row.del_req ?? false,
-    del: row.del ?? false,
-  }
-}
-
-// Msg → DB row
-function msgToRow(m: Msg) {
-  return {
-    id: m.id,
-    nick: m.nick,
-    body: m.body,
-    ts: m.ts,
-    shape: m.shape,
-    col: m.col,
-    cells: JSON.stringify(m.cells),
-    ua: m.ua,
-    del_req: m.delReq,
-    del: m.del,
-  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -122,6 +90,7 @@ function landRow(grid: (string | null)[][], cells: [number, number][], ox: numbe
   return best
 }
 
+/** Column-wise gravity: compact blocks downward after a deletion */
 function applyGravity(msgs: Msg[]): Msg[] {
   const g = buildGrid(msgs)
   const ng: (string | null)[][] = Array.from({ length: TOTAL_R }, () => Array(COLS).fill(null))
@@ -137,40 +106,22 @@ function applyGravity(msgs: Msg[]): Msg[] {
       const id = ng[r][c]
       if (id) (nb[id] ??= []).push([r, c])
     }
+  // Only return surviving (non-deleted) messages with updated cell positions
   return msgs
     .filter(m => !m.del)
     .map(m => ({ ...m, cells: nb[m.id] ?? m.cells }))
 }
 
 // ─────────────────────────────────────────────────────────────
-// SUPABASE PERSISTENCE
+// PERSISTENCE
 // ─────────────────────────────────────────────────────────────
-async function loadMsgsFromDB(): Promise<Msg[]> {
-  const { data, error } = await supabase
-    .from('messages')
-    .select('*')
-    .order('ts', { ascending: true })
-  if (error || !data) return []
-  return data.map(rowToMsg)
+function loadMsgs(): Msg[] {
+  if (typeof window === 'undefined') return []
+  try { return JSON.parse(localStorage.getItem(LS_KEY) ?? '[]') } catch { return [] }
 }
-
-async function insertMsgToDB(msg: Msg) {
-  await supabase.from('messages').insert([msgToRow(msg)])
-}
-
-async function updateMsgInDB(msg: Msg) {
-  await supabase.from('messages').update(msgToRow(msg)).eq('id', msg.id)
-}
-
-async function deleteMsgFromDB(id: string) {
-  await supabase.from('messages').delete().eq('id', id)
-}
-
-async function bulkUpdateCells(msgs: Msg[]) {
-  // Update cells for all surviving messages after gravity
-  for (const m of msgs) {
-    await supabase.from('messages').update({ cells: JSON.stringify(m.cells) }).eq('id', m.id)
-  }
+function saveMsgs(msgs: Msg[]) {
+  if (typeof window === 'undefined') return
+  try { localStorage.setItem(LS_KEY, JSON.stringify(msgs)) } catch { /* noop */ }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -195,7 +146,7 @@ function golStep(g: boolean[][]): boolean[][] {
         }
       if (alive) return n === 2 || n === 3
       if (n === 3) return true
-      return Math.random() < 0.0005
+      return Math.random() < 0.0005  // rare spontaneous spark
     })
   )
 }
@@ -234,11 +185,13 @@ function GolCanvas({ side }: { side: 'left' | 'right' }) {
       for (let r = 0; r < grows; r++) {
         for (let c = 0; c < gcols; c++) {
           if (!grid[r]?.[c]) continue
+          // drift brightness → twinkling effect
           bright[r][c] += (Math.random() - 0.48) * 0.32
           bright[r][c] = Math.max(0.07, Math.min(1, bright[r][c]))
           const a = bright[r][c]
           ctx!.fillStyle = `rgba(0, 210, 245, ${a * 0.62})`
           ctx!.fillRect(c * GOL_SZ + 1, r * GOL_SZ + 1, GOL_SZ - 2, GOL_SZ - 2)
+          // bright flash on high-brightness cells
           if (a > 0.76) {
             ctx!.fillStyle = `rgba(160, 240, 255, ${(a - 0.76) * 2.8})`
             ctx!.fillRect(c * GOL_SZ + 2, r * GOL_SZ + 2, GOL_SZ - 4, GOL_SZ - 4)
@@ -262,7 +215,7 @@ function GolCanvas({ side }: { side: 'left' | 'right' }) {
       if (timer) clearInterval(timer)
       window.removeEventListener('resize', onResize)
     }
-  }, [])
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <canvas
@@ -333,37 +286,8 @@ export default function InteractivePage() {
   const dropTimer = useRef<ReturnType<typeof setInterval> | null>(null)
   const boardRef  = useRef<HTMLDivElement>(null)
 
-  // ── mount: load from Supabase ──────────────────────────────
-  useEffect(() => {
-    loadMsgsFromDB().then(data => {
-      setMsgs(data)
-      setReady(true)
-    })
-
-    // Real-time: listen for new inserts
-    const channel = supabase
-      .channel('wall-realtime')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
-        const newMsg = rowToMsg(payload.new)
-        setMsgs(prev => {
-          if (prev.some(m => m.id === newMsg.id)) return prev
-          return [...prev, newMsg]
-        })
-      })
-      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages' }, (payload) => {
-        const delId = (payload.old as any).id
-        if (delId) {
-          setMsgs(prev => prev.filter(m => m.id !== delId))
-        }
-      })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' }, (payload) => {
-        const updated = rowToMsg(payload.new)
-        setMsgs(prev => prev.map(m => m.id === updated.id ? updated : m))
-      })
-      .subscribe()
-
-    return () => { supabase.removeChannel(channel) }
-  }, [])
+  // ── mount ──────────────────────────────────────────────────
+  useEffect(() => { setMsgs(loadMsgs()); setReady(true) }, [])
 
   // ── derived ────────────────────────────────────────────────
   const grid     = useMemo(() => buildGrid(msgs), [msgs])
@@ -405,7 +329,9 @@ export default function InteractivePage() {
   const moveLeft  = useCallback(() => bounds && setOx(x => Math.max(bounds.lo, x - 1)), [bounds])
   const moveRight = useCallback(() => bounds && setOx(x => Math.min(bounds.hi, x + 1)), [bounds])
 
-  // ── drop ───────────────────────────────────────────────────
+  // ── drop  ──────────────────────────────────────────────────
+  // FIX: Use a plain closure variable (cur) instead of calling
+  // setState inside another setState updater, which caused freezes.
   const handleDrop = useCallback(() => {
     if (ghostR == null || ghostR < 0 || !piece || !pieceKey) return
 
@@ -446,10 +372,11 @@ export default function InteractivePage() {
           del:    false,
         }
 
-        // Save to Supabase (also triggers realtime for other users)
-        insertMsgToDB(newMsg)
-
-        setMsgs(prev => [...prev, newMsg])
+        setMsgs(prev => {
+          const updated = [...prev, newMsg]
+          saveMsgs(updated)
+          return updated
+        })
 
         setTimeout(() => {
           setPhase('idle')
@@ -481,25 +408,22 @@ export default function InteractivePage() {
   const requestDelete = (id: string) => {
     setMsgs(prev => {
       const u = prev.map(m => m.id === id ? { ...m, delReq: true } : m)
-      // Update in DB
-      const target = u.find(m => m.id === id)
-      if (target) updateMsgInDB(target)
+      saveMsgs(u)
       return u
     })
   }
 
   // ── admin delete + gravity ─────────────────────────────────
+  // FIX: Close the detail panel first (setSelId(null)), then defer
+  // the heavy gravity computation via setTimeout(0) so React can
+  // finish the current render cycle before updating msgs.
   const adminDelete = (id: string) => {
     setSelId(null)
-    setTimeout(async () => {
-      // Delete from DB
-      await deleteMsgFromDB(id)
-
+    setTimeout(() => {
       setMsgs(prev => {
         const marked  = prev.map(m => m.id === id ? { ...m, del: true } : m)
         const settled = applyGravity(marked)
-        // Update cell positions in DB for surviving messages
-        bulkUpdateCells(settled)
+        saveMsgs(settled)
         return settled
       })
     }, 0)
@@ -545,9 +469,11 @@ export default function InteractivePage() {
         @keyframes tw-drop  { 0%,100% { opacity: 0.65; } 50% { opacity: 1; } }
       `}</style>
 
+      {/* ── GoL side panels ── */}
       <GolCanvas side="left"  />
       <GolCanvas side="right" />
 
+      {/* ── back button ── */}
       <button
         onClick={() => router.push('/')}
         style={{ position: 'fixed', top: 14, left: 14, zIndex: 500, background: 'rgba(2,4,7,0.85)', border: '1px solid #0a1e2a', borderRadius: 3, color: '#0a2535', fontFamily: "'Share Tech Mono', monospace", fontSize: 11, padding: '5px 10px', cursor: 'pointer', letterSpacing: 2 }}
@@ -555,8 +481,10 @@ export default function InteractivePage() {
         ← BACK
       </button>
 
+      {/* ── page body (above GoL) ── */}
       <div style={{ position: 'relative', zIndex: 1, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: 240, fontFamily: "'VT323', monospace" }}>
 
+        {/* ── HEADER ── */}
         <div style={{ textAlign: 'center', padding: '30px 0 20px', userSelect: 'none' }}>
           <div style={{ fontSize: 54, letterSpacing: 10, color: '#00e5ff', animation: 'tw-title 3.5s ease-in-out infinite' }}>
             SAM&apos;S WALL
@@ -571,6 +499,7 @@ export default function InteractivePage() {
           </div>
         </div>
 
+        {/* ── INPUT FORM  (idle) ── */}
         {phase === 'idle' && (
           <div style={{ width: BW, background: '#050b14', border: '1px solid #0d2035', borderRadius: 5, padding: 16, marginBottom: 12, boxShadow: '0 12px 50px rgba(0,0,0,0.7)' }}>
             <input
@@ -619,10 +548,14 @@ export default function InteractivePage() {
           </div>
         )}
 
+        {/* ── PLACEMENT CONTROLS ── */}
         {phase === 'placing' && piece && (
           <div style={{ width: BW, marginBottom: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#050b14', border: `2px solid ${piece.color}66`, borderRadius: 5, padding: '10px 18px', marginBottom: 9, boxShadow: `0 0 40px ${piece.color}1c, inset 0 0 20px ${piece.color}08` }}>
-              <button onClick={moveLeft} style={{ background: 'transparent', border: `1px solid ${piece.color}44`, borderRadius: 3, color: piece.color, fontFamily: "'VT323'", fontSize: 38, padding: '0 20px', cursor: 'pointer', textShadow: `0 0 14px ${piece.color}`, lineHeight: 1.1 }}>◀</button>
+              <button
+                onClick={moveLeft}
+                style={{ background: 'transparent', border: `1px solid ${piece.color}44`, borderRadius: 3, color: piece.color, fontFamily: "'VT323'", fontSize: 38, padding: '0 20px', cursor: 'pointer', textShadow: `0 0 14px ${piece.color}`, lineHeight: 1.1 }}
+              >◀</button>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ color: piece.color, fontSize: 28, letterSpacing: 4, textShadow: `0 0 20px ${piece.color}` }}>
                   {pieceKey} · choose a position
@@ -631,16 +564,23 @@ export default function InteractivePage() {
                   ← → move &nbsp;·&nbsp; SPACE fall
                 </div>
               </div>
-              <button onClick={moveRight} style={{ background: 'transparent', border: `1px solid ${piece.color}44`, borderRadius: 3, color: piece.color, fontFamily: "'VT323'", fontSize: 38, padding: '0 20px', cursor: 'pointer', textShadow: `0 0 14px ${piece.color}`, lineHeight: 1.1 }}>▶</button>
+              <button
+                onClick={moveRight}
+                style={{ background: 'transparent', border: `1px solid ${piece.color}44`, borderRadius: 3, color: piece.color, fontFamily: "'VT323'", fontSize: 38, padding: '0 20px', cursor: 'pointer', textShadow: `0 0 14px ${piece.color}`, lineHeight: 1.1 }}
+              >▶</button>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button onClick={handleDrop} style={{ background: `${piece.color}10`, border: `2px solid ${piece.color}`, borderRadius: 4, color: piece.color, fontFamily: "'VT323'", fontSize: 28, padding: '8px 64px', cursor: 'pointer', boxShadow: `0 0 38px ${piece.color}55, 0 4px 20px rgba(0,0,0,0.5)`, textShadow: `0 0 18px ${piece.color}`, letterSpacing: 4 }}>
+              <button
+                onClick={handleDrop}
+                style={{ background: `${piece.color}10`, border: `2px solid ${piece.color}`, borderRadius: 4, color: piece.color, fontFamily: "'VT323'", fontSize: 28, padding: '8px 64px', cursor: 'pointer', boxShadow: `0 0 38px ${piece.color}55, 0 4px 20px rgba(0,0,0,0.5)`, textShadow: `0 0 18px ${piece.color}`, letterSpacing: 4 }}
+              >
                 ▼ fall
               </button>
             </div>
           </div>
         )}
 
+        {/* ── DROPPING INDICATOR ── */}
         {phase === 'dropping' && piece && (
           <div style={{ width: BW, textAlign: 'center', marginBottom: 10 }}>
             <div style={{ color: piece.color, fontSize: 24, letterSpacing: 5, animation: 'tw-drop 0.45s ease infinite', textShadow: `0 0 22px ${piece.color}` }}>
@@ -649,15 +589,21 @@ export default function InteractivePage() {
           </div>
         )}
 
+        {/* ══════════════════════════════════════════
+            BOARD
+        ══════════════════════════════════════════ */}
         <div
           ref={boardRef}
           className="tw-sc"
           style={{ width: BW + 2, height: VH, overflowY: 'scroll', overflowX: 'hidden', border: '1px solid #0d1f2e', borderRadius: 3, boxShadow: 'inset 0 0 100px rgba(0,0,0,0.8), 0 0 70px rgba(0,100,160,0.14)', position: 'relative' }}
         >
+          {/* scanlines overlay */}
           <div style={{ position: 'absolute', inset: 0, zIndex: 10, pointerEvents: 'none', background: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.05) 3px, rgba(0,0,0,0.05) 6px)' }} />
 
+          {/* inner canvas */}
           <div style={{ width: BW, height: TOTAL_R * CELL, position: 'relative', background: '#030810', backgroundImage: `linear-gradient(rgba(0,229,255,0.034) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.034) 1px, transparent 1px)`, backgroundSize: `${CELL}px ${CELL}px` }}>
 
+            {/* empty state */}
             {msgs.length === 0 && phase === 'idle' && (
               <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', textAlign: 'center', color: '#0a1e2a', fontFamily: "'Share Tech Mono'", fontSize: 11, letterSpacing: 2, lineHeight: 2.4, pointerEvents: 'none' }}>
                 <div style={{ fontSize: 48, marginBottom: 14, color: '#0d2535' }}>⠿</div>
@@ -665,6 +611,7 @@ export default function InteractivePage() {
               </div>
             )}
 
+            {/* ── settled blocks ── */}
             {Array.from({ length: TOTAL_R }, (_, r) =>
               Array.from({ length: COLS }, (_, c) => {
                 const id = grid[r][c]
@@ -681,13 +628,17 @@ export default function InteractivePage() {
                     onClick={() => setSelId(p => p === id ? null : id)}
                     style={{
                       position: 'absolute',
-                      top: r * CELL + 2, left: c * CELL + 2,
-                      width: CELL - 4, height: CELL - 4,
-                      borderRadius: 3, cursor: 'pointer', zIndex: 2,
-                      opacity: msg.delReq ? 0.28 : 1,
+                      top:    r * CELL + 2,
+                      left:   c * CELL + 2,
+                      width:  CELL - 4,
+                      height: CELL - 4,
+                      borderRadius: 3,
+                      cursor: 'pointer',
+                      zIndex: 2,
+                      opacity:    msg.delReq ? 0.28 : 1,
                       background: hi ? `${cl}ee` : `${cl}a0`,
-                      border: `2px solid ${cl}${hi ? '' : 'cc'}`,
-                      boxShadow: hi
+                      border:     `2px solid ${cl}${hi ? '' : 'cc'}`,
+                      boxShadow:  hi
                         ? `0 0 26px ${cl}, 0 0 52px ${cl}66, inset 0 0 20px ${cl}77`
                         : `0 0 10px ${cl}55, inset 0 0 8px ${cl}28`,
                       transition: 'background 0.1s, box-shadow 0.1s',
@@ -702,6 +653,7 @@ export default function InteractivePage() {
               })
             )}
 
+            {/* ── ghost cells ── */}
             {ghostCells?.map(([r, c], i) => {
               if (grid[r]?.[c]) return null
               return (
@@ -709,25 +661,33 @@ export default function InteractivePage() {
               )
             })}
 
+            {/* ── falling piece ── */}
             {fallCells?.map(([r, c], i) => (
               <div key={`fp${i}`} style={{ position: 'absolute', top: r * CELL + 2, left: c * CELL + 2, width: CELL - 4, height: CELL - 4, background: `${piece?.color}ee`, border: `2px solid ${piece?.color}`, boxShadow: `0 0 32px ${piece?.color}, 0 0 64px ${piece?.color}55, inset 0 0 20px ${piece?.color}66`, borderRadius: 3, zIndex: 6, pointerEvents: 'none' }} />
             ))}
           </div>
         </div>
 
+        {/* status */}
         <div style={{ color: '#08182a', fontSize: 11, fontFamily: "'Share Tech Mono'", marginTop: 9, letterSpacing: 2 }}>
           {msgs.length} MESSAGES &nbsp;·&nbsp; HOVER TO GLOW &nbsp;·&nbsp; CLICK TO READ
         </div>
 
-      </div>
+      </div>{/* end page body */}
 
+      {/* ══════════════════════════════════════════
+          MESSAGE DETAIL PANEL
+      ══════════════════════════════════════════ */}
       {selMsg && (
         <div
           style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#03070e', borderTop: `2px solid ${selMsg.col}`, padding: '20px 20px 26px', zIndex: 400, animation: 'tw-up 0.28s ease', boxShadow: `0 -35px 90px ${selMsg.col}18` }}
           onClick={e => { if (e.target === e.currentTarget) setSelId(null) }}
         >
           <div style={{ maxWidth: BW, margin: '0 auto', position: 'relative' }}>
-            <button onClick={() => setSelId(null)} style={{ position: 'absolute', top: -2, right: 0, background: 'transparent', border: 'none', color: '#1a3a50', fontFamily: "'VT323'", fontSize: 30, cursor: 'pointer', padding: '0 4px', lineHeight: 1 }}>✕</button>
+            <button
+              onClick={() => setSelId(null)}
+              style={{ position: 'absolute', top: -2, right: 0, background: 'transparent', border: 'none', color: '#1a3a50', fontFamily: "'VT323'", fontSize: 30, cursor: 'pointer', padding: '0 4px', lineHeight: 1 }}
+            >✕</button>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap', paddingRight: 30 }}>
               <div style={{ width: 10, height: 10, borderRadius: 2, background: selMsg.col, boxShadow: `0 0 12px ${selMsg.col}`, flexShrink: 0 }} />
@@ -753,7 +713,10 @@ export default function InteractivePage() {
 
             <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
               {!selMsg.delReq && !isAdm && (
-                <button onClick={() => requestDelete(selMsg.id)} style={{ ...BTN_S, background: '#ff52520d', border: '1px solid #ff525444', color: '#ff5252', fontSize: 19, padding: '5px 20px' }}>
+                <button
+                  onClick={() => requestDelete(selMsg.id)}
+                  style={{ ...BTN_S, background: '#ff52520d', border: '1px solid #ff525444', color: '#ff5252', fontSize: 19, padding: '5px 20px' }}
+                >
                   request for deletion
                 </button>
               )}
@@ -763,7 +726,10 @@ export default function InteractivePage() {
                 </span>
               )}
               {isAdm && (
-                <button onClick={() => adminDelete(selMsg.id)} style={{ ...BTN_S, background: '#ff52521a', border: '1px solid #ff5252', color: '#ff5252', fontSize: 19, padding: '5px 20px' }}>
+                <button
+                  onClick={() => adminDelete(selMsg.id)}
+                  style={{ ...BTN_S, background: '#ff52521a', border: '1px solid #ff5252', color: '#ff5252', fontSize: 19, padding: '5px 20px' }}
+                >
                   🗑 delete
                 </button>
               )}
@@ -772,6 +738,7 @@ export default function InteractivePage() {
         </div>
       )}
 
+      {/* ── admin hidden button ── */}
       <button
         onClick={() => isAdm ? setShowPanel(true) : setShowLogin(true)}
         style={{ position: 'fixed', bottom: 14, right: 14, zIndex: 500, background: 'rgba(2,4,8,0.8)', border: '1px solid #081520', borderRadius: 3, color: '#081520', fontFamily: "'Share Tech Mono'", fontSize: 11, padding: '3px 8px', cursor: 'pointer', letterSpacing: 1 }}
@@ -779,6 +746,9 @@ export default function InteractivePage() {
         {isAdm ? '⚙ ADM' : '⚙'}
       </button>
 
+      {/* ══════════════════════════════════════════
+          ADMIN LOGIN MODAL
+      ══════════════════════════════════════════ */}
       {showLogin && (
         <div
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 600 }}
@@ -786,21 +756,45 @@ export default function InteractivePage() {
         >
           <div style={{ background: '#050b14', border: '1px solid #0d2035', borderRadius: 8, padding: 34, width: 320 }}>
             <div style={{ color: '#00e5ff', fontSize: 34, letterSpacing: 6, marginBottom: 22, textShadow: '0 0 28px #00e5ff' }}>ADMIN</div>
-            <input className="tw-in" style={{ ...INPUT_S, marginBottom: 14 }} type="password" value={admPw} onChange={e => setAdmPw(e.target.value)} onKeyDown={e => e.key === 'Enter' && admLogin()} placeholder="password..." />
+            <input
+              className="tw-in"
+              style={{ ...INPUT_S, marginBottom: 14 }}
+              type="password"
+              value={admPw}
+              onChange={e => setAdmPw(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && admLogin()}
+              placeholder="password..."
+            />
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={admLogin} style={{ flex: 1, background: '#00e5ff0d', border: '1px solid #00e5ff55', borderRadius: 3, color: '#00e5ff', fontFamily: "'VT323'", fontSize: 24, padding: '6px 0', cursor: 'pointer', textShadow: '0 0 14px #00e5ff' }}>login</button>
-              <button onClick={() => setShowLogin(false)} style={{ background: 'transparent', border: '1px solid #1a2e3a', borderRadius: 3, color: '#2a4055', fontFamily: "'VT323'", fontSize: 24, padding: '6px 18px', cursor: 'pointer' }}>cancel</button>
+              <button
+                onClick={admLogin}
+                style={{ flex: 1, background: '#00e5ff0d', border: '1px solid #00e5ff55', borderRadius: 3, color: '#00e5ff', fontFamily: "'VT323'", fontSize: 24, padding: '6px 0', cursor: 'pointer', textShadow: '0 0 14px #00e5ff' }}
+              >
+                login
+              </button>
+              <button
+                onClick={() => setShowLogin(false)}
+                style={{ background: 'transparent', border: '1px solid #1a2e3a', borderRadius: 3, color: '#2a4055', fontFamily: "'VT323'", fontSize: 24, padding: '6px 18px', cursor: 'pointer' }}
+              >
+                cancel
+              </button>
             </div>
           </div>
         </div>
       )}
 
+      {/* ══════════════════════════════════════════
+          ADMIN PANEL MODAL
+      ══════════════════════════════════════════ */}
       {showPanel && isAdm && (
         <div
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.94)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 600 }}
           onClick={e => { if (e.target === e.currentTarget) setShowPanel(false) }}
         >
-          <div className="tw-sc" style={{ background: '#050b14', border: '1px solid #0d2035', borderRadius: 8, padding: 28, width: 600, maxHeight: '82vh', overflowY: 'auto' }}>
+          <div
+            className="tw-sc"
+            style={{ background: '#050b14', border: '1px solid #0d2035', borderRadius: 8, padding: 28, width: 600, maxHeight: '82vh', overflowY: 'auto' }}
+          >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <span style={{ color: '#00e5ff', fontSize: 30, letterSpacing: 4 }}>⚙ ADMIN PANEL</span>
               <button onClick={() => setShowPanel(false)} style={{ background: 'transparent', border: 'none', color: '#2a4055', fontFamily: "'VT323'", fontSize: 30, cursor: 'pointer' }}>✕</button>
@@ -819,17 +813,28 @@ export default function InteractivePage() {
                   <div key={m.id} style={{ background: '#020507', border: '1px solid #ff525222', borderRadius: 4, padding: '12px 15px', marginBottom: 9, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 15 }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ color: m.col, fontSize: 24 }}>{m.nick}</div>
-                      <div style={{ color: '#2a5565', fontSize: 12, fontFamily: "'Share Tech Mono'", margin: '5px 0', lineHeight: 1.6 }}>{m.body.slice(0, 80)}{m.body.length > 80 ? '…' : ''}</div>
-                      <div style={{ color: '#0a1825', fontSize: 11, fontFamily: "'Share Tech Mono'" }}>{new Date(m.ts).toLocaleString('zh-CN')}</div>
+                      <div style={{ color: '#2a5565', fontSize: 12, fontFamily: "'Share Tech Mono'", margin: '5px 0', lineHeight: 1.6 }}>
+                        {m.body.slice(0, 80)}{m.body.length > 80 ? '…' : ''}
+                      </div>
+                      <div style={{ color: '#0a1825', fontSize: 11, fontFamily: "'Share Tech Mono'" }}>
+                        {new Date(m.ts).toLocaleString('zh-CN')}
+                      </div>
                     </div>
-                    <button onClick={() => adminDelete(m.id)} style={{ ...BTN_S, background: '#ff52521a', border: '1px solid #ff5252', color: '#ff5252', fontSize: 18, padding: '4px 16px', whiteSpace: 'nowrap', flexShrink: 0 }}>approve</button>
+                    <button
+                      onClick={() => adminDelete(m.id)}
+                      style={{ ...BTN_S, background: '#ff52521a', border: '1px solid #ff5252', color: '#ff5252', fontSize: 18, padding: '4px 16px', whiteSpace: 'nowrap', flexShrink: 0 }}
+                    >
+                      approve
+                    </button>
                   </div>
                 ))}
                 <div style={{ borderTop: '1px solid #0a1828', margin: '20px 0' }} />
               </>
             )}
 
-            <div style={{ color: '#0c2535', fontSize: 24, marginBottom: 10, letterSpacing: 2 }}>all messages ({msgs.length})</div>
+            <div style={{ color: '#0c2535', fontSize: 24, marginBottom: 10, letterSpacing: 2 }}>
+              all messages ({msgs.length})
+            </div>
             {msgs.length === 0 && (
               <div style={{ color: '#08101a', fontFamily: "'Share Tech Mono'", fontSize: 12 }}>no message at the time</div>
             )}
@@ -838,10 +843,17 @@ export default function InteractivePage() {
                 <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                   <span style={{ display: 'inline-block', width: 8, height: 8, background: m.col, borderRadius: 2, marginRight: 8, verticalAlign: 'middle' }} />
                   <span style={{ color: m.col, fontSize: 22 }}>{m.nick}</span>
-                  <span style={{ color: '#1a3545', fontSize: 12, fontFamily: "'Share Tech Mono'", marginLeft: 10 }}>{m.body.slice(0, 45)}{m.body.length > 45 ? '…' : ''}</span>
+                  <span style={{ color: '#1a3545', fontSize: 12, fontFamily: "'Share Tech Mono'", marginLeft: 10 }}>
+                    {m.body.slice(0, 45)}{m.body.length > 45 ? '…' : ''}
+                  </span>
                   {m.delReq && <span style={{ color: '#ff525544', fontSize: 10, fontFamily: "'Share Tech Mono'", marginLeft: 8 }}>[DEL REQ]</span>}
                 </div>
-                <button onClick={() => adminDelete(m.id)} style={{ ...BTN_S, border: '1px solid #ff525222', color: '#ff525555', fontSize: 14, padding: '2px 10px', flexShrink: 0 }}>delete</button>
+                <button
+                  onClick={() => adminDelete(m.id)}
+                  style={{ ...BTN_S, border: '1px solid #ff525222', color: '#ff525555', fontSize: 14, padding: '2px 10px', flexShrink: 0 }}
+                >
+                  delete
+                </button>
               </div>
             ))}
           </div>
