@@ -3,9 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-// ✏️ Change this to your real birthday (format: YYYY-MM-DD)
-const BIRTHDAY = '2001-09-11'
-
 /* ===== Bilingual Data ===== */
 const DATA = {
   name: { cn: '施尚岳', en: 'Sam Shii' },
@@ -451,112 +448,14 @@ export default function CVPage() {
   const router = useRouter()
   const [lang, setLang] = useState<Lang>('cn')
   const [showPaper, setShowPaper] = useState(false)
-  const [unlocked, setUnlocked] = useState(false)
-  const [bdInput, setBdInput] = useState('')
-  const [bdError, setBdError] = useState(false)
 
   function handleDownload() {
     window.print()
   }
 
-  function handleUnlock() {
-    if (bdInput === BIRTHDAY) {
-      setUnlocked(true)
-      setBdError(false)
-    } else {
-      setBdError(true)
-    }
-  }
-
   const d = DATA
   const s = d.sections
 
-  /* ===== Birthday Gate ===== */
-  if (!unlocked) {
-    return (
-      <div style={{
-        minHeight: '100vh', background: '#0b0b0f',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: "'JetBrains Mono', 'Courier New', monospace",
-      }}>
-        <div style={{ textAlign: 'center', maxWidth: 360, padding: '0 20px' }}>
-          <div style={{
-            fontSize: 13, letterSpacing: 6, textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.15)', marginBottom: 32,
-          }}>
-            Access Restricted
-          </div>
-          <div style={{
-            fontSize: 18, color: 'rgba(255,255,255,0.5)',
-            marginBottom: 8, fontFamily: "'Crimson Pro', serif",
-          }}>
-            When is Sam&apos;s birthday?
-          </div>
-          <div style={{
-            fontSize: 12, color: 'rgba(255,255,255,0.15)', marginBottom: 28,
-          }}>
-            format: YYYY-MM-DD
-          </div>
-          <input
-            type="date"
-            value={bdInput}
-            onChange={e => { setBdInput(e.target.value); setBdError(false) }}
-            onKeyDown={e => e.key === 'Enter' && handleUnlock()}
-            style={{
-              display: 'block', width: '100%', padding: '12px 16px',
-              background: 'rgba(255,255,255,0.03)',
-              border: `1px solid ${bdError ? 'rgba(255,80,80,0.4)' : 'rgba(255,255,255,0.08)'}`,
-              borderRadius: 4, color: 'white', fontSize: 15,
-              fontFamily: 'inherit', outline: 'none',
-              textAlign: 'center', marginBottom: 16,
-            }}
-          />
-          {bdError && (
-            <div style={{
-              fontSize: 12, color: 'rgba(255,80,80,0.6)',
-              marginBottom: 16, animation: 'shake 0.3s ease',
-            }}>
-              wrong answer
-            </div>
-          )}
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-            <button
-              onClick={handleUnlock}
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.5)', padding: '8px 28px',
-                borderRadius: 4, cursor: 'pointer', fontSize: 12,
-                letterSpacing: 2, fontFamily: 'inherit', transition: 'all 0.2s',
-              }}
-            >
-              ENTER
-            </button>
-            <button
-              onClick={() => router.push('/')}
-              style={{
-                background: 'none', border: '1px solid rgba(255,255,255,0.06)',
-                color: 'rgba(255,255,255,0.2)', padding: '8px 20px',
-                borderRadius: 4, cursor: 'pointer', fontSize: 12,
-                letterSpacing: 1, fontFamily: 'inherit',
-              }}
-            >
-              BACK
-            </button>
-          </div>
-          <style>{`
-            @keyframes shake {
-              0%, 100% { transform: translateX(0); }
-              25% { transform: translateX(-6px); }
-              75% { transform: translateX(6px); }
-            }
-          `}</style>
-        </div>
-      </div>
-    )
-  }
-
-  /* ===== Main CV ===== */
   return (
     <>
       <style jsx global>{`
