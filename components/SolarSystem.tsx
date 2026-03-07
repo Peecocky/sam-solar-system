@@ -157,7 +157,7 @@ export default function SolarSystem({
           targetTimeScale.current = 1
           setHoverText(null)
         }}
-        onClick={() => router.push('/games/lottery')}
+        onClick={() => router.push('/games')}
       />
 
       {/* ===== Planet 4: Message Wall ===== */}
