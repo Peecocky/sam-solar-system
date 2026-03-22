@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import BirthdayGate from '@/components/BirthdayGate'
 
 type StockSnapshot = {
   symbol: string
@@ -79,7 +80,7 @@ export default function StocksPage() {
   }, [])
 
   return (
-    <>
+    <BirthdayGate backHref="/" prompt="When is Sam's birthday?">
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap');
 
@@ -352,6 +353,6 @@ export default function StocksPage() {
           </section>
         </div>
       </div>
-    </>
+    </BirthdayGate>
   )
 }
