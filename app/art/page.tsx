@@ -52,6 +52,13 @@ const DEFAULT_ARTWORKS: Artwork[] = [
 
 const ADMIN_PASSWORD = 'sam2024'
 
+function normalizeArtworks(items: Artwork[]) {
+  return items.map((item, index) => ({
+    ...item,
+    accent: item.accent || DEFAULT_ARTWORKS[index % DEFAULT_ARTWORKS.length]?.accent || '#8fb6ff',
+  }))
+}
+
 function loadStoredArtworks() {
   if (typeof window === 'undefined') return DEFAULT_ARTWORKS
 
@@ -60,14 +67,14 @@ function loadStoredArtworks() {
     if (saved) {
       const parsed = JSON.parse(saved)
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed as Artwork[]
+        return normalizeArtworks(parsed as Artwork[])
       }
     }
   } catch {
     // Ignore malformed local data and fall back to defaults.
   }
 
-  return DEFAULT_ARTWORKS
+  return normalizeArtworks(DEFAULT_ARTWORKS)
 }
 
 export default function ArtPage() {

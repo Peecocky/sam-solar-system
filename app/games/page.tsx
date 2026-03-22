@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 type Realm = {
@@ -14,7 +14,8 @@ type Realm = {
   path: string
   labelX: number
   labelY: number
-  sparks: Array<[number, number]>
+  labelLines: string[]
+  sparkles: Array<[number, number]>
   locked: boolean
 }
 
@@ -22,180 +23,368 @@ const REALMS: Realm[] = [
   {
     id: 'lottery',
     name: 'Lottery Isles',
-    subtitle: 'Ball-drop fortunes in windy coves',
-    description: 'A bright little archipelago where luck is a profession.',
+    subtitle: 'A bright coast for luck-driven adventures',
+    description: 'The most optimistic territory on the parchment: wind, water, and irresponsible confidence.',
     route: '/games/lottery',
-    accent: '#5577a6',
-    fill: '#dbe8f1',
-    path: 'M140,180 L195,155 L240,170 L260,200 L250,250 L270,290 L240,320 L200,310 L170,330 L130,300 L110,260 L100,220 L120,190 Z',
-    labelX: 182,
-    labelY: 248,
-    sparks: [
-      [148, 190],
-      [214, 176],
-      [238, 258],
-      [154, 298],
+    accent: '#8b5e33',
+    fill: '#ead8bb',
+    path: 'M132 188 C157 150 204 141 242 158 C274 172 293 201 291 238 C289 269 304 291 293 319 C279 354 248 361 216 352 C189 344 168 361 143 348 C116 333 95 300 94 264 C92 232 107 212 132 188 Z',
+    labelX: 205,
+    labelY: 257,
+    labelLines: ['Lottery', 'Isles'],
+    sparkles: [
+      [146, 194],
+      [246, 174],
+      [276, 302],
+      [152, 324],
     ],
     locked: false,
   },
   {
     id: 'aim',
     name: 'Scoop Republic',
-    subtitle: 'Precision drills, dignity optional',
-    description: 'The province of heroic aim and deeply unserious training.',
+    subtitle: 'Precision trials inside a very proud city-state',
+    description: 'Stone walls, tidy streets, and a population unreasonably committed to accuracy.',
     route: '/games/aim',
-    accent: '#9b6a42',
-    fill: '#ead9c6',
-    path: 'M420,120 L490,100 L560,115 L590,160 L600,220 L580,270 L540,290 L490,300 L440,280 L400,240 L390,190 L400,150 Z',
-    labelX: 495,
-    labelY: 200,
-    sparks: [
-      [434, 138],
-      [566, 132],
-      [582, 234],
-      [432, 262],
+    accent: '#6c4b2d',
+    fill: '#e6d1b0',
+    path: 'M934 328 C980 307 1033 316 1068 348 C1104 382 1113 427 1090 466 C1068 503 1024 516 979 503 C940 492 910 463 901 426 C892 390 900 346 934 328 Z',
+    labelX: 1000,
+    labelY: 414,
+    labelLines: ['Scoop', 'Republic'],
+    sparkles: [
+      [926, 346],
+      [1082, 366],
+      [1074, 478],
+      [924, 472],
     ],
     locked: false,
   },
   {
     id: 'sound',
     name: 'Echoing Isles',
-    subtitle: 'A hunt guided by sound alone',
-    description: 'Mist, whispers, and directional audio doing all the flirting.',
+    subtitle: 'Misty islands navigated by sound alone',
+    description: 'A northeastern chain where direction is a rumor and listening is survival.',
     route: '/games/sound',
-    accent: '#7b62a6',
-    fill: '#ddd4ef',
-    path: 'M750,80 L820,70 L880,90 L910,140 L900,200 L860,230 L810,240 L760,220 L730,180 L720,130 Z',
-    labelX: 814,
-    labelY: 156,
-    sparks: [
-      [748, 104],
-      [886, 108],
-      [888, 204],
-      [754, 208],
+    accent: '#7a5a3f',
+    fill: '#eadbc2',
+    path: 'M1048 152 C1084 134 1130 139 1166 164 C1198 188 1207 228 1188 261 C1170 293 1130 309 1088 299 C1048 290 1014 264 1006 228 C998 198 1018 168 1048 152 Z',
+    labelX: 1099,
+    labelY: 222,
+    labelLines: ['Echoing', 'Isles'],
+    sparkles: [
+      [1026, 168],
+      [1168, 180],
+      [1170, 278],
+      [1028, 278],
     ],
     locked: false,
   },
   {
     id: 'puzzle',
     name: 'Enigma Reach',
-    subtitle: 'A seal still keeps the riddles in',
-    description: 'Not yet open. Even the doors want a clever answer first.',
+    subtitle: 'Still sealed under a patient old spell',
+    description: 'The region of riddles is not open yet. Even the signpost looks smug about it.',
     route: null,
-    accent: '#5f8a67',
-    fill: '#dce8db',
-    path: 'M680,340 L740,310 L810,320 L860,360 L870,420 L840,470 L790,490 L730,480 L690,450 L660,400 L670,360 Z',
-    labelX: 770,
-    labelY: 404,
-    sparks: [
-      [698, 336],
-      [840, 370],
-      [826, 460],
-      [694, 446],
+    accent: '#6d6d44',
+    fill: '#e4dbba',
+    path: 'M922 594 C964 566 1016 563 1063 579 C1110 595 1138 632 1136 678 C1133 726 1096 760 1048 770 C999 781 946 768 910 737 C875 707 874 626 922 594 Z',
+    labelX: 1004,
+    labelY: 672,
+    labelLines: ['Enigma', 'Reach'],
+    sparkles: [
+      [920, 602],
+      [1108, 612],
+      [1088, 748],
+      [916, 730],
     ],
     locked: true,
   },
   {
     id: 'racing',
     name: 'Velocity Plains',
-    subtitle: 'Fast enough to offend the horses',
-    description: 'Wide grasslands reserved for future reckless behavior.',
+    subtitle: 'Reserved for future bad decisions at speed',
+    description: 'Open grass and implied danger. The horses have already filed a complaint.',
     route: null,
-    accent: '#a65f5f',
-    fill: '#edd2d2',
-    path: 'M300,410 L370,380 L440,390 L480,430 L490,480 L470,530 L420,560 L360,550 L310,520 L280,470 L290,430 Z',
-    labelX: 386,
-    labelY: 474,
-    sparks: [
-      [320, 404],
-      [458, 418],
-      [456, 518],
-      [318, 524],
+    accent: '#8a643b',
+    fill: '#e6d2ad',
+    path: 'M398 676 C448 642 512 638 571 648 C635 660 672 699 669 746 C665 792 625 824 566 832 C499 841 430 819 388 780 C350 745 350 706 398 676 Z',
+    labelX: 511,
+    labelY: 744,
+    labelLines: ['Velocity', 'Plains'],
+    sparkles: [
+      [404, 688],
+      [632, 688],
+      [618, 808],
+      [402, 798],
     ],
     locked: true,
   },
   {
     id: 'memory',
     name: 'Mnemos Atoll',
-    subtitle: 'Where your memory will be tested politely',
-    description: 'A calm-looking atoll with no intention of staying calm.',
+    subtitle: 'Calm surf, suspiciously challenging memories',
+    description: 'It looks peaceful, which is exactly why nobody trusts it.',
     route: null,
-    accent: '#4e8388',
-    fill: '#d4eaec',
-    path: 'M100,420 L150,400 L200,410 L230,450 L225,500 L195,530 L145,540 L105,510 L80,470 L85,440 Z',
-    labelX: 156,
-    labelY: 470,
-    sparks: [
-      [108, 414],
-      [208, 424],
-      [204, 516],
-      [104, 504],
+    accent: '#5a6c54',
+    fill: '#dde2c9',
+    path: 'M148 604 C182 577 232 569 275 580 C317 592 342 624 340 665 C337 706 307 735 265 744 C223 752 178 739 147 710 C118 682 112 635 148 604 Z',
+    labelX: 228,
+    labelY: 664,
+    labelLines: ['Mnemos', 'Atoll'],
+    sparkles: [
+      [154, 606],
+      [318, 612],
+      [300, 726],
+      [146, 714],
     ],
     locked: true,
   },
   {
     id: 'battle',
     name: 'The Warfields',
-    subtitle: 'Future skirmishes, future chaos',
-    description: 'Currently under tactical fog and paperwork.',
+    subtitle: 'Under tactical fog until further notice',
+    description: 'A future combat province currently occupied by paperwork and ominous weather.',
     route: null,
-    accent: '#8d7b43',
-    fill: '#ebe1c4',
-    path: 'M520,460 L580,440 L640,455 L660,500 L650,550 L610,580 L560,575 L520,545 L500,500 Z',
-    labelX: 578,
-    labelY: 510,
-    sparks: [
-      [532, 452],
-      [636, 470],
-      [626, 556],
-      [532, 540],
+    accent: '#7b5632',
+    fill: '#e3d0b1',
+    path: 'M692 660 C731 633 782 628 830 637 C877 645 905 676 904 714 C904 755 875 786 831 796 C783 806 729 795 694 767 C660 740 652 688 692 660 Z',
+    labelX: 780,
+    labelY: 718,
+    labelLines: ['The', 'Warfields'],
+    sparkles: [
+      [698, 664],
+      [888, 670],
+      [874, 780],
+      [694, 774],
     ],
     locked: true,
   },
   {
     id: 'stealth',
     name: 'Shadow Depths',
-    subtitle: 'A locked zone that refuses witnesses',
-    description: 'One day it will open. It still has trust issues.',
+    subtitle: 'An eastern seal for unseen things',
+    description: 'Still locked. Still brooding. Still absolutely convinced it should remain mysterious.',
     route: null,
-    accent: '#5c6c8f',
-    fill: '#d7deeb',
-    path: 'M880,300 L940,280 L990,300 L1010,350 L1000,400 L960,430 L910,420 L870,390 L860,340 Z',
-    labelX: 934,
-    labelY: 356,
-    sparks: [
-      [886, 298],
-      [994, 318],
-      [982, 404],
-      [890, 404],
+    accent: '#5c5f6e',
+    fill: '#dbdce0',
+    path: 'M1184 430 C1218 406 1264 408 1296 432 C1328 456 1339 494 1324 530 C1308 569 1268 593 1224 591 C1181 589 1148 565 1141 530 C1134 495 1149 455 1184 430 Z',
+    labelX: 1234,
+    labelY: 508,
+    labelLines: ['Shadow', 'Depths'],
+    sparkles: [
+      [1180, 438],
+      [1318, 452],
+      [1300, 572],
+      [1172, 572],
     ],
     locked: true,
   },
 ]
 
-const MOUNTAIN_PATHS = [
-  'M445 260 L500 136 L542 238 L590 116 L640 258',
-  'M488 266 L540 154 L572 220 L616 140 L664 270',
-  'M536 272 L584 174 L624 238 L678 156 L728 276',
+type Point = [number, number]
+
+function createForest(startX: number, startY: number, cols: number, rows: number, dx: number, dy: number) {
+  const points: Point[] = []
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      points.push([
+        startX + col * dx + (row % 2) * 8,
+        startY + row * dy + ((col + row) % 3) * 2,
+      ])
+    }
+  }
+  return points
+}
+
+const WHISPERWOOD_TREES = [
+  ...createForest(148, 464, 13, 6, 32, 26),
+  ...createForest(248, 604, 8, 3, 34, 24),
 ]
 
-const FOREST_TREES = [
-  [120, 520],
-  [148, 538],
-  [182, 560],
-  [206, 532],
-  [236, 560],
-  [258, 522],
-  [292, 552],
-  [320, 532],
-  [346, 566],
-  [380, 546],
+const EASTWOOD_TREES = createForest(1034, 116, 4, 5, 26, 24)
+
+const MOUNTAINS = [
+  [504, 254, 0.84],
+  [552, 226, 1.04],
+  [608, 198, 1.2],
+  [672, 216, 1.1],
+  [726, 248, 0.92],
+  [566, 302, 0.82],
+  [624, 278, 0.88],
+  [682, 304, 0.82],
+] as const
+
+const LAKE_WAVES = [
+  [742, 556],
+  [784, 538],
+  [824, 560],
+  [774, 596],
+  [838, 612],
 ]
+
+const COAST_WAVES = [
+  [103, 202],
+  [80, 236],
+  [73, 270],
+  [87, 694],
+  [111, 732],
+  [1202, 198],
+  [1240, 224],
+  [1252, 260],
+  [1280, 518],
+]
+
+function MountainGlyph({
+  x,
+  y,
+  scale,
+}: {
+  x: number
+  y: number
+  scale: number
+}) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${scale})`} opacity="0.92">
+      <path
+        d="M0 44 L26 -30 L45 4 L68 -50 L92 44"
+        fill="none"
+        stroke="#5f5a50"
+        strokeWidth="3"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+      <path
+        d="M26 -30 L35 -4 L44 -18 M68 -50 L56 -8 L74 -18"
+        fill="none"
+        stroke="#5f5a50"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M13 10 L26 -30 L36 -4 M57 14 L68 -50 L82 0"
+        fill="none"
+        stroke="#f7f0dc"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        opacity="0.76"
+      />
+      <path
+        d="M8 44 C28 31 43 34 61 44 M39 44 C57 29 72 31 88 44"
+        fill="none"
+        stroke="#6b655b"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        opacity="0.7"
+      />
+    </g>
+  )
+}
+
+function TreeGlyph({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${scale})`} opacity="0.86">
+      <path
+        d="M0 16 L8 -2 L16 16 Z"
+        fill="#6d7d5e"
+        stroke="#5d6952"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5 10 L12 -6 L19 10 Z"
+        fill="#7f8d6d"
+        stroke="#5d6952"
+        strokeWidth="1"
+        strokeLinejoin="round"
+      />
+      <line x1="10" y1="16" x2="10" y2="23" stroke="#695741" strokeWidth="1.5" />
+    </g>
+  )
+}
+
+function SettlementGlyph({
+  x,
+  y,
+  kind = 'village',
+}: {
+  x: number
+  y: number
+  kind?: 'village' | 'city'
+}) {
+  if (kind === 'city') {
+    return (
+      <g transform={`translate(${x} ${y})`} opacity="0.9">
+        <circle cx="0" cy="0" r="42" fill="none" stroke="#5b5042" strokeWidth="2.2" />
+        <circle cx="0" cy="0" r="26" fill="none" stroke="#5b5042" strokeWidth="1.5" />
+        <path d="M-18 -10h36M-14 4h28M-8 18h16" stroke="#5b5042" strokeWidth="1.4" />
+        <path d="M-8 -18v36M8 -18v36" stroke="#5b5042" strokeWidth="1.4" />
+      </g>
+    )
+  }
+
+  return (
+    <g transform={`translate(${x} ${y})`} opacity="0.88">
+      <path
+        d="M-14 10 h28 M-8 10 v-16 h16 v16"
+        fill="none"
+        stroke="#5b5042"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path d="M-10 -6 L0 -18 L10 -6" fill="none" stroke="#5b5042" strokeWidth="1.8" strokeLinejoin="round" />
+    </g>
+  )
+}
+
+function WaveGlyph({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
+  return (
+    <path
+      d={`M ${x} ${y} q 12 ${-9 * scale} 24 0 q 12 ${9 * scale} 24 0`}
+      fill="none"
+      stroke="#6f6556"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      opacity="0.72"
+    />
+  )
+}
+
+function Sparkle({
+  x,
+  y,
+  accent,
+  index,
+}: {
+  x: number
+  y: number
+  accent: string
+  index: number
+}) {
+  return (
+    <g
+      transform={`translate(${x} ${y})`}
+      className="map-sparkle"
+      style={{ animationDelay: `${index * 0.18}s` }}
+    >
+      <path
+        d="M0 -6 L3 0 L0 6 L-3 0 Z"
+        fill={accent}
+        opacity="0.95"
+      />
+      <circle cx="0" cy="0" r="1.3" fill="#fff9ec" opacity="0.9" />
+    </g>
+  )
+}
 
 export default function GamesHub() {
   const router = useRouter()
-  const [hovered, setHovered] = useState<string | null>(null)
-  const hoveredRealm = hovered ? REALMS.find((realm) => realm.id === hovered) : null
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
+
+  const hoveredRealm = useMemo(
+    () => REALMS.find((realm) => realm.id === hoveredId) ?? null,
+    [hoveredId]
+  )
 
   function enterRealm(realm: Realm) {
     if (realm.locked || !realm.route) return
@@ -205,519 +394,549 @@ export default function GamesHub() {
   return (
     <>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@500;600;700&family=Spectral:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IM+Fell+English+SC&display=swap');
 
-        .realm-page {
-          --ink: #324863;
-          --ink-soft: rgba(50, 72, 99, 0.7);
-          --paper: #f5eed8;
-          --paper-warm: #ead7ae;
-          --line: rgba(68, 91, 116, 0.72);
+        .fantasy-page {
           min-height: 100vh;
           background:
-            radial-gradient(circle at top, rgba(255, 247, 222, 0.9) 0%, rgba(249, 238, 205, 0.96) 28%, rgba(233, 214, 173, 0.98) 100%);
-          color: var(--ink);
-          overflow: hidden;
-          position: relative;
-          font-family: 'Spectral', serif;
+            radial-gradient(circle at top, rgba(255,245,221,0.86) 0%, rgba(232,213,176,0.95) 30%, rgba(212,186,142,1) 100%);
+          color: #4b4134;
+          padding: 22px;
+          box-sizing: border-box;
         }
 
-        .paper-grain {
+        .fantasy-shell {
+          max-width: 1380px;
+          margin: 0 auto;
+          position: relative;
+        }
+
+        .fantasy-topbar {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 18px;
+          margin-bottom: 18px;
+        }
+
+        .fantasy-back {
+          border: 1px solid rgba(88, 74, 55, 0.24);
+          background: rgba(255,251,239,0.54);
+          color: #5c4b38;
+          padding: 10px 14px;
+          font: 500 11px 'IBM Plex Mono', monospace;
+          letter-spacing: 1.8px;
+          text-transform: uppercase;
+          cursor: pointer;
+          box-shadow: 0 10px 24px rgba(96, 66, 24, 0.08);
+        }
+
+        .fantasy-title {
+          text-align: center;
+          flex: 1;
+        }
+
+        .fantasy-title h1 {
+          margin: 0;
+          font-family: 'IM Fell English SC', serif;
+          font-size: clamp(34px, 5vw, 60px);
+          letter-spacing: 3px;
+          color: #5b4b39;
+          text-shadow: 0 1px 0 rgba(255,255,255,0.62);
+        }
+
+        .fantasy-title p {
+          margin: 8px 0 0;
+          font: 500 11px 'IBM Plex Mono', monospace;
+          letter-spacing: 2.6px;
+          text-transform: uppercase;
+          color: rgba(84, 70, 52, 0.72);
+        }
+
+        .fantasy-map {
+          position: relative;
+          background:
+            radial-gradient(circle at top left, rgba(255,255,255,0.22), transparent 26%),
+            radial-gradient(circle at bottom right, rgba(255,255,255,0.14), transparent 28%),
+            linear-gradient(180deg, #efe3c5 0%, #e4d0aa 100%);
+          border: 1px solid rgba(97, 78, 53, 0.28);
+          box-shadow:
+            inset 0 0 0 2px rgba(255,251,239,0.54),
+            0 28px 56px rgba(76, 53, 23, 0.14);
+          overflow: hidden;
+        }
+
+        .fantasy-map::before {
+          content: '';
           position: absolute;
           inset: 0;
           pointer-events: none;
           background-image:
-            radial-gradient(rgba(97, 73, 36, 0.08) 1px, transparent 1px),
-            radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px),
-            linear-gradient(120deg, rgba(255,255,255,0.1), transparent 45%);
-          background-size: 18px 18px, 24px 24px, 100% 100%;
+            radial-gradient(rgba(95,73,37,0.08) 1px, transparent 1px),
+            radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+          background-size: 18px 18px, 26px 26px;
+          opacity: 0.4;
           mix-blend-mode: multiply;
-          opacity: 0.55;
         }
 
-        .page-frame {
-          position: absolute;
-          inset: 18px;
-          border: 1px solid rgba(67, 84, 99, 0.26);
-          box-shadow: inset 0 0 0 2px rgba(255, 252, 238, 0.45);
-          pointer-events: none;
-        }
-
-        .map-topbar {
-          position: absolute;
-          top: 18px;
-          left: 26px;
-          right: 26px;
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          z-index: 10;
-        }
-
-        .map-back {
-          background: rgba(255, 251, 236, 0.66);
-          border: 1px solid rgba(73, 94, 120, 0.3);
-          color: var(--ink);
-          padding: 10px 16px;
-          font: 500 12px 'IBM Plex Mono', monospace;
-          letter-spacing: 1.6px;
-          text-transform: uppercase;
-          cursor: pointer;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-          backdrop-filter: blur(3px);
-        }
-
-        .map-back:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 12px 24px rgba(107, 83, 43, 0.12);
-        }
-
-        .map-title {
-          text-align: center;
-          padding-top: 6px;
-        }
-
-        .map-title h1 {
-          margin: 0;
-          font-family: 'Cormorant SC', serif;
-          font-size: clamp(34px, 4vw, 56px);
-          letter-spacing: 7px;
-          color: #455a74;
-          text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
-        }
-
-        .map-title p {
-          margin: 6px 0 0;
-          font: 500 12px 'IBM Plex Mono', monospace;
-          letter-spacing: 3px;
-          text-transform: uppercase;
-          color: rgba(69, 90, 116, 0.78);
-        }
-
-        .map-wrap {
+        .fantasy-svg {
           width: 100%;
-          height: 100vh;
-          padding: 88px 34px 34px;
-          box-sizing: border-box;
-        }
-
-        .map-svg {
-          width: 100%;
-          height: 100%;
+          height: auto;
           display: block;
-          filter: drop-shadow(0 16px 30px rgba(95, 68, 24, 0.1));
+          position: relative;
+          z-index: 1;
         }
 
         .realm-shape {
-          stroke: rgba(65, 88, 114, 0.85);
-          stroke-width: 2.2;
-          transition: fill 0.25s ease, stroke 0.25s ease, filter 0.25s ease, transform 0.25s ease;
+          stroke: rgba(79, 66, 50, 0.88);
+          stroke-width: 2.3;
+          transition: fill 0.24s ease, stroke 0.24s ease, filter 0.24s ease;
         }
 
         .realm-shape.active {
           cursor: pointer;
         }
 
-        .realm-shape.locked {
-          cursor: default;
-        }
-
-        .realm-border {
+        .realm-inline-shade {
           fill: none;
-          stroke: rgba(255, 248, 222, 0.55);
-          stroke-width: 1;
-          stroke-dasharray: 6 9;
-          animation: borderShift 10s linear infinite;
+          stroke: rgba(255,247,231,0.56);
+          stroke-width: 1.2;
+          stroke-dasharray: 5 9;
+          opacity: 0.34;
         }
 
         .realm-label {
           pointer-events: none;
         }
 
-        .realm-name {
-          font-family: 'Cormorant SC', serif;
-          letter-spacing: 1.5px;
-          transition: transform 0.2s ease, opacity 0.2s ease;
+        .realm-label text {
+          transition: transform 0.24s ease, opacity 0.24s ease;
         }
 
-        .realm-sub {
-          font: 500 8px 'IBM Plex Mono', monospace;
-          letter-spacing: 1.8px;
-          text-transform: uppercase;
-        }
-
-        .hover-rings {
-          pointer-events: none;
-          animation: floatHalo 2.2s ease-in-out infinite;
-        }
-
-        .hover-rings circle {
-          fill: none;
-          stroke-width: 1.5;
-          opacity: 0.9;
-        }
-
-        .spark {
-          animation: sparkPulse 1.6s ease-in-out infinite;
+        .map-sparkle {
+          animation: sparklePulse 1.8s ease-in-out infinite;
           transform-origin: center;
         }
 
-        .map-tooltip {
-          position: absolute;
-          right: 30px;
-          bottom: 30px;
-          width: min(360px, calc(100vw - 60px));
-          background: rgba(255, 248, 228, 0.85);
-          border: 1px solid rgba(70, 89, 109, 0.22);
-          box-shadow: 0 18px 40px rgba(112, 85, 43, 0.12);
-          padding: 18px 20px;
-          backdrop-filter: blur(6px);
+        .hover-ring {
+          animation: ringFloat 2.4s ease-in-out infinite;
         }
 
-        .map-tooltip .eyebrow {
+        .map-info {
+          position: absolute;
+          right: 22px;
+          bottom: 22px;
+          width: min(360px, calc(100vw - 68px));
+          background: rgba(248,239,220,0.9);
+          border: 1px solid rgba(89, 71, 48, 0.18);
+          box-shadow: 0 18px 36px rgba(87, 60, 21, 0.1);
+          padding: 18px 20px;
+          z-index: 2;
+          backdrop-filter: blur(3px);
+        }
+
+        .map-info .eyebrow {
           font: 500 10px 'IBM Plex Mono', monospace;
-          letter-spacing: 2.8px;
+          letter-spacing: 2.2px;
           text-transform: uppercase;
-          color: rgba(69, 90, 116, 0.7);
+          color: rgba(92, 75, 56, 0.68);
           margin-bottom: 8px;
         }
 
-        .map-tooltip h2 {
+        .map-info h2 {
           margin: 0;
-          font-family: 'Cormorant SC', serif;
+          font-family: 'IM Fell English SC', serif;
           font-size: 28px;
-          color: var(--ink);
           letter-spacing: 1px;
         }
 
-        .map-tooltip .sub {
+        .map-info .sub {
           margin-top: 4px;
-          color: rgba(56, 76, 99, 0.86);
+          color: rgba(88, 74, 55, 0.82);
           font-size: 15px;
-        }
-
-        .map-tooltip .desc {
-          margin-top: 10px;
-          color: rgba(56, 76, 99, 0.8);
           line-height: 1.6;
-          font-size: 14px;
         }
 
-        .map-tooltip .status {
+        .map-info .desc {
+          margin-top: 12px;
+          color: rgba(88, 74, 55, 0.78);
+          font-size: 14px;
+          line-height: 1.72;
+        }
+
+        .map-info .status {
           margin-top: 14px;
           font: 500 11px 'IBM Plex Mono', monospace;
           letter-spacing: 1.8px;
           text-transform: uppercase;
         }
 
-        .map-caption {
+        .map-note {
           position: absolute;
-          left: 34px;
-          bottom: 30px;
-          max-width: 280px;
-          color: rgba(64, 82, 103, 0.8);
+          left: 22px;
+          bottom: 22px;
+          max-width: 300px;
+          color: rgba(88, 74, 55, 0.76);
           font-size: 14px;
-          line-height: 1.65;
-          text-shadow: 0 1px 0 rgba(255,255,255,0.45);
+          line-height: 1.72;
+          z-index: 2;
         }
 
-        @keyframes sparkPulse {
+        @keyframes sparklePulse {
           0%, 100% {
-            opacity: 0.42;
-            transform: scale(0.94);
+            opacity: 0.48;
+            transform: scale(0.9);
           }
           50% {
             opacity: 1;
-            transform: scale(1.18);
+            transform: scale(1.16);
           }
         }
 
-        @keyframes borderShift {
-          from {
-            stroke-dashoffset: 0;
-          }
-          to {
-            stroke-dashoffset: -60;
-          }
-        }
-
-        @keyframes floatHalo {
+        @keyframes ringFloat {
           0%, 100% {
-            transform: translateY(0px);
+            transform: translateY(0);
           }
           50% {
             transform: translateY(-4px);
           }
         }
 
-        @media (max-width: 920px) {
-          .map-wrap {
-            padding: 94px 12px 12px;
+        @media (max-width: 980px) {
+          .fantasy-page {
+            padding: 10px;
           }
 
-          .map-topbar {
-            left: 14px;
-            right: 14px;
+          .fantasy-topbar {
+            flex-direction: column;
+            align-items: stretch;
           }
 
-          .map-tooltip {
-            left: 16px;
-            right: 16px;
+          .map-info,
+          .map-note {
+            position: static;
             width: auto;
-            bottom: 16px;
-          }
-
-          .map-caption {
-            display: none;
-          }
-
-          .map-title h1 {
-            letter-spacing: 4px;
+            max-width: none;
+            margin: 14px;
           }
         }
       `}</style>
 
-      <div className="realm-page">
-        <div className="paper-grain" />
-        <div className="page-frame" />
+      <div className="fantasy-page">
+        <div className="fantasy-shell">
+          <div className="fantasy-topbar">
+            <button className="fantasy-back" onClick={() => router.push('/')}>
+              Back to Solar System
+            </button>
 
-        <div className="map-topbar">
-          <button className="map-back" onClick={() => router.push('/')}>
-            Back to Solar System
-          </button>
-          <div className="map-title">
-            <h1>The Playful Atlas</h1>
-            <p>Choose a realm and tempt fate</p>
+            <div className="fantasy-title">
+              <h1>The Cartographer&apos;s Gamebook</h1>
+              <p>Hand-drawn provinces, roads, rivers, peaks, and enchanted hover seals</p>
+            </div>
+
+            <div style={{ width: 158 }} />
           </div>
-          <div style={{ width: 170 }} />
-        </div>
 
-        <div className="map-wrap">
-          <svg
-            className="map-svg"
-            viewBox="0 0 1100 620"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <defs>
-              <filter id="realmGlow">
-                <feGaussianBlur stdDeviation="8" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-            </defs>
+          <div className="fantasy-map">
+            <svg className="fantasy-svg" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <filter id="hoverGlow">
+                  <feGaussianBlur stdDeviation="8" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
 
-            <path
-              d="M50,122 C95,58 186,42 291,55 C392,68 438,47 536,38 C678,25 736,46 826,74 C944,111 1022,189 1038,281 C1052,362 1022,444 960,512 C906,571 825,594 699,594 C587,594 522,572 432,566 C314,559 228,584 148,545 C83,514 44,438 36,362 C29,292 8,181 50,122 Z"
-              fill="#efe2be"
-              stroke="rgba(68, 91, 116, 0.75)"
-              strokeWidth="3"
-            />
+                <path id="spine-label" d="M470 190 C560 140 680 140 780 202" />
+                <path id="forest-label" d="M164 548 C242 566 350 610 446 700" />
+                <path id="lake-label" d="M710 548 C760 528 830 532 888 574" />
+                <path id="river-label" d="M824 184 C860 262 858 338 834 430" />
+                <path id="road-label" d="M290 336 C482 346 644 370 884 438" />
+              </defs>
 
-            <path
-              d="M56,134 C101,72 188,57 292,69 C392,82 441,60 542,51 C676,40 732,59 820,86 C933,121 1004,192 1018,282 C1031,358 1001,433 942,493 C889,547 814,571 697,574 C589,576 526,554 436,549 C326,542 236,566 164,530 C104,500 70,430 63,358 C56,292 37,195 56,134 Z"
-              fill="none"
-              stroke="rgba(255, 248, 226, 0.74)"
-              strokeWidth="1.5"
-            />
-
-            {MOUNTAIN_PATHS.map((path) => (
               <path
-                key={path}
-                d={path}
+                d="M116 156 C176 82 292 54 426 72 C534 86 623 61 756 59 C900 56 1029 90 1142 160 C1263 234 1330 347 1328 496 C1327 630 1245 741 1112 808 C992 868 850 865 714 835 C601 809 507 800 390 816 C266 834 163 807 104 739 C45 670 43 563 63 473 C82 388 52 246 116 156 Z"
+                fill="#efe1bf"
+                stroke="#5a4d3c"
+                strokeWidth="3.2"
+              />
+              <path
+                d="M128 171 C186 98 298 70 427 87 C540 102 626 75 756 73 C895 71 1020 103 1128 172 C1235 241 1311 352 1311 490 C1311 618 1231 726 1100 791 C983 851 847 848 714 820 C601 794 510 786 397 801 C279 816 178 790 121 724 C66 661 64 560 84 477 C104 393 77 255 128 171 Z"
                 fill="none"
-                stroke="#6c7f97"
-                strokeWidth="4"
+                stroke="rgba(255,249,236,0.72)"
+                strokeWidth="1.7"
+              />
+
+              <path
+                d="M790 166 C830 225 855 306 852 380 C849 448 828 500 803 550"
+                fill="none"
+                stroke="#6b604e"
+                strokeWidth="3"
                 strokeLinecap="round"
-                strokeLinejoin="round"
+                strokeDasharray="4 10"
+                opacity="0.8"
+              />
+              <path
+                d="M804 174 C796 244 764 295 752 360 C744 406 744 452 754 500"
+                fill="none"
+                stroke="#7a6954"
+                strokeWidth="2"
+                strokeLinecap="round"
                 opacity="0.72"
               />
-            ))}
 
-            <path
-              d="M667 103C695 118 707 142 703 173C700 203 679 224 673 256C666 290 681 320 711 340"
-              fill="none"
-              stroke="#7b92aa"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeDasharray="3 9"
-              opacity="0.75"
-            />
+              {MOUNTAINS.map(([x, y, scale]) => (
+                <MountainGlyph key={`${x}-${y}`} x={x} y={y} scale={scale} />
+              ))}
 
-            <path
-              d="M592 300C632 302 666 317 696 344C721 367 737 401 741 435C709 448 671 450 637 439C598 425 574 399 554 370C559 337 574 313 592 300Z"
-              fill="#d9e5ef"
-              stroke="#6d839d"
-              strokeWidth="2.2"
-              opacity="0.88"
-            />
+              <path
+                d="M714 510 C760 494 824 500 866 530 C905 559 924 612 915 654 C874 674 828 677 784 664 C739 651 696 627 674 588 C678 551 694 523 714 510 Z"
+                fill="#d5d9d4"
+                stroke="#655a49"
+                strokeWidth="2.1"
+                opacity="0.9"
+              />
+              {LAKE_WAVES.map(([x, y]) => (
+                <WaveGlyph key={`${x}-${y}`} x={x} y={y} scale={1} />
+              ))}
 
-            <path
-              d="M256 196C324 183 381 197 430 229"
-              fill="none"
-              stroke="#778ea5"
-              strokeWidth="3"
-              strokeLinecap="round"
-              opacity="0.55"
-              strokeDasharray="6 10"
-            />
-            <path
-              d="M586 487C654 477 720 468 818 430"
-              fill="none"
-              stroke="#778ea5"
-              strokeWidth="3"
-              strokeLinecap="round"
-              opacity="0.55"
-              strokeDasharray="6 10"
-            />
+              {COAST_WAVES.map(([x, y]) => (
+                <WaveGlyph key={`${x}-${y}`} x={x} y={y} scale={0.72} />
+              ))}
 
-            {FOREST_TREES.map(([x, y]) => (
-              <g key={`${x}-${y}`} opacity="0.72">
-                <path d={`M${x} ${y} l10 -18 l10 18 z`} fill="#7d9378" stroke="#61745e" strokeWidth="1.3" />
-                <path d={`M${x + 6} ${y - 10} l8 -14 l8 14 z`} fill="#8aa281" stroke="#61745e" strokeWidth="1.2" />
-                <line x1={x + 10} y1={y} x2={x + 10} y2={y + 9} stroke="#6f6557" strokeWidth="1.6" />
-              </g>
-            ))}
+              <path
+                d="M930 218 C962 228 988 254 1000 282 C1010 308 1009 335 1000 362"
+                fill="none"
+                stroke="#74614a"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeDasharray="3 7"
+                opacity="0.8"
+              />
+              <path
+                d="M266 322 C446 330 650 366 886 440"
+                fill="none"
+                stroke="#7a654d"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeDasharray="5 9"
+                opacity="0.78"
+              />
+              <path
+                d="M414 760 C494 732 592 718 688 716"
+                fill="none"
+                stroke="#7a654d"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeDasharray="5 9"
+                opacity="0.78"
+              />
 
-            <g opacity="0.78">
-              <circle cx="845" cy="282" r="58" fill="#d8dfeb" stroke="#69809a" strokeWidth="2.4" />
-              <path d="M800 282h90M845 237v90M815 250l60 60M875 250l-60 60" stroke="#69809a" strokeWidth="1.8" fill="none" />
-              <circle cx="845" cy="282" r="25" fill="none" stroke="#69809a" strokeWidth="1.6" />
-            </g>
+              {WHISPERWOOD_TREES.map(([x, y], index) => (
+                <TreeGlyph
+                  key={`${x}-${y}`}
+                  x={x}
+                  y={y}
+                  scale={0.84 + (index % 4) * 0.05}
+                />
+              ))}
+              {EASTWOOD_TREES.map(([x, y], index) => (
+                <TreeGlyph
+                  key={`${x}-${y}`}
+                  x={x}
+                  y={y}
+                  scale={0.8 + (index % 3) * 0.04}
+                />
+              ))}
 
-            {REALMS.map((realm) => {
-              const isHovered = hovered === realm.id
+              <SettlementGlyph x={1006} y={414} kind="city" />
+              <SettlementGlyph x={265} y={278} />
+              <SettlementGlyph x={1128} y={268} />
+              <SettlementGlyph x={572} y={760} />
 
-              return (
-                <g key={realm.id}>
-                  {isHovered && (
+              <text fill="#5c4d3b" fontFamily="'IM Fell English SC', serif" fontSize="58" letterSpacing="4">
+                <textPath href="#spine-label" startOffset="18%">
+                  Dragonspine
+                </textPath>
+              </text>
+
+              <text fill="#64745b" fontFamily="'Cormorant Garamond', serif" fontSize="48" fontStyle="italic" letterSpacing="3">
+                <textPath href="#forest-label" startOffset="10%">
+                  Whisperwood
+                </textPath>
+              </text>
+
+              <text fill="#5c4d3b" fontFamily="'Cormorant Garamond', serif" fontSize="42" fontStyle="italic" letterSpacing="3">
+                <textPath href="#lake-label" startOffset="14%">
+                  Mirrormere
+                </textPath>
+              </text>
+
+              <text fill="#6b604e" fontFamily="'Cormorant Garamond', serif" fontSize="34" fontStyle="italic" letterSpacing="2">
+                <textPath href="#river-label" startOffset="8%">
+                  Merchant&apos;s Flow
+                </textPath>
+              </text>
+
+              <text fill="#6d5c47" fontFamily="'IBM Plex Mono', monospace" fontSize="16" letterSpacing="4">
+                <textPath href="#road-label" startOffset="24%">
+                  Pilgrim Road
+                </textPath>
+              </text>
+
+              {REALMS.map((realm) => {
+                const hovered = realm.id === hoveredId
+
+                return (
+                  <g key={realm.id}>
+                    {hovered && (
+                      <path
+                        d={realm.path}
+                        fill={realm.accent}
+                        opacity="0.14"
+                        filter="url(#hoverGlow)"
+                      />
+                    )}
+
                     <path
                       d={realm.path}
-                      fill={realm.accent}
-                      opacity="0.16"
-                      filter="url(#realmGlow)"
+                      fill={hovered ? `${realm.accent}55` : realm.fill}
+                      className={`realm-shape ${realm.locked ? '' : 'active'}`}
+                      style={{
+                        stroke: hovered ? realm.accent : 'rgba(79, 66, 50, 0.88)',
+                        filter: hovered ? `drop-shadow(0 0 14px ${realm.accent})` : 'none',
+                      }}
+                      onMouseEnter={() => setHoveredId(realm.id)}
+                      onMouseLeave={() => setHoveredId(null)}
+                      onClick={() => enterRealm(realm)}
                     />
-                  )}
 
-                  <path
-                    d={realm.path}
-                    fill={isHovered ? `${realm.accent}55` : realm.fill}
-                    className={`realm-shape ${realm.locked ? 'locked' : 'active'}`}
-                    onMouseEnter={() => setHovered(realm.id)}
-                    onMouseLeave={() => setHovered(null)}
-                    onClick={() => enterRealm(realm)}
-                    style={{
-                      filter: isHovered ? `drop-shadow(0 0 14px ${realm.accent})` : 'none',
-                      stroke: isHovered ? realm.accent : 'rgba(65, 88, 114, 0.85)',
-                    }}
-                  />
+                    <path
+                      d={realm.path}
+                      className="realm-inline-shade"
+                      transform="translate(4 4) scale(0.97)"
+                      style={{
+                        opacity: hovered ? 0.75 : 0.24,
+                        stroke: realm.accent,
+                      }}
+                    />
 
-                  <path
-                    d={realm.path}
-                    className="realm-border"
-                    transform={`translate(3 4) scale(0.97)`}
-                    style={{
-                      opacity: isHovered ? 0.8 : 0.26,
-                    }}
-                  />
+                    {hovered && (
+                      <g className="hover-ring">
+                        <circle
+                          cx={realm.labelX}
+                          cy={realm.labelY - 18}
+                          r="18"
+                          fill="none"
+                          stroke={realm.accent}
+                          strokeWidth="1.6"
+                          opacity="0.85"
+                        />
+                        <circle
+                          cx={realm.labelX}
+                          cy={realm.labelY - 18}
+                          r="30"
+                          fill="none"
+                          stroke={realm.accent}
+                          strokeWidth="1"
+                          opacity="0.42"
+                        />
+                      </g>
+                    )}
 
-                  {isHovered && (
-                    <g className="hover-rings">
-                      <circle cx={realm.labelX} cy={realm.labelY - 24} r="18" stroke={realm.accent} />
-                      <circle cx={realm.labelX} cy={realm.labelY - 24} r="29" stroke={realm.accent} opacity="0.45" />
+                    {realm.sparkles.map(([x, y], index) => (
+                      <Sparkle
+                        key={`${realm.id}-${x}-${y}`}
+                        x={x}
+                        y={y}
+                        accent={realm.accent}
+                        index={index}
+                      />
+                    ))}
+
+                    <g className="realm-label" transform={`translate(${realm.labelX} ${realm.labelY})`}>
+                      {realm.labelLines.map((line, index) => (
+                        <text
+                          key={line}
+                          x="0"
+                          y={index * 26}
+                          textAnchor="middle"
+                          fill={hovered ? realm.accent : '#564734'}
+                          fontFamily="'IM Fell English SC', serif"
+                          fontSize={hovered ? 30 : 27}
+                          letterSpacing="1.5"
+                          opacity={hovered ? 1 : 0.92}
+                        >
+                          {line}
+                        </text>
+                      ))}
+                      <text
+                        x="0"
+                        y={realm.labelLines.length * 26 + 10}
+                        textAnchor="middle"
+                        fill="rgba(90, 74, 56, 0.72)"
+                        fontFamily="'IBM Plex Mono', monospace"
+                        fontSize="11"
+                        letterSpacing="1.8"
+                      >
+                        {realm.locked ? 'sealed for later' : 'click to enter'}
+                      </text>
                     </g>
-                  )}
-
-                  {realm.sparks.map(([x, y], index) => (
-                    <circle
-                      key={`${realm.id}-${x}-${y}`}
-                      cx={x}
-                      cy={y}
-                      r={isHovered ? (index % 2 === 0 ? 3.4 : 2.4) : 1.5}
-                      fill={realm.accent}
-                      opacity={isHovered ? 0.95 : 0.34}
-                      className={isHovered ? 'spark' : undefined}
-                      style={{ animationDelay: `${index * 0.18}s` }}
-                    />
-                  ))}
-
-                  <g className="realm-label">
-                    <text
-                      x={realm.labelX}
-                      y={realm.labelY}
-                      textAnchor="middle"
-                      className="realm-name"
-                      style={{
-                        fill: isHovered ? realm.accent : '#475c76',
-                        fontSize: isHovered ? 28 : 24,
-                        opacity: isHovered ? 1 : 0.88,
-                      }}
-                    >
-                      {realm.name}
-                    </text>
-                    <text
-                      x={realm.labelX}
-                      y={realm.labelY + 18}
-                      textAnchor="middle"
-                      className="realm-sub"
-                      style={{
-                        fill: 'rgba(67, 89, 113, 0.78)',
-                        opacity: isHovered ? 1 : 0.7,
-                      }}
-                    >
-                      {realm.locked ? 'sealed for later' : 'click to enter'}
-                    </text>
                   </g>
-                </g>
-              )
-            })}
+                )
+              })}
 
-            <g transform="translate(966 488)" opacity="0.82">
-              <circle cx="0" cy="0" r="46" fill="none" stroke="#5f7692" strokeWidth="2.3" />
-              <circle cx="0" cy="0" r="34" fill="none" stroke="#5f7692" strokeWidth="1.3" />
-              <path d="M0 -36 L9 0 L0 36 L-9 0 Z" fill="#5f7692" />
-              <path d="M-36 0 L0 9 L36 0 L0 -9 Z" fill="none" stroke="#5f7692" strokeWidth="2" />
-              <text x="0" y="-54" textAnchor="middle" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">N</text>
-              <text x="0" y="65" textAnchor="middle" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">S</text>
-              <text x="-54" y="4" textAnchor="middle" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">W</text>
-              <text x="54" y="4" textAnchor="middle" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">E</text>
-            </g>
+              <g transform="translate(1200 744)" opacity="0.84">
+                <circle cx="0" cy="0" r="58" fill="none" stroke="#5a4d3c" strokeWidth="2.4" />
+                <circle cx="0" cy="0" r="42" fill="none" stroke="#5a4d3c" strokeWidth="1.4" />
+                <path d="M0 -46 L10 0 L0 46 L-10 0 Z" fill="#5a4d3c" />
+                <path d="M-46 0 L0 10 L46 0 L0 -10 Z" fill="none" stroke="#5a4d3c" strokeWidth="2" />
+                <path d="M-34 -34 L0 -8 L34 -34" fill="none" stroke="#5a4d3c" strokeWidth="1.3" />
+                <path d="M-34 34 L0 8 L34 34" fill="none" stroke="#5a4d3c" strokeWidth="1.3" />
+                <text x="0" y="-70" textAnchor="middle" fontFamily="'IBM Plex Mono', monospace" fontSize="11" fill="#5a4d3c">N</text>
+                <text x="0" y="82" textAnchor="middle" fontFamily="'IBM Plex Mono', monospace" fontSize="11" fill="#5a4d3c">S</text>
+                <text x="-70" y="4" textAnchor="middle" fontFamily="'IBM Plex Mono', monospace" fontSize="11" fill="#5a4d3c">W</text>
+                <text x="70" y="4" textAnchor="middle" fontFamily="'IBM Plex Mono', monospace" fontSize="11" fill="#5a4d3c">E</text>
+              </g>
 
-            <g transform="translate(66 574)" opacity="0.76">
-              <line x1="0" y1="0" x2="112" y2="0" stroke="#5f7692" strokeWidth="3" />
-              <line x1="0" y1="-8" x2="0" y2="8" stroke="#5f7692" strokeWidth="3" />
-              <line x1="56" y1="-8" x2="56" y2="8" stroke="#5f7692" strokeWidth="3" />
-              <line x1="112" y1="-8" x2="112" y2="8" stroke="#5f7692" strokeWidth="3" />
-              <text x="0" y="-16" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">0</text>
-              <text x="48" y="-16" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">16</text>
-              <text x="100" y="-16" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">32</text>
-              <text x="120" y="4" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">miles</text>
-            </g>
-          </svg>
-        </div>
+              <g transform="translate(76 812)" opacity="0.76">
+                <line x1="0" y1="0" x2="132" y2="0" stroke="#5a4d3c" strokeWidth="3" />
+                <line x1="0" y1="-8" x2="0" y2="8" stroke="#5a4d3c" strokeWidth="3" />
+                <line x1="44" y1="-8" x2="44" y2="8" stroke="#5a4d3c" strokeWidth="3" />
+                <line x1="88" y1="-8" x2="88" y2="8" stroke="#5a4d3c" strokeWidth="3" />
+                <line x1="132" y1="-8" x2="132" y2="8" stroke="#5a4d3c" strokeWidth="3" />
+                <text x="0" y="-16" fontFamily="'IBM Plex Mono', monospace" fontSize="10" fill="#5a4d3c">0</text>
+                <text x="38" y="-16" fontFamily="'IBM Plex Mono', monospace" fontSize="10" fill="#5a4d3c">20</text>
+                <text x="82" y="-16" fontFamily="'IBM Plex Mono', monospace" fontSize="10" fill="#5a4d3c">40</text>
+                <text x="136" y="4" fontFamily="'IBM Plex Mono', monospace" fontSize="10" fill="#5a4d3c">miles</text>
+              </g>
+            </svg>
 
-        <div className="map-caption">
-          A brighter parchment, clearer labels, and a little magic on hover.
-          The map is now meant to feel discoverable, not merely clickable.
-        </div>
-
-        {hoveredRealm && (
-          <div className="map-tooltip">
-            <div className="eyebrow">Realm dossier</div>
-            <h2 style={{ color: hoveredRealm.accent }}>{hoveredRealm.name}</h2>
-            <div className="sub">{hoveredRealm.subtitle}</div>
-            <div className="desc">{hoveredRealm.description}</div>
-            <div
-              className="status"
-              style={{
-                color: hoveredRealm.locked ? 'rgba(71, 92, 118, 0.72)' : hoveredRealm.accent,
-              }}
-            >
-              {hoveredRealm.locked ? 'Locked for future mischief' : 'Open now'}
+            <div className="map-note">
+              Built toward a Tolkien-like fantasy-map language: hand-drawn mountain fences,
+              repeated forest symbols, ringed water, road labels, settlement icons, and a more
+              illustrative parchment hierarchy than the previous UI-style map.
             </div>
+
+            {hoveredRealm && (
+              <div className="map-info">
+                <div className="eyebrow">Realm dossier</div>
+                <h2 style={{ color: hoveredRealm.accent }}>{hoveredRealm.name}</h2>
+                <div className="sub">{hoveredRealm.subtitle}</div>
+                <div className="desc">{hoveredRealm.description}</div>
+                <div
+                  className="status"
+                  style={{
+                    color: hoveredRealm.locked ? 'rgba(92, 75, 56, 0.72)' : hoveredRealm.accent,
+                  }}
+                >
+                  {hoveredRealm.locked ? 'Locked for later campaigns' : 'Open now'}
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </>
   )

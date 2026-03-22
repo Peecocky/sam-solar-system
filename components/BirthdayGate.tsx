@@ -1,11 +1,10 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 const BIRTHDAY = '2001-09-11'
-const STORAGE_KEY = 'sam-birthday-gate-v1'
 
 export default function BirthdayGate({
   children,
@@ -17,30 +16,18 @@ export default function BirthdayGate({
   prompt?: string
 }) {
   const router = useRouter()
-  const [ready, setReady] = useState(false)
   const [unlocked, setUnlocked] = useState(false)
   const [value, setValue] = useState('')
   const [error, setError] = useState(false)
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    setUnlocked(localStorage.getItem(STORAGE_KEY) === 'true')
-    setReady(true)
-  }, [])
-
   function handleUnlock() {
     if (value === BIRTHDAY) {
-      localStorage.setItem(STORAGE_KEY, 'true')
       setUnlocked(true)
       setError(false)
       return
     }
 
     setError(true)
-  }
-
-  if (!ready) {
-    return null
   }
 
   if (unlocked) {
