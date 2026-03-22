@@ -131,7 +131,6 @@ export default function MusicPage() {
     const audio = audioRef.current
     if (!audio) return
     audio.src = song.src; audio.load()
-    setCurrentTime(0); setDuration(0); setLoadError(false)
     if (playing) audio.play().catch(() => setPlaying(false))
   }, [currentIdx]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -142,10 +141,16 @@ export default function MusicPage() {
     else audio.pause()
   }, [playing])
 
+  function resetTrackState() {
+    setCurrentTime(0)
+    setDuration(0)
+    setLoadError(false)
+  }
+
   function togglePlay() { setPlaying(p => !p) }
-  function playIdx(i: number) { setCurrentIdx(i); setPlaying(true) }
-  function prevTrack() { setCurrentIdx(i => (i - 1 + SONGS.length) % SONGS.length); setPlaying(true) }
-  function nextTrack() { setCurrentIdx(i => (i + 1) % SONGS.length); setPlaying(true) }
+  function playIdx(i: number) { resetTrackState(); setCurrentIdx(i); setPlaying(true) }
+  function prevTrack() { resetTrackState(); setCurrentIdx(i => (i - 1 + SONGS.length) % SONGS.length); setPlaying(true) }
+  function nextTrack() { resetTrackState(); setCurrentIdx(i => (i + 1) % SONGS.length); setPlaying(true) }
 
   function seek(e: React.MouseEvent<HTMLDivElement>) {
     const audio = audioRef.current

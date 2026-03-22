@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 256">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#efe0bc" />
+      <stop offset="55%" stop-color="#d2c49d" />
+      <stop offset="100%" stop-color="#b69a72" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="256" fill="url(#bg)" />
+  <path d="M20 23c32-14 106-19 150-5 34 11 65 9 104-7 39-16 109-12 170 12 35 14 49 39 48 73-1 33-16 54-39 78-26 28-46 54-104 59-57 4-80 20-130 17-44-3-75-17-109-14-34 3-88-4-106-32-16-24-18-46-7-72 8-21 4-45 23-69z" fill="none" stroke="#4b617d" stroke-width="5" opacity="0.82" />
+  <path d="M178 142l28-51 24 37 18-25 33 44" fill="none" stroke="#6f7f96" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
+  <path d="M318 58c17 4 30 18 29 32-1 15-18 21-25 33-8 14-1 31-8 47" fill="none" stroke="#5d7794" stroke-width="6" stroke-linecap="round" />
+  <path d="M82 166c24-22 59-27 94-17 26 7 44 26 71 26 25 0 50-14 76-6 22 7 33 31 61 37 27 6 63-5 95-24" fill="none" stroke="#7d8ea1" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 12" />
+  <path d="M72 84c8 13 10 28 6 42M90 78c11 13 14 34 9 55M106 89c10 11 14 27 13 43" fill="none" stroke="#67816e" stroke-width="4" stroke-linecap="round" />
+  <path d="M374 150c11 5 22 5 35 1M390 172c13 5 29 6 43 2M404 194c13 3 23 2 35-3" fill="none" stroke="#5f7488" stroke-width="4" stroke-linecap="round" />
+  <circle cx="420" cy="63" r="32" fill="none" stroke="#506784" stroke-width="5" opacity="0.8" />
+  <path d="M420 34v58M391 63h58M401 44l38 38M439 44l-38 38" fill="none" stroke="#506784" stroke-width="3" opacity="0.8" />
+  <text x="258" y="54" fill="#4a5d77" font-size="28" font-family="Georgia, serif" letter-spacing="4" text-anchor="middle">REALMS</text>
+</svg>

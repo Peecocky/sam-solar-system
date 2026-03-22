@@ -35,7 +35,20 @@ interface Msg {
 }
 
 // DB row → Msg
-function rowToMsg(row: any): Msg {
+type MessageRow = {
+  id: string
+  nick: string
+  body: string
+  ts: number
+  shape: string
+  col: string
+  cells: string | [number, number][]
+  ua?: string | null
+  del_req?: boolean | null
+  del?: boolean | null
+}
+
+function rowToMsg(row: MessageRow): Msg {
   return {
     id: row.id,
     nick: row.nick,
@@ -344,20 +357,20 @@ export default function InteractivePage() {
     const channel = supabase
       .channel('wall-realtime')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
-        const newMsg = rowToMsg(payload.new)
+        const newMsg = rowToMsg(payload.new as MessageRow)
         setMsgs(prev => {
           if (prev.some(m => m.id === newMsg.id)) return prev
           return [...prev, newMsg]
         })
       })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages' }, (payload) => {
-        const delId = (payload.old as any).id
+        const delId = (payload.old as Partial<MessageRow>).id
         if (delId) {
           setMsgs(prev => prev.filter(m => m.id !== delId))
         }
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' }, (payload) => {
-        const updated = rowToMsg(payload.new)
+        const updated = rowToMsg(payload.new as MessageRow)
         setMsgs(prev => prev.map(m => m.id === updated.id ? updated : m))
       })
       .subscribe()

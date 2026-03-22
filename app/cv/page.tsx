@@ -442,9 +442,10 @@ const DATA = {
 
 type Lang = 'cn' | 'en'
 type LangStr = { cn: string; en: string }
+type LangList = { cn: string[]; en: string[] }
 
-function t(obj: LangStr | { cn: string[]; en: string[] }, lang: Lang): any {
-  return (obj as any)[lang]
+function t<T extends LangStr | LangList>(obj: T, lang: Lang): T[Lang] {
+  return obj[lang]
 }
 
 export default function CVPage() {
@@ -1092,8 +1093,8 @@ export default function CVPage() {
               <div className="cv-entry" key={i}>
                 <div className="cv-entry-header">
                   <span className="cv-entry-title">
-                    {(l as any).link ? (
-                      <a href={(l as any).link} target="_blank" rel="noreferrer">
+                    {'link' in l && l.link ? (
+                      <a href={l.link} target="_blank" rel="noreferrer">
                         {t(l.title, lang)}
                       </a>
                     ) : (
@@ -1102,12 +1103,12 @@ export default function CVPage() {
                   </span>
                   <span className="cv-entry-date">{t(l.date, lang)}</span>
                 </div>
-                {(l as any).desc && (
-                  <div className="cv-entry-desc">{t((l as any).desc, lang)}</div>
+                {'desc' in l && l.desc && (
+                  <div className="cv-entry-desc">{t(l.desc, lang)}</div>
                 )}
-                {(l as any).bullets && (
+                {'bullets' in l && l.bullets && (
                   <ul className="cv-bullets">
-                    {(t((l as any).bullets, lang) as string[]).map(
+                    {(t(l.bullets, lang) as string[]).map(
                       (b: string, j: number) => (
                         <li key={j}>{b}</li>
                       )

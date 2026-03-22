@@ -1,609 +1,452 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-/* ===== Data ===== */
-type Recipe = {
+type KitchenMoment = {
   id: string
-  name: string
-  nameCn: string
-  category: string
-  tagline: string
-  description: string
-  image: string
-  steps: string[]
-  tips: string
+  title: string
+  label: string
+  summary: string
+  story: string
+  punchline: string
+  details: string[]
 }
 
-const RECIPES: Recipe[] = [
+const KITCHEN_MOMENTS: KitchenMoment[] = [
   {
-    id: 'steak',
-    name: 'Pan-Seared Steak',
-    nameCn: '牛排',
-    category: 'meat',
-    tagline: 'The perfect sear, every time.',
-    description:
-      'A thick-cut ribeye, kissed by cast iron until the crust shatters and the interior blushes pink. Finished with garlic butter, thyme, and a whisper of flaky salt.',
-    image:
-      'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&q=80',
-    steps: [
-      'Bring steak to room temperature for 40 minutes. Pat completely dry with paper towels.',
-      'Season generously with coarse salt and cracked black pepper on all sides.',
-      'Heat cast iron until smoking. Add high smoke-point oil — avocado or grapeseed.',
-      'Sear 3 minutes per side undisturbed. Listen for that deep, crackling sizzle.',
-      'Add butter, crushed garlic, and fresh thyme. Baste continuously for 60 seconds.',
-      'Rest on a wire rack for 8 minutes. The carryover heat finishes the work.',
-    ],
-    tips: 'The secret is patience: a dry surface and a screaming hot pan create the Maillard crust.',
+    id: 'tea',
+    title: '泡茶',
+    label: 'Kitchen boot sequence',
+    summary: '一切从烧水开始。厨房是否文明，先看这壶水有没有被认真对待。',
+    story:
+      '这不是普通喝茶，这是 Sam 给厨房按下开机键。步骤看似简单，气质必须到位：水温不能马虎，茶叶不能受委屈，杯子最好也被尊重。',
+    punchline: '如果说做饭是主线任务，那泡茶就是进入副本前的庄严读条。',
+    details: ['热水管理', '茶叶投放', '气氛值拉满'],
+  },
+  {
+    id: 'sushi',
+    title: '寿司',
+    label: 'First-cook confidence incident',
+    summary: '第一次做饭就去碰寿司，属于对自己有一种未经证实但非常坚定的信任。',
+    story:
+      '米饭、醋、卷帘、整形，理论上每一步都很温柔，实际上每一步都在考验手部稳定性和精神状态。朋友圈那次，是一场名副其实的首秀。',
+    punchline: '成品的灵魂大概是：想当米其林，先别让海苔走位。',
+    details: ['第一次做饭纪念', '卷物塑形', '朋友圈留档'],
   },
   {
     id: 'shrimp',
-    name: 'Garlic Butter Shrimp',
-    nameCn: '虾仁',
-    category: 'seafood',
-    tagline: 'Five minutes. Infinite flavor.',
-    description:
-      'Plump shrimp swimming in a pool of golden garlic butter, bright with lemon zest and a kick of red pepper flakes. Simple enough for Tuesday, elegant enough for Saturday.',
-    image:
-      'https://images.unsplash.com/photo-1625943553852-781c6dd46faa?w=800&q=80',
-    steps: [
-      'Devein and butterfly large shrimp. Pat dry — moisture is the enemy of a good sear.',
-      'Melt butter over medium-high heat until it foams and smells nutty.',
-      'Add thinly sliced garlic, cook 30 seconds until fragrant but not brown.',
-      'Add shrimp in a single layer. Cook 90 seconds until edges turn coral pink.',
-      'Flip, squeeze half a lemon over the pan, add red pepper flakes.',
-      'Remove from heat immediately. The residual heat cooks them through.',
-    ],
-    tips: 'Overcooked shrimp are rubber. When they curl into a C shape, they\'re perfect. A full O means overdone.',
+    title: '剥虾',
+    label: 'Shellfish labor division',
+    summary: '先做甲壳类劳务，再做虾米饭。流程完整，态度端正，手指略微抗议。',
+    story:
+      '剥虾这件事看着像前置步骤，实际是耐心测试。每只虾都得经过人工处理，最后再汇总进入虾米饭项目，形成一个高效但不轻松的供应链。',
+    punchline: '虾负责鲜，Sam 负责工时。',
+    details: ['去壳处理', '虾米饭前置', '手工耐心活'],
+  },
+  {
+    id: 'crab',
+    title: '剥蟹',
+    label: 'King crab surgery',
+    summary: '帝王蟹 + 小剪刀，这已经不是做饭了，这是一台精密海鲜外科手术。',
+    story:
+      '器材并不夸张，但精神状态必须像主刀医生。剪刀下去要准，力道不能莽，目标是在不制造海鲜灾难的前提下，把可食用部分体面地请出来。',
+    punchline: '别看工具很小，处理的是帝王级别的复杂度。',
+    details: ['帝王蟹处理', '小剪刀作业', '精细拆解'],
   },
   {
     id: 'salmon',
-    name: 'Miso-Glazed Salmon',
-    nameCn: '三文鱼',
-    category: 'seafood',
-    tagline: 'Umami meets elegance.',
-    description:
-      'Silky salmon fillets lacquered in a sweet-savory miso glaze, broiled until the edges caramelize and the center stays jewel-toned. Served over steamed rice with pickled ginger.',
-    image:
-      'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&q=80',
-    steps: [
-      'Mix white miso, mirin, sake, and brown sugar into a smooth glaze.',
-      'Marinate salmon fillets for at least 2 hours, ideally overnight.',
-      'Preheat broiler. Line a sheet pan with foil and lightly oil it.',
-      'Place salmon skin-side down. Broil 6-8 minutes until glaze bubbles and chars.',
-      'The flesh should flake easily but still be slightly translucent at center.',
-      'Garnish with sesame seeds and thinly sliced scallion.',
-    ],
-    tips: 'White miso is milder and sweeter than red. For salmon, it\'s the perfect partner.',
+    title: '三文鱼解冻和蘸酱油',
+    label: 'Ceremonial patience',
+    summary: '三文鱼最怕两件事：粗暴解冻，以及酱油倒得像报复社会。',
+    story:
+      '这一步的重点不在“快”，而在“稳”。先把鱼恢复到一个合适状态，再让酱油以配角身份出现。毕竟主角已经够贵了，没必要再被折腾。',
+    punchline: '真正的技术不是猛，是知道什么时候该等一下。',
+    details: ['解冻节奏', '蘸酱控制', '刺身前的尊重'],
   },
   {
-    id: 'milk-tea',
-    name: 'Hong Kong Milk Tea',
-    nameCn: '奶茶',
-    category: 'drinks',
-    tagline: 'Silk stocking, silk smooth.',
-    description:
-      'The legendary pantyhose tea — bold Ceylon black tea, pulled repeatedly through a cloth filter until it achieves that unmistakable velvety body. Sweetened with evaporated milk.',
-    image:
-      'https://images.unsplash.com/photo-1558857563-b371033873b8?w=800&q=80',
-    steps: [
-      'Bring water to a rolling boil. Use strong Ceylon or a blend of Assam + Ceylon.',
-      'Add tea leaves generously — this should be bold. Boil for 3 minutes.',
-      'Pour through a fine cloth strainer into another pot. Then pour back. Repeat 4-6 times.',
-      'This "pulling" aerates the tea and creates the signature smooth texture.',
-      'Add evaporated milk (not fresh milk) to taste — about 1:3 ratio.',
-      'Serve scalding hot, or pour over ice for the iced version.',
-    ],
-    tips: 'The repeated pulling is what separates good milk tea from great. Don\'t skip it.',
+    id: 'surf-clam',
+    title: '北极贝清洁与刺身切割',
+    label: 'Seafood spa and precision slicing',
+    summary: '清洁非常仔细，切割非常认真，北极贝大概经历了它职业生涯里最正式的一次护理。',
+    story:
+      '先清，再修，再切，动作里带一点洁癖和一点强迫症。处理北极贝这件事最怕含糊，所以这部分的风格非常明确：海鲜可以凉，流程不能乱。',
+    punchline: '这不是随便切两刀，这是给北极贝做毕业答辩。',
+    details: ['仔细清洁', '刺身切片', '整齐度执念'],
   },
   {
-    id: 'pasta',
-    name: 'Aglio e Olio',
-    nameCn: '蒜油意面',
-    category: 'pasta',
-    tagline: 'Poverty food. Billionaire flavor.',
-    description:
-      'The Roman classic stripped to its essence: spaghetti, garlic, olive oil, chili, parsley. Every ingredient has nowhere to hide, so every detail matters.',
-    image:
-      'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&q=80',
-    steps: [
-      'Cook spaghetti in heavily salted water. Reserve a full cup of pasta water before draining.',
-      'Slice garlic paper-thin. Heat olive oil gently — low and slow.',
-      'Toast garlic until pale gold, never brown. Add chili flakes off-heat.',
-      'Drain pasta 2 minutes early. Finish cooking in the garlic oil with splashes of pasta water.',
-      'Toss vigorously — the starch creates a glossy, emulsified sauce.',
-      'Finish with fresh parsley and the best olive oil you own.',
-    ],
-    tips: 'Burnt garlic makes this dish bitter and ruins everything. Gold, never brown.',
+    id: 'milk',
+    title: '热牛奶',
+    label: 'Soft landing',
+    summary: '不是所有夜晚都需要大菜，有时候一杯热牛奶就足够像句号。',
+    story:
+      '热牛奶的厉害之处在于，它明明很简单，却非常会收尾。厨房忙完之后来这一杯，整个页面的语气都会自动柔和下来。',
+    punchline: '有些人负责做硬菜，有些人负责在最后把世界调成温柔模式。',
+    details: ['深夜收尾', '热度管理', '安静但有效'],
   },
-]
-
-const CATEGORIES = [
-  { key: 'all', label: 'All' },
-  { key: 'meat', label: 'Meat' },
-  { key: 'seafood', label: 'Seafood' },
-  { key: 'pasta', label: 'Pasta' },
-  { key: 'drinks', label: 'Drinks' },
 ]
 
 export default function CookingPage() {
   const router = useRouter()
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [activeCategory, setActiveCategory] = useState('all')
-  const [activeRecipe, setActiveRecipe] = useState<string | null>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
-
-  const filteredRecipes =
-    activeCategory === 'all'
-      ? RECIPES
-      : RECIPES.filter((r) => r.category === activeCategory)
-
-  const selectedRecipe = RECIPES.find((r) => r.id === activeRecipe)
-
-  function scrollToRecipe(id: string) {
-    setActiveRecipe(id)
-    setDrawerOpen(false)
-    setTimeout(() => {
-      document.getElementById(`recipe-${id}`)?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      })
-    }, 300)
-  }
-
-  /* ===== Intersection observer for scroll reveals ===== */
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('revealed')
-          }
-        })
-      },
-      { threshold: 0.15 }
-    )
-
-    const cards = document.querySelectorAll('.recipe-card')
-    cards.forEach((card) => observer.observe(card))
-
-    return () => observer.disconnect()
-  }, [filteredRecipes])
 
   return (
     <>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Serif+SC:wght@500;600;700&display=swap');
 
-        .cooking-page {
-          --bg: #0c0a09;
-          --text: #faf8f5;
-          --muted: #a8a29e;
-          --accent: #d4a574;
-          --accent2: #c2410c;
-          font-family: 'DM Sans', sans-serif;
-          background: var(--bg);
-          color: var(--text);
+        .kitchen-page {
+          --bg: #fff7ec;
+          --bg-deep: #f3dbc0;
+          --ink: #563a2d;
+          --muted: #8a6858;
+          --line: rgba(86, 58, 45, 0.15);
+          --accent: #bf6a3f;
           min-height: 100vh;
+          background:
+            radial-gradient(circle at top right, rgba(255,255,255,0.88), transparent 28%),
+            linear-gradient(180deg, #fff7ec 0%, #f8ead4 52%, #f2d9b7 100%);
+          color: var(--ink);
+          font-family: 'IBM Plex Sans', 'Noto Serif SC', sans-serif;
+          position: relative;
           overflow-x: hidden;
         }
 
-        /* Drawer */
-        .drawer-overlay {
+        .kitchen-page::before {
+          content: '';
           position: fixed;
           inset: 0;
-          background: rgba(0, 0, 0, 0.6);
-          backdrop-filter: blur(4px);
-          z-index: 900;
-          opacity: 0;
           pointer-events: none;
-          transition: opacity 0.35s ease;
-        }
-        .drawer-overlay.open {
-          opacity: 1;
-          pointer-events: all;
+          background-image:
+            radial-gradient(rgba(104, 74, 44, 0.08) 1px, transparent 1px),
+            linear-gradient(120deg, rgba(255,255,255,0.25), transparent 45%);
+          background-size: 20px 20px, 100% 100%;
+          opacity: 0.45;
         }
 
-        .drawer {
-          position: fixed;
+        .topbar {
+          position: sticky;
           top: 0;
-          left: 0;
-          bottom: 0;
-          width: 340px;
-          background: #1a1614;
-          border-right: 1px solid rgba(212, 165, 116, 0.15);
-          z-index: 950;
-          transform: translateX(-100%);
-          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-          padding: 60px 32px 32px;
-          overflow-y: auto;
-        }
-        .drawer.open {
-          transform: translateX(0);
-        }
-
-        .drawer h2 {
-          font-family: 'Playfair Display', serif;
-          font-size: 24px;
-          font-weight: 400;
-          letter-spacing: 3px;
-          color: var(--accent);
-          margin-bottom: 32px;
-          text-transform: uppercase;
-        }
-
-        .drawer .cat-btn {
-          display: block;
-          width: 100%;
-          text-align: left;
-          background: none;
-          border: none;
-          color: var(--muted);
-          font-size: 13px;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          padding: 10px 0;
-          cursor: pointer;
-          transition: color 0.2s;
-          font-family: 'DM Sans', sans-serif;
-        }
-        .drawer .cat-btn.active,
-        .drawer .cat-btn:hover {
-          color: var(--accent);
-        }
-
-        .drawer .recipe-link {
-          display: block;
-          padding: 14px 16px;
-          margin: 4px 0;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: all 0.2s;
-          border: 1px solid transparent;
-        }
-        .drawer .recipe-link:hover {
-          background: rgba(212, 165, 116, 0.08);
-          border-color: rgba(212, 165, 116, 0.15);
-        }
-        .drawer .recipe-link .rname {
-          font-family: 'Playfair Display', serif;
-          font-size: 18px;
-          color: var(--text);
-        }
-        .drawer .recipe-link .rcn {
-          font-size: 12px;
-          color: var(--muted);
-          margin-top: 2px;
-          letter-spacing: 1px;
-        }
-
-        /* Top bar */
-        .top-bar {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          z-index: 800;
+          z-index: 20;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 20px 32px;
-          background: linear-gradient(
-            to bottom,
-            rgba(12, 10, 9, 0.95) 0%,
-            transparent 100%
-          );
-        }
-
-        .menu-btn {
-          background: none;
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: var(--text);
-          padding: 10px 20px;
-          font-size: 12px;
-          letter-spacing: 3px;
-          text-transform: uppercase;
-          cursor: pointer;
-          font-family: 'DM Sans', sans-serif;
-          transition: all 0.3s;
-          border-radius: 2px;
-        }
-        .menu-btn:hover {
-          border-color: var(--accent);
-          color: var(--accent);
-        }
-
-        .logo {
-          font-family: 'Playfair Display', serif;
-          font-size: 18px;
-          font-weight: 400;
-          letter-spacing: 6px;
-          text-transform: uppercase;
-          color: var(--text);
+          padding: 18px 24px;
+          background: rgba(255, 247, 236, 0.8);
+          backdrop-filter: blur(8px);
+          border-bottom: 1px solid rgba(86, 58, 45, 0.08);
         }
 
         .back-btn {
-          background: none;
-          border: none;
-          color: var(--muted);
-          font-size: 13px;
-          letter-spacing: 2px;
+          border: 1px solid rgba(86, 58, 45, 0.18);
+          background: rgba(255, 255, 255, 0.38);
+          color: var(--ink);
+          padding: 10px 14px;
+          font: 600 12px 'IBM Plex Sans', sans-serif;
+          letter-spacing: 1.6px;
+          text-transform: uppercase;
           cursor: pointer;
-          font-family: 'DM Sans', sans-serif;
-          transition: color 0.2s;
-        }
-        .back-btn:hover {
-          color: var(--accent);
         }
 
-        /* Hero */
+        .top-title {
+          font-family: 'Fraunces', 'Noto Serif SC', serif;
+          font-size: 18px;
+          letter-spacing: 2px;
+        }
+
         .hero {
-          height: 100vh;
+          max-width: 1080px;
+          margin: 0 auto;
+          padding: 72px 24px 46px;
+          display: grid;
+          grid-template-columns: 1.15fr 0.85fr;
+          gap: 32px;
+          align-items: end;
+        }
+
+        .hero h1 {
+          margin: 0;
+          font-family: 'Fraunces', 'Noto Serif SC', serif;
+          font-size: clamp(50px, 9vw, 100px);
+          line-height: 0.95;
+          letter-spacing: -2px;
+        }
+
+        .hero p {
+          margin: 18px 0 0;
+          font-size: 18px;
+          line-height: 1.8;
+          color: var(--muted);
+          max-width: 600px;
+        }
+
+        .hero-note {
+          background: rgba(255,255,255,0.38);
+          border: 1px solid rgba(86, 58, 45, 0.12);
+          padding: 22px 24px;
+          box-shadow: 0 18px 40px rgba(126, 85, 49, 0.08);
+        }
+
+        .hero-note .eyebrow,
+        .story-meta,
+        .detail-chip {
+          font-size: 11px;
+          letter-spacing: 1.8px;
+          text-transform: uppercase;
+        }
+
+        .hero-note .eyebrow {
+          color: var(--accent);
+          margin-bottom: 10px;
+          font-weight: 600;
+        }
+
+        .hero-note strong {
+          display: block;
+          font-family: 'Fraunces', 'Noto Serif SC', serif;
+          font-size: 28px;
+          margin-bottom: 10px;
+        }
+
+        .hero-note p {
+          margin: 0;
+          color: var(--muted);
+          font-size: 15px;
+          line-height: 1.7;
+        }
+
+        .stories {
+          max-width: 1080px;
+          margin: 0 auto;
+          padding: 0 24px 90px;
+        }
+
+        .story-card {
+          display: grid;
+          grid-template-columns: 0.96fr 1.04fr;
+          gap: 34px;
+          align-items: center;
+          padding: 34px 0;
+          border-top: 1px solid var(--line);
+        }
+
+        .story-card:nth-child(even) .story-photo {
+          order: 2;
+        }
+
+        .story-card:nth-child(even) .story-copy {
+          order: 1;
+        }
+
+        .story-photo {
+          min-height: 340px;
+          background:
+            linear-gradient(145deg, rgba(255,255,255,0.72), rgba(244, 220, 193, 0.88)),
+            linear-gradient(120deg, rgba(191,106,63,0.08), transparent 60%);
+          border: 1px solid rgba(86, 58, 45, 0.14);
+          box-shadow: 0 24px 45px rgba(118, 84, 51, 0.1);
           display: flex;
-          flex-direction: column;
           align-items: center;
           justify-content: center;
-          text-align: center;
           position: relative;
+          overflow: hidden;
         }
-        .hero::after {
+
+        .story-photo::before {
           content: '';
           position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 200px;
-          background: linear-gradient(transparent, var(--bg));
+          inset: 20px;
+          border: 1px dashed rgba(86, 58, 45, 0.18);
         }
-        .hero h1 {
-          font-family: 'Playfair Display', serif;
-          font-size: clamp(48px, 8vw, 96px);
-          font-weight: 400;
-          letter-spacing: 8px;
-          margin: 0;
-          line-height: 1.1;
-        }
-        .hero p {
-          color: var(--muted);
-          font-size: 14px;
-          letter-spacing: 4px;
-          text-transform: uppercase;
-          margin-top: 20px;
-        }
-        .hero .scroll-hint {
+
+        .story-photo::after {
+          content: '';
           position: absolute;
-          bottom: 48px;
-          color: var(--muted);
-          font-size: 12px;
-          letter-spacing: 3px;
-          animation: float 2s ease-in-out infinite;
-          z-index: 2;
+          width: 180px;
+          height: 180px;
+          border-radius: 999px;
+          background: radial-gradient(circle, rgba(255,255,255,0.55), transparent 68%);
+          top: -24px;
+          right: -24px;
         }
 
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(8px);
-          }
+        .photo-placeholder {
+          position: relative;
+          z-index: 1;
+          text-align: center;
+          color: rgba(86, 58, 45, 0.78);
         }
 
-        /* Recipe cards */
-        .recipes-container {
-          max-width: 1000px;
-          margin: 0 auto;
-          padding: 0 32px 120px;
+        .photo-placeholder .slot {
+          font-family: 'Fraunces', 'Noto Serif SC', serif;
+          font-size: 34px;
+          margin-bottom: 12px;
         }
 
-        .recipe-card {
-          margin-bottom: 160px;
-          opacity: 0;
-          transform: translateY(60px);
-          transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .recipe-card.revealed {
-          opacity: 1;
-          transform: translateY(0);
+        .photo-placeholder p {
+          margin: 0;
+          font-size: 15px;
+          line-height: 1.7;
+          max-width: 300px;
         }
 
-        .recipe-card .card-image {
-          width: 100%;
-          aspect-ratio: 16 / 10;
-          object-fit: cover;
-          border-radius: 4px;
-          filter: brightness(0.85) contrast(1.05);
-          transition: filter 0.4s;
-        }
-        .recipe-card:hover .card-image {
-          filter: brightness(0.95) contrast(1.08);
+        .story-copy {
+          padding-right: 10px;
         }
 
-        .recipe-card .card-meta {
-          display: flex;
-          align-items: baseline;
-          gap: 16px;
-          margin-top: 28px;
-          margin-bottom: 8px;
+        .story-index {
+          color: rgba(191, 106, 63, 0.58);
+          font-family: 'Fraunces', serif;
+          font-size: 56px;
+          line-height: 1;
+          margin-bottom: 12px;
         }
-        .recipe-card .card-meta .num {
-          font-family: 'Playfair Display', serif;
-          font-size: 48px;
-          font-weight: 400;
-          color: rgba(212, 165, 116, 0.25);
+
+        .story-copy h2 {
+          margin: 0;
+          font-family: 'Fraunces', 'Noto Serif SC', serif;
+          font-size: clamp(34px, 6vw, 52px);
           line-height: 1;
         }
-        .recipe-card .card-meta .cat-label {
-          font-size: 11px;
-          letter-spacing: 3px;
-          text-transform: uppercase;
+
+        .story-copy .label {
+          margin-top: 10px;
           color: var(--accent);
-        }
-
-        .recipe-card h2 {
-          font-family: 'Playfair Display', serif;
-          font-size: 36px;
-          font-weight: 400;
-          margin: 8px 0 4px;
-          line-height: 1.2;
-        }
-        .recipe-card .tagline {
-          font-family: 'Playfair Display', serif;
-          font-style: italic;
-          color: var(--muted);
-          font-size: 18px;
-          margin-bottom: 20px;
-        }
-        .recipe-card .desc {
-          color: #d6d3d1;
-          font-size: 15px;
-          line-height: 1.8;
-          max-width: 700px;
-        }
-
-        /* Steps */
-        .steps {
-          margin-top: 40px;
-          padding-left: 0;
-          list-style: none;
-          counter-reset: step;
-        }
-        .steps li {
-          counter-increment: step;
-          position: relative;
-          padding: 16px 0 16px 48px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-          font-size: 14px;
-          line-height: 1.7;
-          color: #d6d3d1;
-        }
-        .steps li::before {
-          content: counter(step);
-          position: absolute;
-          left: 0;
-          top: 16px;
-          font-family: 'Playfair Display', serif;
-          font-size: 22px;
-          color: rgba(212, 165, 116, 0.35);
-        }
-
-        .recipe-card .tip {
-          margin-top: 24px;
-          padding: 20px 24px;
-          background: rgba(212, 165, 116, 0.06);
-          border-left: 2px solid var(--accent);
           font-size: 13px;
-          line-height: 1.7;
-          color: var(--muted);
-          font-style: italic;
-          border-radius: 0 4px 4px 0;
+          letter-spacing: 1.4px;
+          text-transform: uppercase;
+          font-weight: 600;
         }
 
-        /* Divider */
-        .section-divider {
-          width: 40px;
-          height: 1px;
-          background: var(--accent);
-          margin: 0 auto 160px;
-          opacity: 0.3;
+        .story-copy .summary {
+          margin-top: 16px;
+          font-size: 20px;
+          line-height: 1.65;
+          color: #6a4a3d;
+        }
+
+        .story-copy .story {
+          margin-top: 14px;
+          font-size: 15px;
+          line-height: 1.9;
+          color: var(--muted);
+        }
+
+        .story-copy .punchline {
+          margin-top: 18px;
+          padding: 14px 16px;
+          border-left: 3px solid rgba(191, 106, 63, 0.5);
+          background: rgba(255, 255, 255, 0.36);
+          color: #6f4a3c;
+          line-height: 1.8;
+          font-size: 15px;
+        }
+
+        .detail-row {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          margin-top: 18px;
+        }
+
+        .detail-chip {
+          padding: 8px 10px;
+          background: rgba(255,255,255,0.44);
+          border: 1px solid rgba(86, 58, 45, 0.1);
+          color: rgba(86, 58, 45, 0.76);
+        }
+
+        .story-meta {
+          margin-top: 16px;
+          color: rgba(86, 58, 45, 0.54);
+          font-weight: 600;
+        }
+
+        @media (max-width: 860px) {
+          .hero {
+            grid-template-columns: 1fr;
+            padding-top: 54px;
+          }
+
+          .story-card {
+            grid-template-columns: 1fr;
+            gap: 22px;
+          }
+
+          .story-card:nth-child(even) .story-photo,
+          .story-card:nth-child(even) .story-copy {
+            order: initial;
+          }
+
+          .story-photo {
+            min-height: 280px;
+          }
         }
       `}</style>
 
-      <div className="cooking-page">
-        {/* Drawer overlay */}
-        <div
-          className={`drawer-overlay ${drawerOpen ? 'open' : ''}`}
-          onClick={() => setDrawerOpen(false)}
-        />
-
-        {/* Drawer */}
-        <div className={`drawer ${drawerOpen ? 'open' : ''}`}>
-          <h2>Menu</h2>
-
-          <div style={{ marginBottom: 24 }}>
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat.key}
-                className={`cat-btn ${activeCategory === cat.key ? 'active' : ''}`}
-                onClick={() => setActiveCategory(cat.key)}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 16 }}>
-            {filteredRecipes.map((recipe) => (
-              <div
-                key={recipe.id}
-                className="recipe-link"
-                onClick={() => scrollToRecipe(recipe.id)}
-              >
-                <div className="rname">{recipe.name}</div>
-                <div className="rcn">{recipe.nameCn}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Top bar */}
-        <div className="top-bar">
-          <button className="menu-btn" onClick={() => setDrawerOpen(!drawerOpen)}>
-            Menu
-          </button>
-          <div className="logo">Sam&apos;s Kitchen</div>
+      <div className="kitchen-page">
+        <div className="topbar">
           <button className="back-btn" onClick={() => router.push('/')}>
-            ← Solar System
+            Back to Solar System
           </button>
+          <div className="top-title">Sam&apos;s Kitchen</div>
+          <div style={{ width: 150 }} />
         </div>
 
-        {/* Hero */}
-        <div className="hero">
-          <h1>
-            Sam&apos;s
-            <br />
-            Kitchen
-          </h1>
-          <p>A personal collection of recipes</p>
-          <div className="scroll-hint">scroll to explore ↓</div>
-        </div>
+        <section className="hero">
+          <div>
+            <h1>
+              Sam&apos;s
+              <br />
+              Kitchen
+            </h1>
+            <p>
+              这页不再假装自己是一个公共菜谱网站。现在它只干一件事：
+              认真记录 Sam 在厨房里发生过的 7 起重要事件，并给照片留下体面的位置。
+            </p>
+          </div>
 
-        {/* Recipe cards */}
-        <div className="recipes-container" ref={contentRef}>
-          {RECIPES.map((recipe, idx) => (
-            <div key={recipe.id} id={`recipe-${recipe.id}`}>
-              <div className="recipe-card">
-                <img
-                  className="card-image"
-                  src={recipe.image}
-                  alt={recipe.name}
-                  loading="lazy"
-                />
-                <div className="card-meta">
-                  <span className="num">
-                    {String(idx + 1).padStart(2, '0')}
-                  </span>
-                  <span className="cat-label">{recipe.category}</span>
+          <div className="hero-note">
+            <div className="eyebrow">Field note</div>
+            <strong>Evidence locker is open.</strong>
+            <p>
+              每张图目前都留了专属照片位。你后续把照片发来之后，直接替换掉占位区就可以，
+              页面结构已经按“个人厨房档案馆”准备好了。
+            </p>
+          </div>
+        </section>
+
+        <section className="stories">
+          {KITCHEN_MOMENTS.map((moment, index) => (
+            <article className="story-card" key={moment.id}>
+              <div className="story-photo">
+                <div className="photo-placeholder">
+                  <div className="slot">Photo Slot {String(index + 1).padStart(2, '0')}</div>
+                  <p>
+                    Reserved for {moment.title} evidence.
+                    <br />
+                    Waiting for your photo drop.
+                  </p>
                 </div>
-                <h2>{recipe.name}</h2>
-                <div className="tagline">{recipe.tagline}</div>
-                <div className="desc">{recipe.description}</div>
-
-                <ol className="steps">
-                  {recipe.steps.map((step, i) => (
-                    <li key={i}>{step}</li>
-                  ))}
-                </ol>
-
-                <div className="tip">💡 {recipe.tips}</div>
               </div>
 
-              {idx < RECIPES.length - 1 && <div className="section-divider" />}
-            </div>
+              <div className="story-copy">
+                <div className="story-index">{String(index + 1).padStart(2, '0')}</div>
+                <h2>{moment.title}</h2>
+                <div className="label">{moment.label}</div>
+                <div className="summary">{moment.summary}</div>
+                <div className="story">{moment.story}</div>
+                <div className="punchline">{moment.punchline}</div>
+                <div className="detail-row">
+                  {moment.details.map((detail) => (
+                    <span className="detail-chip" key={detail}>
+                      {detail}
+                    </span>
+                  ))}
+                </div>
+                <div className="story-meta">Photo reserved and ready for replacement.</div>
+              </div>
+            </article>
           ))}
-        </div>
+        </section>
       </div>
     </>
   )

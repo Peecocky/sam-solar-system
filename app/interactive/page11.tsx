@@ -215,7 +215,7 @@ function GolCanvas({ side }: { side: 'left' | 'right' }) {
       if (timer) clearInterval(timer)
       window.removeEventListener('resize', onResize)
     }
-  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <canvas

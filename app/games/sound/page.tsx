@@ -3,9 +3,31 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 
+type DeviceOrientationPermissionState = 'granted' | 'denied'
+type DeviceOrientationPermissionAPI = {
+  requestPermission?: () => Promise<DeviceOrientationPermissionState>
+}
+
+declare global {
+  interface Window {
+    __soundHuntCleanup?: () => void
+  }
+}
+
+function isMobileDevice() {
+  if (typeof navigator === 'undefined' || typeof window === 'undefined') {
+    return true
+  }
+
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints > 0 && window.innerWidth < 1024)
+}
+
 export default function SoundHuntPage() {
   const router = useRouter()
-  const [phase, setPhase] = useState<'intro' | 'requesting' | 'denied' | 'hunting' | 'found' | 'desktop'>('intro')
+  const [phase, setPhase] = useState<'intro' | 'requesting' | 'denied' | 'hunting' | 'found' | 'desktop'>(
+    () => (isMobileDevice() ? 'intro' : 'desktop')
+  )
   const [proximity, setProximity] = useState(0) // 0..1, 1 = right on top
   const [direction, setDirection] = useState<'left' | 'right' | 'center'>('center')
   const [pulseSpeed, setPulseSpeed] = useState(2) // seconds per pulse
@@ -18,12 +40,10 @@ export default function SoundHuntPage() {
   const proximityRef = useRef(0)
   const foundRef = useRef(false)
 
-  // Check if mobile
-  useEffect(() => {
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-      (navigator.maxTouchPoints > 0 && window.innerWidth < 1024)
-    if (!isMobile) {
-      setPhase('desktop')
+  const cleanup = useCallback(() => {
+    if (window.__soundHuntCleanup) {
+      window.__soundHuntCleanup()
+      delete window.__soundHuntCleanup
     }
   }, [])
 
@@ -31,9 +51,10 @@ export default function SoundHuntPage() {
     setPhase('requesting')
 
     // Request device orientation permission (iOS 13+)
-    if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+    const permissionApi = DeviceOrientationEvent as DeviceOrientationPermissionAPI
+    if (typeof permissionApi.requestPermission === 'function') {
       try {
-        const perm = await (DeviceOrientationEvent as any).requestPermission()
+        const perm = await permissionApi.requestPermission()
         if (perm !== 'granted') {
           setPhase('denied')
           return
@@ -173,24 +194,17 @@ export default function SoundHuntPage() {
     setPhase('hunting')
 
     // Cleanup function stored for later
-    ;(window as any).__soundHuntCleanup = () => {
+    window.__soundHuntCleanup = () => {
       window.removeEventListener('deviceorientation', onOrientation)
       try { osc.stop() } catch {}
       try { osc2.stop() } catch {}
       try { ctx.close() } catch {}
     }
-  }, [router])
-
-  function cleanup() {
-    if ((window as any).__soundHuntCleanup) {
-      (window as any).__soundHuntCleanup()
-      delete (window as any).__soundHuntCleanup
-    }
-  }
+  }, [cleanup, router])
 
   useEffect(() => {
     return () => cleanup()
-  }, [])
+  }, [cleanup])
 
   // Proximity bar color
   function getColor(p: number) {

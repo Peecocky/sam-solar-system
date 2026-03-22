@@ -3,481 +3,721 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-type Country = {
+type Realm = {
   id: string
   name: string
   subtitle: string
+  description: string
   route: string | null
-  color: string
-  hoverColor: string
-  // SVG path data for the country shape
+  accent: string
+  fill: string
   path: string
-  // Label position
   labelX: number
   labelY: number
-  // Icon
-  icon: string
+  sparks: Array<[number, number]>
   locked: boolean
 }
 
-const COUNTRIES: Country[] = [
+const REALMS: Realm[] = [
   {
     id: 'lottery',
     name: 'Lottery Isles',
-    subtitle: 'Ball-drop casino archipelago',
+    subtitle: 'Ball-drop fortunes in windy coves',
+    description: 'A bright little archipelago where luck is a profession.',
     route: '/games/lottery',
-    color: '#1a3a4a',
-    hoverColor: '#00e5ff',
+    accent: '#5577a6',
+    fill: '#dbe8f1',
     path: 'M140,180 L195,155 L240,170 L260,200 L250,250 L270,290 L240,320 L200,310 L170,330 L130,300 L110,260 L100,220 L120,190 Z',
-    labelX: 175,
-    labelY: 250,
-    icon: '🎰',
+    labelX: 182,
+    labelY: 248,
+    sparks: [
+      [148, 190],
+      [214, 176],
+      [238, 258],
+      [154, 298],
+    ],
     locked: false,
   },
   {
     id: 'aim',
     name: 'Scoop Republic',
-    subtitle: 'Poop scooper training grounds',
+    subtitle: 'Precision drills, dignity optional',
+    description: 'The province of heroic aim and deeply unserious training.',
     route: '/games/aim',
-    color: '#3a2a1a',
-    hoverColor: '#ffaa44',
+    accent: '#9b6a42',
+    fill: '#ead9c6',
     path: 'M420,120 L490,100 L560,115 L590,160 L600,220 L580,270 L540,290 L490,300 L440,280 L400,240 L390,190 L400,150 Z',
     labelX: 495,
     labelY: 200,
-    icon: '💩',
+    sparks: [
+      [434, 138],
+      [566, 132],
+      [582, 234],
+      [432, 262],
+    ],
     locked: false,
   },
   {
     id: 'sound',
     name: 'Echoing Isles',
-    subtitle: 'Spatial sound hunt (mobile only)',
+    subtitle: 'A hunt guided by sound alone',
+    description: 'Mist, whispers, and directional audio doing all the flirting.',
     route: '/games/sound',
-    color: '#2a1a3a',
-    hoverColor: '#aa66ff',
+    accent: '#7b62a6',
+    fill: '#ddd4ef',
     path: 'M750,80 L820,70 L880,90 L910,140 L900,200 L860,230 L810,240 L760,220 L730,180 L720,130 Z',
-    labelX: 815,
-    labelY: 155,
-    icon: '🎧',
+    labelX: 814,
+    labelY: 156,
+    sparks: [
+      [748, 104],
+      [886, 108],
+      [888, 204],
+      [754, 208],
+    ],
     locked: false,
   },
   {
     id: 'puzzle',
     name: 'Enigma Reach',
-    subtitle: 'Coming soon...',
+    subtitle: 'A seal still keeps the riddles in',
+    description: 'Not yet open. Even the doors want a clever answer first.',
     route: null,
-    color: '#1a2a1a',
-    hoverColor: '#66ff88',
+    accent: '#5f8a67',
+    fill: '#dce8db',
     path: 'M680,340 L740,310 L810,320 L860,360 L870,420 L840,470 L790,490 L730,480 L690,450 L660,400 L670,360 Z',
     labelX: 770,
-    labelY: 400,
-    icon: '🧩',
+    labelY: 404,
+    sparks: [
+      [698, 336],
+      [840, 370],
+      [826, 460],
+      [694, 446],
+    ],
     locked: true,
   },
   {
     id: 'racing',
     name: 'Velocity Plains',
-    subtitle: 'Coming soon...',
+    subtitle: 'Fast enough to offend the horses',
+    description: 'Wide grasslands reserved for future reckless behavior.',
     route: null,
-    color: '#3a1a1a',
-    hoverColor: '#ff6666',
+    accent: '#a65f5f',
+    fill: '#edd2d2',
     path: 'M300,410 L370,380 L440,390 L480,430 L490,480 L470,530 L420,560 L360,550 L310,520 L280,470 L290,430 Z',
-    labelX: 385,
-    labelY: 475,
-    icon: '🏎️',
+    labelX: 386,
+    labelY: 474,
+    sparks: [
+      [320, 404],
+      [458, 418],
+      [456, 518],
+      [318, 524],
+    ],
     locked: true,
   },
   {
     id: 'memory',
     name: 'Mnemos Atoll',
-    subtitle: 'Coming soon...',
+    subtitle: 'Where your memory will be tested politely',
+    description: 'A calm-looking atoll with no intention of staying calm.',
     route: null,
-    color: '#1a3a3a',
-    hoverColor: '#44dddd',
+    accent: '#4e8388',
+    fill: '#d4eaec',
     path: 'M100,420 L150,400 L200,410 L230,450 L225,500 L195,530 L145,540 L105,510 L80,470 L85,440 Z',
-    labelX: 155,
+    labelX: 156,
     labelY: 470,
-    icon: '🧠',
+    sparks: [
+      [108, 414],
+      [208, 424],
+      [204, 516],
+      [104, 504],
+    ],
     locked: true,
   },
   {
     id: 'battle',
     name: 'The Warfields',
-    subtitle: 'Coming soon...',
+    subtitle: 'Future skirmishes, future chaos',
+    description: 'Currently under tactical fog and paperwork.',
     route: null,
-    color: '#2a2a1a',
-    hoverColor: '#ddaa44',
+    accent: '#8d7b43',
+    fill: '#ebe1c4',
     path: 'M520,460 L580,440 L640,455 L660,500 L650,550 L610,580 L560,575 L520,545 L500,500 Z',
     labelX: 578,
     labelY: 510,
-    icon: '⚔️',
+    sparks: [
+      [532, 452],
+      [636, 470],
+      [626, 556],
+      [532, 540],
+    ],
     locked: true,
   },
   {
     id: 'stealth',
     name: 'Shadow Depths',
-    subtitle: 'Coming soon...',
+    subtitle: 'A locked zone that refuses witnesses',
+    description: 'One day it will open. It still has trust issues.',
     route: null,
-    color: '#151520',
-    hoverColor: '#8888cc',
+    accent: '#5c6c8f',
+    fill: '#d7deeb',
     path: 'M880,300 L940,280 L990,300 L1010,350 L1000,400 L960,430 L910,420 L870,390 L860,340 Z',
-    labelX: 935,
-    labelY: 355,
-    icon: '🥷',
+    labelX: 934,
+    labelY: 356,
+    sparks: [
+      [886, 298],
+      [994, 318],
+      [982, 404],
+      [890, 404],
+    ],
     locked: true,
   },
+]
+
+const MOUNTAIN_PATHS = [
+  'M445 260 L500 136 L542 238 L590 116 L640 258',
+  'M488 266 L540 154 L572 220 L616 140 L664 270',
+  'M536 272 L584 174 L624 238 L678 156 L728 276',
+]
+
+const FOREST_TREES = [
+  [120, 520],
+  [148, 538],
+  [182, 560],
+  [206, 532],
+  [236, 560],
+  [258, 522],
+  [292, 552],
+  [320, 532],
+  [346, 566],
+  [380, 546],
 ]
 
 export default function GamesHub() {
   const router = useRouter()
   const [hovered, setHovered] = useState<string | null>(null)
-  const hoveredCountry = hovered ? COUNTRIES.find(c => c.id === hovered) : null
+  const hoveredRealm = hovered ? REALMS.find((realm) => realm.id === hovered) : null
 
-  function handleClick(country: Country) {
-    if (country.locked || !country.route) return
-    router.push(country.route)
+  function enterRealm(realm: Realm) {
+    if (realm.locked || !realm.route) return
+    router.push(realm.route)
   }
 
   return (
     <>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@500;600;700&family=Spectral:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
-        .map-page {
-          --bg: #0a0c10;
-          font-family: 'Cinzel', serif;
-          background: var(--bg);
-          color: white;
-          width: 100vw;
-          height: 100vh;
+        .realm-page {
+          --ink: #324863;
+          --ink-soft: rgba(50, 72, 99, 0.7);
+          --paper: #f5eed8;
+          --paper-warm: #ead7ae;
+          --line: rgba(68, 91, 116, 0.72);
+          min-height: 100vh;
+          background:
+            radial-gradient(circle at top, rgba(255, 247, 222, 0.9) 0%, rgba(249, 238, 205, 0.96) 28%, rgba(233, 214, 173, 0.98) 100%);
+          color: var(--ink);
           overflow: hidden;
           position: relative;
-          user-select: none;
+          font-family: 'Spectral', serif;
         }
 
-        /* Top bar */
+        .paper-grain {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background-image:
+            radial-gradient(rgba(97, 73, 36, 0.08) 1px, transparent 1px),
+            radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+            linear-gradient(120deg, rgba(255,255,255,0.1), transparent 45%);
+          background-size: 18px 18px, 24px 24px, 100% 100%;
+          mix-blend-mode: multiply;
+          opacity: 0.55;
+        }
+
+        .page-frame {
+          position: absolute;
+          inset: 18px;
+          border: 1px solid rgba(67, 84, 99, 0.26);
+          box-shadow: inset 0 0 0 2px rgba(255, 252, 238, 0.45);
+          pointer-events: none;
+        }
+
         .map-topbar {
           position: absolute;
-          top: 0; left: 0; right: 0;
-          z-index: 50;
+          top: 18px;
+          left: 26px;
+          right: 26px;
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: space-between;
-          padding: 16px 24px;
-          background: linear-gradient(var(--bg), transparent);
+          z-index: 10;
         }
+
         .map-back {
-          background: none;
-          border: 1px solid rgba(255,255,255,0.06);
-          color: rgba(255,255,255,0.25);
-          padding: 6px 14px;
-          font: 11px 'Space Mono', monospace;
-          letter-spacing: 1px;
-          cursor: pointer;
-          border-radius: 3px;
-          transition: all 0.2s;
-        }
-        .map-back:hover {
-          border-color: rgba(255,255,255,0.15);
-          color: rgba(255,255,255,0.5);
-        }
-
-        .map-title-bar {
-          text-align: center;
-        }
-        .map-title-bar h1 {
-          font-size: 18px;
-          font-weight: 600;
-          letter-spacing: 8px;
-          color: rgba(255,255,255,0.2);
+          background: rgba(255, 251, 236, 0.66);
+          border: 1px solid rgba(73, 94, 120, 0.3);
+          color: var(--ink);
+          padding: 10px 16px;
+          font: 500 12px 'IBM Plex Mono', monospace;
+          letter-spacing: 1.6px;
           text-transform: uppercase;
-          margin: 0;
-        }
-        .map-title-bar p {
-          font: 10px 'Space Mono', monospace;
-          color: rgba(255,255,255,0.08);
-          letter-spacing: 3px;
-          margin: 4px 0 0;
+          cursor: pointer;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          backdrop-filter: blur(3px);
         }
 
-        /* SVG map */
+        .map-back:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 12px 24px rgba(107, 83, 43, 0.12);
+        }
+
+        .map-title {
+          text-align: center;
+          padding-top: 6px;
+        }
+
+        .map-title h1 {
+          margin: 0;
+          font-family: 'Cormorant SC', serif;
+          font-size: clamp(34px, 4vw, 56px);
+          letter-spacing: 7px;
+          color: #455a74;
+          text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .map-title p {
+          margin: 6px 0 0;
+          font: 500 12px 'IBM Plex Mono', monospace;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          color: rgba(69, 90, 116, 0.78);
+        }
+
+        .map-wrap {
+          width: 100%;
+          height: 100vh;
+          padding: 88px 34px 34px;
+          box-sizing: border-box;
+        }
+
         .map-svg {
           width: 100%;
           height: 100%;
+          display: block;
+          filter: drop-shadow(0 16px 30px rgba(95, 68, 24, 0.1));
         }
 
-        .country-path {
-          transition: fill 0.3s, filter 0.3s, stroke 0.3s;
-          stroke: rgba(255,255,255,0.04);
-          stroke-width: 1.5;
+        .realm-shape {
+          stroke: rgba(65, 88, 114, 0.85);
+          stroke-width: 2.2;
+          transition: fill 0.25s ease, stroke 0.25s ease, filter 0.25s ease, transform 0.25s ease;
         }
-        .country-path:hover {
-          stroke-width: 2;
-        }
-        .country-path.active {
+
+        .realm-shape.active {
           cursor: pointer;
         }
-        .country-path.locked {
+
+        .realm-shape.locked {
           cursor: default;
         }
 
-        /* Grid lines */
-        .grid-line {
-          stroke: rgba(255,255,255,0.015);
-          stroke-width: 0.5;
+        .realm-border {
+          fill: none;
+          stroke: rgba(255, 248, 222, 0.55);
+          stroke-width: 1;
+          stroke-dasharray: 6 9;
+          animation: borderShift 10s linear infinite;
         }
 
-        /* Country label */
-        .country-label {
+        .realm-label {
           pointer-events: none;
-          transition: opacity 0.3s;
         }
 
-        /* Tooltip */
-        .map-tooltip {
-          position: absolute;
-          bottom: 28px;
-          left: 50%;
-          transform: translateX(-50%);
-          z-index: 40;
-          background: rgba(10,12,16,0.92);
-          border: 1px solid rgba(255,255,255,0.08);
-          backdrop-filter: blur(12px);
-          border-radius: 6px;
-          padding: 16px 24px;
-          text-align: center;
-          min-width: 240px;
-          animation: tooltipIn 0.2s ease;
-          pointer-events: none;
+        .realm-name {
+          font-family: 'Cormorant SC', serif;
+          letter-spacing: 1.5px;
+          transition: transform 0.2s ease, opacity 0.2s ease;
         }
-        @keyframes tooltipIn {
-          from { opacity: 0; transform: translateX(-50%) translateY(8px); }
-          to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-        .map-tooltip .tt-icon {
-          font-size: 28px;
-          margin-bottom: 6px;
-        }
-        .map-tooltip .tt-name {
-          font-size: 16px;
-          font-weight: 600;
-          letter-spacing: 3px;
-          margin-bottom: 4px;
-        }
-        .map-tooltip .tt-sub {
-          font: 11px 'Space Mono', monospace;
-          color: rgba(255,255,255,0.3);
-          letter-spacing: 1px;
-        }
-        .map-tooltip .tt-action {
-          font: 10px 'Space Mono', monospace;
-          letter-spacing: 2px;
-          margin-top: 10px;
+
+        .realm-sub {
+          font: 500 8px 'IBM Plex Mono', monospace;
+          letter-spacing: 1.8px;
           text-transform: uppercase;
         }
 
-        /* Compass rose */
-        .compass {
-          position: absolute;
-          bottom: 24px;
-          right: 24px;
-          z-index: 30;
-          opacity: 0.06;
-          font-size: 11px;
-          letter-spacing: 3px;
-          color: white;
-          font-family: 'Space Mono', monospace;
+        .hover-rings {
+          pointer-events: none;
+          animation: floatHalo 2.2s ease-in-out infinite;
         }
 
-        /* Sea texture dots */
-        .sea-dots {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          pointer-events: none;
-          background-image: radial-gradient(rgba(255,255,255,0.01) 1px, transparent 1px);
-          background-size: 24px 24px;
+        .hover-rings circle {
+          fill: none;
+          stroke-width: 1.5;
+          opacity: 0.9;
         }
 
-        /* Decorative borders */
-        .map-border {
+        .spark {
+          animation: sparkPulse 1.6s ease-in-out infinite;
+          transform-origin: center;
+        }
+
+        .map-tooltip {
           position: absolute;
-          inset: 12px;
-          border: 1px solid rgba(255,255,255,0.025);
-          border-radius: 4px;
-          pointer-events: none;
-          z-index: 20;
+          right: 30px;
+          bottom: 30px;
+          width: min(360px, calc(100vw - 60px));
+          background: rgba(255, 248, 228, 0.85);
+          border: 1px solid rgba(70, 89, 109, 0.22);
+          box-shadow: 0 18px 40px rgba(112, 85, 43, 0.12);
+          padding: 18px 20px;
+          backdrop-filter: blur(6px);
+        }
+
+        .map-tooltip .eyebrow {
+          font: 500 10px 'IBM Plex Mono', monospace;
+          letter-spacing: 2.8px;
+          text-transform: uppercase;
+          color: rgba(69, 90, 116, 0.7);
+          margin-bottom: 8px;
+        }
+
+        .map-tooltip h2 {
+          margin: 0;
+          font-family: 'Cormorant SC', serif;
+          font-size: 28px;
+          color: var(--ink);
+          letter-spacing: 1px;
+        }
+
+        .map-tooltip .sub {
+          margin-top: 4px;
+          color: rgba(56, 76, 99, 0.86);
+          font-size: 15px;
+        }
+
+        .map-tooltip .desc {
+          margin-top: 10px;
+          color: rgba(56, 76, 99, 0.8);
+          line-height: 1.6;
+          font-size: 14px;
+        }
+
+        .map-tooltip .status {
+          margin-top: 14px;
+          font: 500 11px 'IBM Plex Mono', monospace;
+          letter-spacing: 1.8px;
+          text-transform: uppercase;
+        }
+
+        .map-caption {
+          position: absolute;
+          left: 34px;
+          bottom: 30px;
+          max-width: 280px;
+          color: rgba(64, 82, 103, 0.8);
+          font-size: 14px;
+          line-height: 1.65;
+          text-shadow: 0 1px 0 rgba(255,255,255,0.45);
+        }
+
+        @keyframes sparkPulse {
+          0%, 100% {
+            opacity: 0.42;
+            transform: scale(0.94);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.18);
+          }
+        }
+
+        @keyframes borderShift {
+          from {
+            stroke-dashoffset: 0;
+          }
+          to {
+            stroke-dashoffset: -60;
+          }
+        }
+
+        @keyframes floatHalo {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-4px);
+          }
+        }
+
+        @media (max-width: 920px) {
+          .map-wrap {
+            padding: 94px 12px 12px;
+          }
+
+          .map-topbar {
+            left: 14px;
+            right: 14px;
+          }
+
+          .map-tooltip {
+            left: 16px;
+            right: 16px;
+            width: auto;
+            bottom: 16px;
+          }
+
+          .map-caption {
+            display: none;
+          }
+
+          .map-title h1 {
+            letter-spacing: 4px;
+          }
         }
       `}</style>
 
-      <div className="map-page">
-        <div className="sea-dots" />
-        <div className="map-border" />
+      <div className="realm-page">
+        <div className="paper-grain" />
+        <div className="page-frame" />
 
-        {/* Top bar */}
         <div className="map-topbar">
           <button className="map-back" onClick={() => router.push('/')}>
-            ← Solar System
+            Back to Solar System
           </button>
-          <div className="map-title-bar">
-            <h1>Sam&apos;s Realm</h1>
-            <p>Choose your arena</p>
+          <div className="map-title">
+            <h1>The Playful Atlas</h1>
+            <p>Choose a realm and tempt fate</p>
           </div>
-          <div style={{ width: 100 }} />
+          <div style={{ width: 170 }} />
         </div>
 
-        {/* SVG Map */}
-        <svg
-          className="map-svg"
-          viewBox="0 0 1100 620"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          {/* Grid lines */}
-          {Array.from({ length: 12 }, (_, i) => (
-            <line key={`gv${i}`} className="grid-line" x1={i * 100} y1={0} x2={i * 100} y2={620} />
-          ))}
-          {Array.from({ length: 7 }, (_, i) => (
-            <line key={`gh${i}`} className="grid-line" x1={0} y1={i * 100} x2={1100} y2={i * 100} />
-          ))}
+        <div className="map-wrap">
+          <svg
+            className="map-svg"
+            viewBox="0 0 1100 620"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <defs>
+              <filter id="realmGlow">
+                <feGaussianBlur stdDeviation="8" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
 
-          {/* Sea route dashed lines connecting countries */}
-          <line x1={250} y1={260} x2={420} y2={190} stroke="rgba(255,255,255,0.03)" strokeWidth={1} strokeDasharray="6 8" />
-          <line x1={560} y1={270} x2={750} y2={160} stroke="rgba(255,255,255,0.03)" strokeWidth={1} strokeDasharray="6 8" />
-          <line x1={490} y1={300} x2={500} y2={440} stroke="rgba(255,255,255,0.03)" strokeWidth={1} strokeDasharray="6 8" />
-          <line x1={240} y1={320} x2={200} y2={410} stroke="rgba(255,255,255,0.03)" strokeWidth={1} strokeDasharray="6 8" />
-          <line x1={660} y1={450} x2={880} y2={350} stroke="rgba(255,255,255,0.03)" strokeWidth={1} strokeDasharray="6 8" />
+            <path
+              d="M50,122 C95,58 186,42 291,55 C392,68 438,47 536,38 C678,25 736,46 826,74 C944,111 1022,189 1038,281 C1052,362 1022,444 960,512 C906,571 825,594 699,594 C587,594 522,572 432,566 C314,559 228,584 148,545 C83,514 44,438 36,362 C29,292 8,181 50,122 Z"
+              fill="#efe2be"
+              stroke="rgba(68, 91, 116, 0.75)"
+              strokeWidth="3"
+            />
 
-          {/* Countries */}
-          {COUNTRIES.map((c) => {
-            const isHov = hovered === c.id
-            return (
-              <g key={c.id}>
-                {/* Shadow / glow */}
-                {isHov && (
-                  <path
-                    d={c.path}
-                    fill={c.hoverColor}
-                    opacity={0.08}
-                    filter="url(#glow)"
-                    transform="translate(0,2)"
-                  />
-                )}
+            <path
+              d="M56,134 C101,72 188,57 292,69 C392,82 441,60 542,51 C676,40 732,59 820,86 C933,121 1004,192 1018,282 C1031,358 1001,433 942,493 C889,547 814,571 697,574 C589,576 526,554 436,549 C326,542 236,566 164,530 C104,500 70,430 63,358 C56,292 37,195 56,134 Z"
+              fill="none"
+              stroke="rgba(255, 248, 226, 0.74)"
+              strokeWidth="1.5"
+            />
 
-                {/* Country shape */}
-                <path
-                  d={c.path}
-                  fill={isHov ? c.hoverColor + '30' : c.color}
-                  stroke={isHov ? c.hoverColor + '80' : 'rgba(255,255,255,0.04)'}
-                  strokeWidth={isHov ? 2.5 : 1.5}
-                  className={`country-path ${c.locked ? 'locked' : 'active'}`}
-                  onMouseEnter={() => setHovered(c.id)}
-                  onMouseLeave={() => setHovered(null)}
-                  onClick={() => handleClick(c)}
-                  style={{
-                    filter: isHov ? `drop-shadow(0 0 20px ${c.hoverColor}40)` : 'none',
-                  }}
-                />
+            {MOUNTAIN_PATHS.map((path) => (
+              <path
+                key={path}
+                d={path}
+                fill="none"
+                stroke="#6c7f97"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="0.72"
+              />
+            ))}
 
-                {/* Inland texture lines */}
-                <path
-                  d={c.path}
-                  fill="none"
-                  stroke={isHov ? c.hoverColor + '15' : 'rgba(255,255,255,0.01)'}
-                  strokeWidth={0.5}
-                  strokeDasharray="2 6"
-                  pointerEvents="none"
-                  transform={`translate(3,3) scale(0.96)`}
-                  style={{ transformOrigin: `${c.labelX}px ${c.labelY}px` }}
-                />
+            <path
+              d="M667 103C695 118 707 142 703 173C700 203 679 224 673 256C666 290 681 320 711 340"
+              fill="none"
+              stroke="#7b92aa"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeDasharray="3 9"
+              opacity="0.75"
+            />
 
-                {/* Icon */}
-                <text
-                  x={c.labelX}
-                  y={c.labelY - 14}
-                  textAnchor="middle"
-                  fontSize={isHov ? 26 : 20}
-                  className="country-label"
-                  style={{
-                    opacity: isHov ? 1 : 0.5,
-                    transition: 'font-size 0.2s, opacity 0.2s',
-                  }}
-                >
-                  {c.icon}
-                </text>
+            <path
+              d="M592 300C632 302 666 317 696 344C721 367 737 401 741 435C709 448 671 450 637 439C598 425 574 399 554 370C559 337 574 313 592 300Z"
+              fill="#d9e5ef"
+              stroke="#6d839d"
+              strokeWidth="2.2"
+              opacity="0.88"
+            />
 
-                {/* Name */}
-                <text
-                  x={c.labelX}
-                  y={c.labelY + 10}
-                  textAnchor="middle"
-                  fontSize={isHov ? 11 : 9}
-                  fontFamily="'Cinzel', serif"
-                  fontWeight={isHov ? 700 : 400}
-                  letterSpacing={isHov ? 2 : 1}
-                  fill={isHov ? c.hoverColor : 'rgba(255,255,255,0.15)'}
-                  className="country-label"
-                  style={{ transition: 'all 0.2s' }}
-                >
-                  {c.name}
-                </text>
+            <path
+              d="M256 196C324 183 381 197 430 229"
+              fill="none"
+              stroke="#778ea5"
+              strokeWidth="3"
+              strokeLinecap="round"
+              opacity="0.55"
+              strokeDasharray="6 10"
+            />
+            <path
+              d="M586 487C654 477 720 468 818 430"
+              fill="none"
+              stroke="#778ea5"
+              strokeWidth="3"
+              strokeLinecap="round"
+              opacity="0.55"
+              strokeDasharray="6 10"
+            />
 
-                {/* Lock indicator */}
-                {c.locked && (
-                  <text
-                    x={c.labelX}
-                    y={c.labelY + 26}
-                    textAnchor="middle"
-                    fontSize={8}
-                    fontFamily="'Space Mono', monospace"
-                    fill="rgba(255,255,255,0.08)"
-                    letterSpacing={1}
-                    className="country-label"
-                  >
-                    LOCKED
-                  </text>
-                )}
+            {FOREST_TREES.map(([x, y]) => (
+              <g key={`${x}-${y}`} opacity="0.72">
+                <path d={`M${x} ${y} l10 -18 l10 18 z`} fill="#7d9378" stroke="#61745e" strokeWidth="1.3" />
+                <path d={`M${x + 6} ${y - 10} l8 -14 l8 14 z`} fill="#8aa281" stroke="#61745e" strokeWidth="1.2" />
+                <line x1={x + 10} y1={y} x2={x + 10} y2={y + 9} stroke="#6f6557" strokeWidth="1.6" />
               </g>
-            )
-          })}
+            ))}
 
-          {/* Glow filter */}
-          <defs>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="8" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-        </svg>
+            <g opacity="0.78">
+              <circle cx="845" cy="282" r="58" fill="#d8dfeb" stroke="#69809a" strokeWidth="2.4" />
+              <path d="M800 282h90M845 237v90M815 250l60 60M875 250l-60 60" stroke="#69809a" strokeWidth="1.8" fill="none" />
+              <circle cx="845" cy="282" r="25" fill="none" stroke="#69809a" strokeWidth="1.6" />
+            </g>
 
-        {/* Tooltip */}
-        {hoveredCountry && (
+            {REALMS.map((realm) => {
+              const isHovered = hovered === realm.id
+
+              return (
+                <g key={realm.id}>
+                  {isHovered && (
+                    <path
+                      d={realm.path}
+                      fill={realm.accent}
+                      opacity="0.16"
+                      filter="url(#realmGlow)"
+                    />
+                  )}
+
+                  <path
+                    d={realm.path}
+                    fill={isHovered ? `${realm.accent}55` : realm.fill}
+                    className={`realm-shape ${realm.locked ? 'locked' : 'active'}`}
+                    onMouseEnter={() => setHovered(realm.id)}
+                    onMouseLeave={() => setHovered(null)}
+                    onClick={() => enterRealm(realm)}
+                    style={{
+                      filter: isHovered ? `drop-shadow(0 0 14px ${realm.accent})` : 'none',
+                      stroke: isHovered ? realm.accent : 'rgba(65, 88, 114, 0.85)',
+                    }}
+                  />
+
+                  <path
+                    d={realm.path}
+                    className="realm-border"
+                    transform={`translate(3 4) scale(0.97)`}
+                    style={{
+                      opacity: isHovered ? 0.8 : 0.26,
+                    }}
+                  />
+
+                  {isHovered && (
+                    <g className="hover-rings">
+                      <circle cx={realm.labelX} cy={realm.labelY - 24} r="18" stroke={realm.accent} />
+                      <circle cx={realm.labelX} cy={realm.labelY - 24} r="29" stroke={realm.accent} opacity="0.45" />
+                    </g>
+                  )}
+
+                  {realm.sparks.map(([x, y], index) => (
+                    <circle
+                      key={`${realm.id}-${x}-${y}`}
+                      cx={x}
+                      cy={y}
+                      r={isHovered ? (index % 2 === 0 ? 3.4 : 2.4) : 1.5}
+                      fill={realm.accent}
+                      opacity={isHovered ? 0.95 : 0.34}
+                      className={isHovered ? 'spark' : undefined}
+                      style={{ animationDelay: `${index * 0.18}s` }}
+                    />
+                  ))}
+
+                  <g className="realm-label">
+                    <text
+                      x={realm.labelX}
+                      y={realm.labelY}
+                      textAnchor="middle"
+                      className="realm-name"
+                      style={{
+                        fill: isHovered ? realm.accent : '#475c76',
+                        fontSize: isHovered ? 28 : 24,
+                        opacity: isHovered ? 1 : 0.88,
+                      }}
+                    >
+                      {realm.name}
+                    </text>
+                    <text
+                      x={realm.labelX}
+                      y={realm.labelY + 18}
+                      textAnchor="middle"
+                      className="realm-sub"
+                      style={{
+                        fill: 'rgba(67, 89, 113, 0.78)',
+                        opacity: isHovered ? 1 : 0.7,
+                      }}
+                    >
+                      {realm.locked ? 'sealed for later' : 'click to enter'}
+                    </text>
+                  </g>
+                </g>
+              )
+            })}
+
+            <g transform="translate(966 488)" opacity="0.82">
+              <circle cx="0" cy="0" r="46" fill="none" stroke="#5f7692" strokeWidth="2.3" />
+              <circle cx="0" cy="0" r="34" fill="none" stroke="#5f7692" strokeWidth="1.3" />
+              <path d="M0 -36 L9 0 L0 36 L-9 0 Z" fill="#5f7692" />
+              <path d="M-36 0 L0 9 L36 0 L0 -9 Z" fill="none" stroke="#5f7692" strokeWidth="2" />
+              <text x="0" y="-54" textAnchor="middle" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">N</text>
+              <text x="0" y="65" textAnchor="middle" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">S</text>
+              <text x="-54" y="4" textAnchor="middle" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">W</text>
+              <text x="54" y="4" textAnchor="middle" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">E</text>
+            </g>
+
+            <g transform="translate(66 574)" opacity="0.76">
+              <line x1="0" y1="0" x2="112" y2="0" stroke="#5f7692" strokeWidth="3" />
+              <line x1="0" y1="-8" x2="0" y2="8" stroke="#5f7692" strokeWidth="3" />
+              <line x1="56" y1="-8" x2="56" y2="8" stroke="#5f7692" strokeWidth="3" />
+              <line x1="112" y1="-8" x2="112" y2="8" stroke="#5f7692" strokeWidth="3" />
+              <text x="0" y="-16" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">0</text>
+              <text x="48" y="-16" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">16</text>
+              <text x="100" y="-16" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">32</text>
+              <text x="120" y="4" fontSize="10" fill="#5f7692" fontFamily="'IBM Plex Mono', monospace">miles</text>
+            </g>
+          </svg>
+        </div>
+
+        <div className="map-caption">
+          A brighter parchment, clearer labels, and a little magic on hover.
+          The map is now meant to feel discoverable, not merely clickable.
+        </div>
+
+        {hoveredRealm && (
           <div className="map-tooltip">
-            <div className="tt-icon">{hoveredCountry.icon}</div>
-            <div className="tt-name" style={{ color: hoveredCountry.hoverColor }}>
-              {hoveredCountry.name}
-            </div>
-            <div className="tt-sub">{hoveredCountry.subtitle}</div>
+            <div className="eyebrow">Realm dossier</div>
+            <h2 style={{ color: hoveredRealm.accent }}>{hoveredRealm.name}</h2>
+            <div className="sub">{hoveredRealm.subtitle}</div>
+            <div className="desc">{hoveredRealm.description}</div>
             <div
-              className="tt-action"
+              className="status"
               style={{
-                color: hoveredCountry.locked
-                  ? 'rgba(255,255,255,0.1)'
-                  : hoveredCountry.hoverColor,
+                color: hoveredRealm.locked ? 'rgba(71, 92, 118, 0.72)' : hoveredRealm.accent,
               }}
             >
-              {hoveredCountry.locked ? '🔒 coming soon' : '▶ click to enter'}
+              {hoveredRealm.locked ? 'Locked for future mischief' : 'Open now'}
             </div>
           </div>
         )}
-
-        {/* Compass */}
-        <div className="compass">
-          N<br />
-          W · E<br />
-          S
-        </div>
       </div>
     </>
   )

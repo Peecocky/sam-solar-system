@@ -2,53 +2,46 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+function getStoredMusicPreference() {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem('sam-music-pref')
+}
+
 export default function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null)
-  const [playing, setPlaying] = useState(false)
-  const [visible, setVisible] = useState(false)
-  const [volume, setVolume] = useState(0.35)
+  const [playing, setPlaying] = useState(() => getStoredMusicPreference() === 'on')
+  const [visible, setVisible] = useState(() => getStoredMusicPreference() !== null)
+  const volume = 0.35
 
-  // Only show player if user has made a choice
-  useEffect(() => {
-    const pref = localStorage.getItem('sam-music-pref')
-    if (pref === 'on') {
-      setVisible(true)
-      setPlaying(true)
-    } else if (pref === 'off') {
-      setVisible(true)
-      setPlaying(false)
-    }
-    // If no pref yet, stay hidden — notification will handle first choice
-  }, [])
-
-  // Play/pause
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
+
     audio.volume = volume
     if (playing) {
       audio.play().catch(() => {
-        // Autoplay blocked — user needs to interact first
         setPlaying(false)
       })
-    } else {
-      audio.pause()
+      return
     }
+
+    audio.pause()
   }, [playing, volume])
 
-  // Listen for custom event from notification
   useEffect(() => {
     function onMusicChoice(e: Event) {
-      const detail = (e as CustomEvent).detail
+      const detail = (e as CustomEvent<'on' | 'off'>).detail
       setVisible(true)
       if (detail === 'on') {
         setPlaying(true)
         localStorage.setItem('sam-music-pref', 'on')
-      } else {
-        setPlaying(false)
-        localStorage.setItem('sam-music-pref', 'off')
+        return
       }
+
+      setPlaying(false)
+      localStorage.setItem('sam-music-pref', 'off')
     }
+
     window.addEventListener('sam-music-choice', onMusicChoice)
     return () => window.removeEventListener('sam-music-choice', onMusicChoice)
   }, [])
@@ -86,9 +79,9 @@ export default function MusicPlayer() {
         title={playing ? 'Mute' : 'Play music'}
       >
         {playing ? (
-          <span style={{ animation: 'musicPulse 1.5s ease-in-out infinite' }}>♪</span>
+          <span style={{ animation: 'musicPulse 1.5s ease-in-out infinite' }}>||</span>
         ) : (
-          <span style={{ opacity: 0.3 }}>♪</span>
+          <span style={{ opacity: 0.3 }}>{'>'}</span>
         )}
       </div>
       <style>{`

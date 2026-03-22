@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 256">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#08121a" />
+      <stop offset="48%" stop-color="#112737" />
+      <stop offset="100%" stop-color="#0f7b6c" />
+    </linearGradient>
+    <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+      <path d="M34 0H0v34" fill="none" stroke="#baf2e9" stroke-width="1" opacity="0.12" />
+    </pattern>
+  </defs>
+  <rect width="512" height="256" fill="url(#bg)" />
+  <rect width="512" height="256" fill="url(#grid)" />
+  <path d="M40 190c44-3 74-17 108-52 30-30 52-48 83-51 35-4 67 13 102 12 37 0 76-21 138-60" fill="none" stroke="#e9ff70" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M422 39l49 2-14 47" fill="none" stroke="#e9ff70" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M106 160V209M154 144V209M204 132V209M252 120V209M302 102V209M350 92V209M398 74V209" stroke="#aaf0d1" stroke-width="8" stroke-linecap="round" opacity="0.72" />
+  <rect x="96" y="172" width="20" height="24" fill="#2bd9a8" />
+  <rect x="144" y="156" width="20" height="40" fill="#2bd9a8" />
+  <rect x="194" y="146" width="20" height="50" fill="#2bd9a8" />
+  <rect x="242" y="130" width="20" height="66" fill="#2bd9a8" />
+  <rect x="292" y="112" width="20" height="84" fill="#2bd9a8" />
+  <rect x="340" y="102" width="20" height="94" fill="#2bd9a8" />
+  <rect x="388" y="84" width="20" height="112" fill="#2bd9a8" />
+</svg>

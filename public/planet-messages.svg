@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 256">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#071015" />
+      <stop offset="52%" stop-color="#0f2632" />
+      <stop offset="100%" stop-color="#1f5446" />
+    </linearGradient>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M28 0H0v28" fill="none" stroke="#75f4f4" stroke-width="1" opacity="0.15" />
+    </pattern>
+  </defs>
+  <rect width="512" height="256" fill="url(#bg)" />
+  <rect width="512" height="256" fill="url(#grid)" />
+  <rect x="64" y="64" width="36" height="36" rx="5" fill="#75f4f4" opacity="0.86" />
+  <rect x="100" y="64" width="36" height="36" rx="5" fill="#75f4f4" opacity="0.6" />
+  <rect x="136" y="64" width="36" height="36" rx="5" fill="#75f4f4" opacity="0.35" />
+  <rect x="172" y="64" width="36" height="36" rx="5" fill="#75f4f4" opacity="0.86" />
+  <rect x="208" y="100" width="36" height="36" rx="5" fill="#75f4f4" opacity="0.75" />
+  <rect x="244" y="100" width="36" height="36" rx="5" fill="#75f4f4" opacity="0.55" />
+  <rect x="280" y="100" width="36" height="36" rx="5" fill="#75f4f4" opacity="0.3" />
+  <rect x="316" y="100" width="36" height="36" rx="5" fill="#75f4f4" opacity="0.86" />
+  <rect x="352" y="136" width="36" height="36" rx="5" fill="#75f4f4" opacity="0.8" />
+  <rect x="388" y="136" width="36" height="36" rx="5" fill="#75f4f4" opacity="0.52" />
+  <path d="M102 194c25-30 58-44 100-44 31 0 46 11 72 11 23 0 53-15 80-15 17 0 40 7 58 28" fill="none" stroke="#9df3c4" stroke-width="10" stroke-linecap="round" opacity="0.55" />
+  <path d="M60 212h394" stroke="#14343d" stroke-width="10" stroke-linecap="round" opacity="0.8" />
+</svg>

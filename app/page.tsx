@@ -1,30 +1,42 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Stars, OrbitControls } from '@react-three/drei'
 import SolarSystem from '@/components/SolarSystem'
 
 /* ===== Notifications ===== */
 const NOTIFICATIONS = [
-  { id: 'v1-notice', text: 'New: Notification system added.' },
-  { id: 'v1-kitchen', text: "Sam's Kitchen is still under construction." },
-  { id: 'v1-art', text: 'Art Gallery is still under construction.' },
+  {
+    id: 'v2-map',
+    text: 'Mini Game realm rebuilt as a fantasy map with enchanted hover effects.',
+  },
+  {
+    id: 'v2-kitchen',
+    text: "Sam's Kitchen now documents seven highly serious culinary incidents, with photo slots reserved.",
+  },
+  {
+    id: 'v2-planets',
+    text: 'Minecraft, internship comet, and stock research planets have entered orbit.',
+  },
+  {
+    id: 'v2-art',
+    text: 'Art Gallery layout is refreshed and ready for your painting uploads.',
+  },
 ]
+
+const NOTICE_STORAGE_KEY = 'sam-notices-seen-v2'
 
 export default function Home() {
   const [hoverText, setHoverText] = useState<string | null>(null)
-  const [showNotice, setShowNotice] = useState(false)
-
-  useEffect(() => {
-    const seen = localStorage.getItem('sam-notices-seen')
-    if (!seen) {
-      setShowNotice(true)
-    }
-  }, [])
+  const [showNotice, setShowNotice] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      localStorage.getItem(NOTICE_STORAGE_KEY) === null
+  )
 
   function dismissNotice() {
-    localStorage.setItem('sam-notices-seen', 'true')
+    localStorage.setItem(NOTICE_STORAGE_KEY, 'true')
     setShowNotice(false)
   }
 
@@ -33,7 +45,8 @@ export default function Home() {
       style={{
         width: '100vw',
         height: '100vh',
-        background: '#010108',
+        background:
+          'radial-gradient(circle at top, rgba(41,73,126,0.24) 0%, rgba(7,12,24,0.6) 35%, #010108 72%)',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -45,16 +58,16 @@ export default function Home() {
           top: 32,
           left: '50%',
           transform: 'translateX(-50%)',
-          fontSize: 28,
-          fontWeight: 300,
-          letterSpacing: 8,
-          fontFamily: "'Courier New', monospace",
-          color: 'rgba(255,255,255,0.9)',
+          fontSize: 30,
+          fontWeight: 500,
+          letterSpacing: 9,
+          fontFamily: "'Georgia', serif",
+          color: 'rgba(248,252,255,0.95)',
           pointerEvents: 'none',
           opacity: hoverText ? 1 : 0,
           transition: 'opacity 0.35s ease',
           textShadow:
-            '0 0 20px rgba(100,150,255,0.4), 0 0 60px rgba(80,120,255,0.15)',
+            '0 0 24px rgba(150,190,255,0.55), 0 0 70px rgba(90,120,255,0.18)',
           zIndex: 999,
           textTransform: 'uppercase',
         }}
@@ -75,9 +88,9 @@ export default function Home() {
       />
 
       <Canvas camera={{ position: [0, 12, 35], fov: 45 }}>
-        <ambientLight intensity={0.25} />
-        <pointLight position={[0, 0, 0]} intensity={2.5} color="#ffddaa" />
-        <pointLight position={[0, 20, 0]} intensity={0.3} color="#4466ff" />
+        <ambientLight intensity={0.34} />
+        <pointLight position={[0, 0, 0]} intensity={2.9} color="#ffe7a8" />
+        <pointLight position={[0, 20, 0]} intensity={0.45} color="#6ea8ff" />
 
         <Stars
           radius={400}

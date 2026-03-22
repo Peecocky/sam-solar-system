@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 const PLANET_DEFS = [
-  { texture: '/planet1.jpg', label: 'Art Gallery', route: '/art', color: '#aa77ee' },
-  { texture: '/planet2.jpg', label: 'My CV', route: '/cv', color: '#66aacc' },
-  { texture: '/planet3.jpg', label: 'Mini Game', route: '/games/lottery', color: '#ff8866' },
-  { texture: '/planet4.jpg', label: 'Message Wall', route: '/interactive', color: '#66ccaa' },
+  { texture: '/planet-art.svg', label: 'Art Gallery', route: '/art', color: '#ff9fcd' },
+  { texture: '/planet-cv.svg', label: 'My CV', route: '/cv', color: '#8ec8f2' },
+  { texture: '/planet-games.svg', label: 'Mini Game', route: '/games', color: '#ffbc85' },
+  { texture: '/planet-messages.svg', label: 'Message Wall', route: '/interactive', color: '#a5ffe1' },
   { texture: '/avatar.jpg', label: 'About Me', route: '/sam', color: '#ffaa44' },
-  { texture: '/planet2.jpg', label: "Sam's Kitchen", route: '/cooking', color: '#ffaa66' },
+  { texture: '/planet-kitchen.svg', label: "Sam's Kitchen", route: '/cooking', color: '#ffd09c' },
+  { texture: '/planet-minecraft.svg', label: 'Minecraft Planet', route: '/minecraft', color: '#bcff8a' },
+  { texture: '/planet-stocks.svg', label: 'Stock Research', route: '/stocks', color: '#90f6c4' },
 ]
 
 export default function VisionPage() {
@@ -126,7 +128,7 @@ export default function VisionPage() {
       } catch { if (!destroyed) setNoCamera(true) }
     })()
 
-    let warpSpeed = 1.5, targetWarp = 1.5, time = 0, hue = 220, frameCount = 0
+    let warpSpeed = 1.5, targetWarp = 1.5, hue = 220, frameCount = 0
     let collisionRoute: string | null = null
 
     /* ===== Wireframe ship ===== */
@@ -221,7 +223,7 @@ export default function VisionPage() {
 
     function render() {
       if (collisionRoute) return
-      time += 0.016; frameCount++
+      frameCount++
       const cx = W / 2, cy = H / 2
       const pure = pureModeRef.current
 

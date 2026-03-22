@@ -103,7 +103,8 @@ export default function Planet({
       : makeEllipsePoints(a, b)
   }, [orbitType, a, b, starOuterR, starInnerR, starSegmentsPerEdge])
 
-  const phase = useRef(Math.random())
+  const [initialPhase] = useState(() => Math.random())
+  const phase = useRef(initialPhase)
   const glowPulse = useRef(0)
 
   useFrame((_, delta) => {
@@ -158,7 +159,13 @@ export default function Planet({
         onClick={onClick}
       >
         <sphereGeometry args={[size, 48, 48]} />
-        <meshStandardMaterial map={texture} />
+        <meshStandardMaterial
+          map={texture}
+          roughness={0.95}
+          metalness={0.03}
+          emissive={hovered ? glowColor : '#000000'}
+          emissiveIntensity={hovered ? 0.08 : 0.02}
+        />
 
         {/* Glow aura */}
         <mesh scale={1.35}>

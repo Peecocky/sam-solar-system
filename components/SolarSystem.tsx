@@ -7,9 +7,10 @@ import {
   AdditiveBlending,
   Color,
 } from 'three'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Planet from './Planet'
+import TransientComet from './TransientComet'
 
 export default function SolarSystem({
   setHoverText,
@@ -18,20 +19,16 @@ export default function SolarSystem({
 }) {
   const router = useRouter()
 
-  /* ===== Infinite lottery state ===== */
-  const [infiniteLottery, setInfiniteLottery] = useState(false)
-  useEffect(() => {
-    setInfiniteLottery(localStorage.getItem('infinite-lottery') === 'true')
-  }, [])
+  const [infiniteLottery] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      localStorage.getItem('infinite-lottery') === 'true'
+  )
 
-  /* ===== Slow-motion system ===== */
   const timeScale = useRef(1)
   const targetTimeScale = useRef(1)
-
-  /* ===== Sun glow ===== */
   const glowRef = useRef<MeshBasicMaterial>(null!)
   const pulseTime = useRef(0)
-
   const sunTexture = useLoader(TextureLoader, '/avatar.jpg')
 
   useFrame((_, delta) => {
@@ -41,15 +38,24 @@ export default function SolarSystem({
 
     const pulse = 0.5 + Math.sin(pulseTime.current * 2) * 0.5
     if (glowRef.current) {
-      glowRef.current.opacity = 0.15 + pulse * 0.18
-      const hue = 30 + Math.sin(pulseTime.current * 0.5) * 15
-      glowRef.current.color = new Color(`hsl(${hue}, 100%, 70%)`)
+      glowRef.current.opacity = 0.2 + pulse * 0.22
+      const hue = 42 + Math.sin(pulseTime.current * 0.45) * 18
+      glowRef.current.color = new Color(`hsl(${hue}, 100%, 72%)`)
     }
   })
 
+  function slowOrbit(label: string) {
+    targetTimeScale.current = 0.16
+    setHoverText(label)
+  }
+
+  function resumeOrbit() {
+    targetTimeScale.current = 1
+    setHoverText(null)
+  }
+
   return (
     <>
-      {/* ===== ☀️ Sun (Avatar) ===== */}
       <mesh
         onPointerOver={() => {
           document.body.style.cursor = 'pointer'
@@ -61,182 +67,182 @@ export default function SolarSystem({
         }}
         onClick={() => router.push('/sam')}
       >
-        <sphereGeometry args={[2.6, 64, 64]} />
+        <sphereGeometry args={[2.7, 72, 72]} />
         <meshStandardMaterial
           map={sunTexture}
-          emissive="#fcff44"
-          emissiveIntensity={0.05}
+          emissive="#fff377"
+          emissiveIntensity={0.09}
+          roughness={0.98}
+          metalness={0.02}
         />
       </mesh>
 
-      {/* ===== Sun glow aura ===== */}
-      <mesh scale={1.5}>
-        <sphereGeometry args={[2.6, 64, 64]} />
+      <mesh scale={1.55}>
+        <sphereGeometry args={[2.7, 64, 64]} />
         <meshBasicMaterial
           ref={glowRef}
-          color="#d0ff00"
+          color="#fff07a"
           transparent
           blending={AdditiveBlending}
           depthWrite={false}
           toneMapped={false}
-          opacity={0.05}
+          opacity={0.08}
         />
       </mesh>
 
-      {/* ===== Planet 1: Art Gallery ===== */}
       <Planet
-        textureUrl="/planet1.jpg"
-        size={1}
-        a={7}
-        b={5.5}
-        speed={0.1}
+        textureUrl="/planet-art.svg"
+        size={1.02}
+        a={7.2}
+        b={5.6}
+        speed={0.098}
         timeScale={timeScale}
         orbitTiltX={0.12}
         orbitTiltZ={0.08}
-        orbitColor="#8855cc"
-        orbitOpacity={0.07}
-        glowColor="#aa77ee"
-        glowIntensity={0.1}
-        onHoverIn={() => {
-          targetTimeScale.current = 0.15
-          setHoverText('Art Gallery')
-        }}
-        onHoverOut={() => {
-          targetTimeScale.current = 1
-          setHoverText(null)
-        }}
+        orbitColor="#e58adb"
+        orbitOpacity={0.1}
+        glowColor="#ffb3d9"
+        glowIntensity={0.14}
+        onHoverIn={() => slowOrbit('Art Gallery')}
+        onHoverOut={resumeOrbit}
         onClick={() => router.push('/art')}
       />
 
-      {/* ===== Planet 2: My CV ===== */}
       <Planet
-        textureUrl="/planet2.jpg"
-        size={2}
-        a={11}
-        b={7}
+        textureUrl="/planet-cv.svg"
+        size={1.9}
+        a={11.5}
+        b={7.2}
         speed={0.16}
         timeScale={timeScale}
-        orbitTiltX={-0.15}
+        orbitTiltX={-0.16}
         orbitTiltZ={0.05}
-        orbitColor="#4488aa"
-        orbitOpacity={0.06}
-        glowColor="#66aacc"
-        glowIntensity={0.08}
-        onHoverIn={() => {
-          targetTimeScale.current = 0.15
-          setHoverText('My CV')
-        }}
-        onHoverOut={() => {
-          targetTimeScale.current = 1
-          setHoverText(null)
-        }}
+        orbitColor="#6aa6d9"
+        orbitOpacity={0.08}
+        glowColor="#9cd2f3"
+        glowIntensity={0.1}
+        onHoverIn={() => slowOrbit('My CV')}
+        onHoverOut={resumeOrbit}
         onClick={() => router.push('/cv')}
       />
 
-      {/* ===== Planet 3: Mini Game (star orbit) ===== */}
       <Planet
-        textureUrl="/planet3.jpg"
-        size={1.4}
+        textureUrl="/planet-games.svg"
+        size={1.45}
         orbitType="star"
-        starOuterR={16}
-        starInnerR={7}
+        starOuterR={16.2}
+        starInnerR={7.2}
         speed={0.1}
         timeScale={timeScale}
-        orbitTiltX={0.2}
-        orbitTiltZ={-0.1}
-        orbitColor="#cc6644"
-        orbitOpacity={0.08}
-        glowColor="#ff8866"
-        glowIntensity={0.12}
+        orbitTiltX={0.22}
+        orbitTiltZ={-0.12}
+        orbitColor="#d78b55"
+        orbitOpacity={0.1}
+        glowColor="#f4b37f"
+        glowIntensity={0.16}
         rainbow={infiniteLottery}
-        onHoverIn={() => {
-          targetTimeScale.current = 0.15
-          setHoverText('Mini Game !!!')
-        }}
-        onHoverOut={() => {
-          targetTimeScale.current = 1
-          setHoverText(null)
-        }}
+        onHoverIn={() => slowOrbit('Mini Game / Fantasy Map')}
+        onHoverOut={resumeOrbit}
         onClick={() => router.push('/games')}
       />
 
-      {/* ===== Planet 4: Message Wall ===== */}
       <Planet
-        textureUrl="/planet4.jpg"
-        size={2}
-        a={20}
-        b={11}
-        speed={0.09}
-        timeScale={timeScale}
-        orbitTiltX={-0.08}
-        orbitTiltZ={-0.14}
-        orbitColor="#44aa88"
-        orbitOpacity={0.05}
-        glowColor="#66ccaa"
-        glowIntensity={0.5}
-        onHoverIn={() => {
-          targetTimeScale.current = 0.15
-          setHoverText('Message Wall')
-        }}
-        onHoverOut={() => {
-          targetTimeScale.current = 1
-          setHoverText(null)
-        }}
-        onClick={() => router.push('/interactive')}
-      />
-
-      {/* ===== Planet 5: Cooking ===== */}
-      <Planet
-        textureUrl="/planet2.jpg"
-        size={0.9}
-        a={15}
-        b={9}
+        textureUrl="/planet-kitchen.svg"
+        size={1}
+        a={14.8}
+        b={9.1}
         speed={0.13}
         timeScale={timeScale}
-        orbitTiltX={0.18}
-        orbitTiltZ={0.12}
-        orbitColor="#cc8844"
-        orbitOpacity={0.06}
-        glowColor="#ffaa66"
-        glowIntensity={0.1}
-        onHoverIn={() => {
-          targetTimeScale.current = 0.15
-          setHoverText("Sam's Kitchen")
-        }}
-        onHoverOut={() => {
-          targetTimeScale.current = 1
-          setHoverText(null)
-        }}
+        orbitTiltX={0.19}
+        orbitTiltZ={0.13}
+        orbitColor="#f3a969"
+        orbitOpacity={0.08}
+        glowColor="#ffd09c"
+        glowIntensity={0.12}
+        onHoverIn={() => slowOrbit("Sam's Kitchen")}
+        onHoverOut={resumeOrbit}
         onClick={() => router.push('/cooking')}
       />
 
-      {/* ===== 🌑 Distant Mystery Asteroid ===== */}
-      <group position={[42, 3, -25]}>
+      <Planet
+        textureUrl="/planet-stocks.svg"
+        size={0.98}
+        a={18.2}
+        b={13.1}
+        speed={0.104}
+        timeScale={timeScale}
+        orbitTiltX={-0.1}
+        orbitTiltZ={0.18}
+        orbitColor="#74dfb8"
+        orbitOpacity={0.08}
+        glowColor="#c9ffd1"
+        glowIntensity={0.12}
+        onHoverIn={() => slowOrbit('Stock Research')}
+        onHoverOut={resumeOrbit}
+        onClick={() => router.push('/stocks')}
+      />
+
+      <Planet
+        textureUrl="/planet-messages.svg"
+        size={1.85}
+        a={20.3}
+        b={11.6}
+        speed={0.09}
+        timeScale={timeScale}
+        orbitTiltX={-0.06}
+        orbitTiltZ={-0.14}
+        orbitColor="#77d6c3"
+        orbitOpacity={0.07}
+        glowColor="#aff6ea"
+        glowIntensity={0.18}
+        onHoverIn={() => slowOrbit('Message Wall')}
+        onHoverOut={resumeOrbit}
+        onClick={() => router.push('/interactive')}
+      />
+
+      <Planet
+        textureUrl="/planet-minecraft.svg"
+        size={1.12}
+        a={24.6}
+        b={15.4}
+        speed={0.073}
+        timeScale={timeScale}
+        orbitTiltX={0.08}
+        orbitTiltZ={-0.22}
+        orbitColor="#8ddf6b"
+        orbitOpacity={0.08}
+        glowColor="#c6ff9f"
+        glowIntensity={0.14}
+        onHoverIn={() => slowOrbit('Minecraft Planet')}
+        onHoverOut={resumeOrbit}
+        onClick={() => router.push('/minecraft')}
+      />
+
+      <group position={[42, 4, -25]}>
         <Planet
-          textureUrl="/planet3.jpg"
-          size={0.55}
-          a={3}
-          b={2}
+          textureUrl="/planet-vision.svg"
+          size={0.64}
+          a={3.4}
+          b={2.2}
           speed={0.06}
           timeScale={timeScale}
-          orbitTiltX={0.4}
+          orbitTiltX={0.35}
           orbitTiltZ={-0.3}
-          orbitColor="#9944ff"
-          orbitOpacity={0.04}
-          glowColor="#bb66ff"
-          glowIntensity={0.2}
+          orbitColor="#b66dff"
+          orbitOpacity={0.06}
+          glowColor="#deb8ff"
+          glowIntensity={0.22}
           rainbow
-          onHoverIn={() => {
-            targetTimeScale.current = 0.15
-            setHoverText('??? Mystery Vision')
-          }}
-          onHoverOut={() => {
-            targetTimeScale.current = 1
-            setHoverText(null)
-          }}
+          onHoverIn={() => slowOrbit('Mystery Vision')}
+          onHoverOut={resumeOrbit}
           onClick={() => router.push('/vision')}
         />
       </group>
+
+      <TransientComet
+        href="https://jiaotong-university-koguan-law-scho.vercel.app/"
+        setHoverText={setHoverText}
+      />
     </>
   )
 }
