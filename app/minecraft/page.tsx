@@ -1,299 +1,507 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useState, useEffect, useRef } from 'react'
 
-const FEATURES = [
-  {
-    title: 'Live world viewport',
-    description: 'Target version: a Google Maps style render that lets your builds be explored like territory, not screenshots.',
-  },
-  {
-    title: 'Chunk-aware navigation',
-    description: 'Planned markers for districts, builds, secret projects, and whatever suspiciously large redstone contraption appears next.',
-  },
-  {
-    title: 'Planet-scale bragging rights',
-    description: 'A dedicated planet is the correct amount of seriousness for a world made of cubes and questionable late-night ambition.',
-  },
+const MINECRAFT_IMAGES = [
+  '011998d2df857ae99f454ec380543eba.jpg',
+  '05d15e0d262c4a54003b1085e99aae8b.jpg',
+  '0ff8b1223b101f863772c9933c8b4bac.jpg',
+  '3cead4fa4b38a59b95b4a1049a053609.jpg',
+  '3ebae28d4c33c17e5d86ad307e0f619e.jpg',
+  '62a0a549a9e1a180f62e394c0698984c.jpg',
+  '7937325f2098cc9a1edf0753538982ab.jpg',
+  '9584ca857a78f6e005e4f01c5e6e2cc0.jpg',
+  '9df88141db3adce65234224c9a071dbe.jpg',
+  'b638089530812968e71d42b1571df974.jpg',
+  'cc4802b5d4acf43f7bec84a279fc0d6d.jpg',
+  'e64ab5bde8444d33cb9de50d6b30199a.jpg',
+  'e96642160701753482821371423973c8.jpg',
+  'f8908d4997710e35b1a1a849a5982f59.jpg',
 ]
+
+// Generate scattered positions for images
+const generateImageLayout = () => {
+  const positions = MINECRAFT_IMAGES.map((_, idx) => ({
+    id: idx,
+    top: Math.random() * 200 + 100 + idx * 200,
+    left: Math.random() * 50 + (idx % 3) * 30,
+    rotation: Math.random() * 3 - 1.5,
+    delay: idx * 0.1,
+  }))
+  return positions
+}
 
 export default function MinecraftPage() {
   const router = useRouter()
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [showGallery, setShowGallery] = useState(false)
+  const [isKillMode, setIsKillMode] = useState(false)
+  const [killInput, setKillInput] = useState('')
+  const [showDeathScreen, setShowDeathScreen] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
+  const imageLayoutRef = useRef(generateImageLayout())
+  const killInputRef = useRef('')
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768)
+    
+    // Trigger entrance animation
+    setTimeout(() => setIsLoaded(true), 100)
+    
+    // Show gallery after animation
+    setTimeout(() => setShowGallery(true), 3200)
+    
+    // Handle scroll
+    const handleScroll = () => setScrollY(window.scrollY)
+    window.addEventListener('scroll', handleScroll)
+    
+    // Handle keyboard for kill command
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === 't' && !isKillMode && showGallery) {
+        e.preventDefault()
+        setIsKillMode(true)
+      }
+      
+      if (isKillMode) {
+        if (e.key === 'Enter') {
+          if (killInputRef.current === '/kill') {
+            setShowDeathScreen(true)
+            setIsKillMode(false)
+          }
+          killInputRef.current = ''
+          setKillInput('')
+        } else if (e.key === 'Escape') {
+          setIsKillMode(false)
+          killInputRef.current = ''
+          setKillInput('')
+        } else if (e.key === 'Backspace') {
+          killInputRef.current = killInputRef.current.slice(0, -1)
+          setKillInput(killInputRef.current)
+        } else if (e.key.length === 1) {
+          killInputRef.current += e.key
+          setKillInput(killInputRef.current)
+        }
+      }
+    }
+    
+    window.addEventListener('keydown', handleKeyDown)
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isKillMode, showGallery])
 
   return (
     <>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
-        .mc-page {
-          --bg: #9fe3ff;
-          --grass: #7bc259;
-          --dirt: #7a5731;
-          --stone: #cdd6dd;
-          --ink: #162018;
-          min-height: 100vh;
-          background:
-            linear-gradient(180deg, #9fe3ff 0%, #d8f7ff 36%, #c0ebb4 36%, #9fd27d 100%);
-          color: var(--ink);
-          font-family: 'IBM Plex Sans', sans-serif;
-          position: relative;
-          overflow: hidden;
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
         }
 
-        .mc-page::before {
-          content: '';
+        html {
+          scroll-behavior: smooth;
+        }
+
+        body {
+          overflow-x: hidden;
+        }
+
+        .mc-world {
           position: fixed;
-          inset: 0;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100vh;
+          background: #020202;
+          overflow: hidden;
+          font-family: 'IBM Plex Sans', sans-serif;
+        }
+
+        .bg-video {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          opacity: 0.15;
+          z-index: 1;
+        }
+
+        .entrance-screen {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #000;
+          color: #7bc259;
+          font-family: 'Press Start 2P', cursive;
+          font-size: clamp(32px, 10vw, 120px);
+          text-align: center;
+          z-index: 100;
+          letter-spacing: 8px;
+          opacity: ${isLoaded ? 0 : 1};
+          visibility: ${isLoaded ? 'hidden' : 'visible'};
+          transition: opacity 2s ease-out, visibility 2s ease-out;
+          text-shadow: 0 0 20px #7bc259;
           pointer-events: none;
-          background-image:
-            linear-gradient(rgba(255,255,255,0.12) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px);
-          background-size: 24px 24px;
-          opacity: 0.26;
+        }
+
+        .content-wrapper {
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          min-height: 300vh;
+          padding-top: 100vh;
         }
 
         .topbar {
-          position: relative;
-          z-index: 10;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 18px 24px;
+          padding: 20px 24px;
+          background: rgba(2, 2, 2, 0.7);
+          backdrop-filter: blur(10px);
+          z-index: 50;
+          border-bottom: 1px solid rgba(123, 194, 89, 0.2);
+          opacity: ${showGallery ? 1 : 0};
+          transition: opacity 0.5s ease;
+          pointer-events: ${showGallery ? 'auto' : 'none'};
         }
 
         .back-btn {
-          border: 3px solid #26351f;
-          background: #f2f8ec;
-          color: #26351f;
-          padding: 10px 14px;
-          font: 500 12px 'IBM Plex Mono', monospace;
+          border: 2px solid #7bc259;
+          background: transparent;
+          color: #7bc259;
+          padding: 8px 12px;
+          font: 500 11px 'IBM Plex Mono', monospace;
           text-transform: uppercase;
-          letter-spacing: 1.4px;
+          letter-spacing: 1.2px;
           cursor: pointer;
-          box-shadow: 0 4px 0 #26351f;
+          transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+          background: rgba(123, 194, 89, 0.2);
+          box-shadow: 0 0 8px rgba(123, 194, 89, 0.5);
         }
 
         .title {
           font-family: 'Press Start 2P', cursive;
-          font-size: 12px;
+          font-size: 11px;
           text-transform: uppercase;
+          color: #7bc259;
+          letter-spacing: 2px;
         }
 
-        .hero {
-          max-width: 1180px;
-          margin: 0 auto;
-          padding: 34px 24px 72px;
-          display: grid;
-          grid-template-columns: 1fr 0.9fr;
-          gap: 34px;
-          align-items: center;
-        }
-
-        .hero-copy h1 {
-          margin: 0;
-          font-family: 'Press Start 2P', cursive;
-          font-size: clamp(30px, 5vw, 56px);
-          line-height: 1.3;
-          text-transform: uppercase;
-        }
-
-        .hero-copy p {
-          margin: 22px 0 0;
-          max-width: 620px;
-          font-size: 17px;
-          line-height: 1.8;
-          color: rgba(22, 32, 24, 0.82);
-        }
-
-        .chip-row {
-          display: flex;
-          gap: 10px;
-          flex-wrap: wrap;
-          margin-top: 22px;
-        }
-
-        .chip {
-          padding: 10px 12px;
-          background: rgba(255,255,255,0.5);
-          border: 2px solid rgba(38, 53, 31, 0.2);
-          font: 500 11px 'IBM Plex Mono', monospace;
-          text-transform: uppercase;
-          letter-spacing: 1.4px;
-        }
-
-        .viewport {
-          background: linear-gradient(180deg, #dff6ff 0%, #b6e5ff 45%, #80c85b 45%, #699f49 100%);
-          border: 4px solid #26351f;
-          box-shadow: 0 8px 0 #26351f;
-          min-height: 440px;
+        .gallery-container {
           position: relative;
+          width: 100%;
+          height: 200vh;
+        }
+
+        .gallery-item {
+          position: fixed;
+          width: 280px;
+          height: 200px;
+          border-radius: 8px;
           overflow: hidden;
+          background: rgba(255, 255, 255, 0.07);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(123, 194, 89, 0.3);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+          transition: all 0.3s ease;
+          cursor: pointer;
+          opacity: 0;
+          animation: slideIn 0.6s ease-out forwards;
         }
 
-        .viewport::before {
-          content: '';
-          position: absolute;
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .gallery-item img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.4s ease;
+        }
+
+        .gallery-item:hover {
+          transform: translateZ(10px) scale(1.02);
+          border-color: rgba(123, 194, 89, 0.6);
+          box-shadow: 0 12px 48px rgba(123, 194, 89, 0.2);
+        }
+
+        .gallery-item:hover img {
+          transform: scale(1.08);
+        }
+
+        .exit-hint {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          color: rgba(123, 194, 89, 0.6);
+          font: 11px 'IBM Plex Mono', monospace;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          z-index: 40;
+          opacity: ${showGallery ? 1 : 0};
+          transition: opacity 0.5s ease;
+          animation: pulse 2s infinite;
+          pointer-events: none;
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+
+        .kill-mode-overlay {
+          position: fixed;
+          bottom: 20px;
+          left: 20px;
+          background: rgba(0, 0, 0, 0.8);
+          border: 2px solid #7bc259;
+          padding: 12px 16px;
+          font: 12px 'IBM Plex Mono', monospace;
+          color: #7bc259;
+          z-index: 60;
+          min-width: 300px;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+          from {
+            transform: translateY(20px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        .death-screen {
+          position: fixed;
           inset: 0;
-          background-image:
-            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
-          background-size: 20px 20px;
-          opacity: 0.3;
+          background: rgba(0, 0, 0, 0.95);
+          z-index: 200;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          gap: 40px;
+          opacity: ${showDeathScreen ? 1 : 0};
+          visibility: ${showDeathScreen ? 'visible' : 'hidden'};
+          transition: opacity 0.3s ease;
         }
 
-        .block {
-          position: absolute;
-          width: 72px;
-          height: 72px;
-          box-shadow: inset 0 -8px 0 rgba(0,0,0,0.12);
-        }
-
-        .block.grass {
-          background: linear-gradient(180deg, #7fd55b 0 24%, #8a6337 24% 100%);
-          border: 3px solid rgba(34, 54, 23, 0.25);
-        }
-
-        .block.stone {
-          background: #cfd7de;
-          border: 3px solid rgba(57, 69, 82, 0.18);
-        }
-
-        .block.water {
-          background: linear-gradient(180deg, #6fcaff, #4595df);
-          border: 3px solid rgba(23, 56, 102, 0.12);
-        }
-
-        .floating-panel {
-          position: absolute;
-          right: 18px;
-          bottom: 18px;
-          width: min(280px, calc(100% - 36px));
-          background: rgba(242, 248, 236, 0.92);
-          border: 3px solid #26351f;
-          padding: 16px 18px;
-          box-shadow: 0 6px 0 #26351f;
-        }
-
-        .floating-panel .eyebrow {
-          font: 500 11px 'IBM Plex Mono', monospace;
-          text-transform: uppercase;
-          letter-spacing: 1.4px;
-          margin-bottom: 8px;
-          color: rgba(22, 32, 24, 0.7);
-        }
-
-        .floating-panel strong {
-          display: block;
-          font-size: 18px;
-          margin-bottom: 10px;
-        }
-
-        .floating-panel p {
-          margin: 0;
-          color: rgba(22, 32, 24, 0.76);
-          line-height: 1.7;
-          font-size: 14px;
-        }
-
-        .feature-grid {
-          max-width: 1180px;
-          margin: 0 auto;
-          padding: 0 24px 80px;
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 18px;
-        }
-
-        .feature-card {
-          background: rgba(242, 248, 236, 0.88);
-          border: 3px solid rgba(38, 53, 31, 0.2);
-          box-shadow: 0 8px 0 rgba(38, 53, 31, 0.22);
-          padding: 20px 18px;
-        }
-
-        .feature-card h2 {
-          margin: 0 0 10px;
+        .death-title {
           font-family: 'Press Start 2P', cursive;
-          font-size: 13px;
-          line-height: 1.7;
+          font-size: clamp(32px, 8vw, 72px);
+          color: #7bc259;
+          text-align: center;
+          text-shadow: 0 0 20px rgba(123, 194, 89, 0.5);
+          letter-spacing: 3px;
+          animation: fadeInScale 0.5s ease-out;
+        }
+
+        @keyframes fadeInScale {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        .death-subtitle {
+          font-family: 'IBM Plex Mono', monospace;
+          font-size: 14px;
+          color: rgba(123, 194, 89, 0.7);
+          letter-spacing: 2px;
+        }
+
+        .death-buttons {
+          display: flex;
+          gap: 20px;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .death-btn {
+          border: 2px solid #7bc259;
+          background: rgba(123, 194, 89, 0.1);
+          color: #7bc259;
+          padding: 12px 24px;
+          font: 12px 'IBM Plex Mono', monospace;
+          cursor: pointer;
           text-transform: uppercase;
+          letter-spacing: 1.5px;
+          transition: all 0.3s ease;
         }
 
-        .feature-card p {
-          margin: 0;
-          line-height: 1.8;
-          color: rgba(22, 32, 24, 0.78);
-          font-size: 15px;
+        .death-btn:hover {
+          background: rgba(123, 194, 89, 0.2);
+          box-shadow: 0 0 12px rgba(123, 194, 89, 0.4);
         }
 
-        @media (max-width: 980px) {
-          .hero {
-            grid-template-columns: 1fr;
+        @media (max-width: 768px) {
+          .gallery-item {
+            width: 200px;
+            height: 140px;
           }
 
-          .feature-grid {
-            grid-template-columns: 1fr;
+          .exit-hint {
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
+          }
+
+          .title {
+            font-size: 10px;
+          }
+
+          .back-btn {
+            padding: 6px 10px;
+            font-size: 9px;
+          }
+
+          .kill-mode-overlay {
+            font-size: 10px;
+            min-width: 250px;
+            bottom: 10px;
+            left: 10px;
+            padding: 10px 14px;
           }
         }
       `}</style>
 
-      <div className="mc-page">
+      <video
+        className="bg-video"
+        autoPlay
+        muted
+        loop
+        playsInline
+      >
+        <source src="/minecraft loop video.mp4" type="video/mp4" />
+      </video>
+
+      <div className="mc-world">
+        <div className="entrance-screen">MINECRAFT</div>
+
         <div className="topbar">
           <button className="back-btn" onClick={() => router.push('/')}>
-            Back to Solar System
+            {isMobile ? '← BACK' : '← BACK'}
           </button>
-          <div className="title">Minecraft Planet</div>
-          <div style={{ width: 150 }} />
+          <div className="title">MINECRAFT</div>
+          <div />
         </div>
 
-        <section className="hero">
-          <div className="hero-copy">
-            <h1>Minecraft Planet</h1>
-            <p>
-              这是新加的方块星球，先作为概念页入轨。目标不是普通截图相册，
-              而是做成一个像 Google Maps 一样可以浏览你 MC 建筑的实时渲染视图，
-              让每座建筑都像地标一样被看见。
-            </p>
-            <div className="chip-row">
-              <span className="chip">Concept online</span>
-              <span className="chip">Renderer pending</span>
-              <span className="chip">World scan later</span>
+        <div className="content-wrapper">
+          <div className="gallery-container">
+            {imageLayoutRef.current.map((layout) => {
+              const offsetY = scrollY * (0.3 + layout.id * 0.02)
+              return (
+                <div
+                  key={layout.id}
+                  className="gallery-item"
+                  style={{
+                    top: `${layout.top - offsetY}px`,
+                    left: `${layout.left}%`,
+                    transform: `rotate(${layout.rotation}deg)`,
+                    animationDelay: `${layout.delay}s`,
+                    opacity: showGallery ? 1 : 0,
+                  }}
+                >
+                  <img
+                    src={`/${MINECRAFT_IMAGES[layout.id]}`}
+                    alt={`Build ${layout.id + 1}`}
+                    loading="lazy"
+                  />
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {showGallery && (
+          <div className="exit-hint">
+            press T to {isKillMode ? 'enter command' : 'exit'}
+          </div>
+        )}
+
+        {isKillMode && (
+          <div className="kill-mode-overlay">
+            &gt; {killInput}_
+            <div style={{ fontSize: '10px', marginTop: '8px', color: 'rgba(123, 194, 89, 0.5)' }}>
+              (type /kill to exit)
             </div>
           </div>
+        )}
 
-          <div className="viewport">
-            <div className="block grass" style={{ left: 42, bottom: 54 }} />
-            <div className="block grass" style={{ left: 118, bottom: 54 }} />
-            <div className="block grass" style={{ left: 194, bottom: 54 }} />
-            <div className="block grass" style={{ left: 270, bottom: 54 }} />
-            <div className="block grass" style={{ left: 346, bottom: 54 }} />
-            <div className="block stone" style={{ left: 118, bottom: 126, height: 144 }} />
-            <div className="block stone" style={{ left: 194, bottom: 126, height: 212 }} />
-            <div className="block stone" style={{ left: 270, bottom: 126, height: 168 }} />
-            <div className="block water" style={{ left: 402, bottom: 54, width: 96 }} />
-            <div className="block grass" style={{ left: 518, bottom: 54, width: 88 }} />
-            <div className="block stone" style={{ left: 518, bottom: 126, width: 88, height: 96 }} />
-
-            <div className="floating-panel">
-              <div className="eyebrow">Future interaction</div>
-              <strong>Zoom, pan, jump to builds.</strong>
-              <p>
-                The long-term version should feel like a city browser for blocks:
-                districts, landmarks, hidden corners, and the occasional
-                suspiciously over-engineered farm.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="feature-grid">
-          {FEATURES.map((feature) => (
-            <article className="feature-card" key={feature.title}>
-              <h2>{feature.title}</h2>
-              <p>{feature.description}</p>
-            </article>
-          ))}
-        </section>
+        <div className="death-screen">
+          {showDeathScreen && (
+            <>
+              <div className="death-title">YOU DIED</div>
+              <div className="death-subtitle">
+                {isMobile ? 'Continue?' : 'Respawn or return to Solar System?'}
+              </div>
+              <div className="death-buttons">
+                <button
+                  className="death-btn"
+                  onClick={() => {
+                    setShowDeathScreen(false)
+                    setIsLoaded(false)
+                    setTimeout(() => setIsLoaded(true), 100)
+                    setTimeout(() => setShowGallery(true), 3200)
+                    setScrollY(0)
+                    window.scrollTo(0, 0)
+                  }}
+                >
+                  {isMobile ? 'CONTINUE' : 'RESPAWN'}
+                </button>
+                {!isMobile && (
+                  <button
+                    className="death-btn"
+                    onClick={() => {
+                      router.push('/')
+                    }}
+                  >
+                    MAIN MENU
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </>
   )
