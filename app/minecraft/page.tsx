@@ -120,7 +120,6 @@ export default function MinecraftPage() {
           width: 100%;
           height: 100vh;
           background: #020202;
-          overflow: hidden;
           font-family: 'IBM Plex Sans', sans-serif;
         }
 
@@ -319,6 +318,7 @@ export default function MinecraftPage() {
           opacity: ${showDeathScreen ? 1 : 0};
           visibility: ${showDeathScreen ? 'visible' : 'hidden'};
           transition: opacity 0.3s ease;
+          pointer-events: ${showDeathScreen ? 'auto' : 'none'};
         }
 
         .death-title {
@@ -366,6 +366,10 @@ export default function MinecraftPage() {
           text-transform: uppercase;
           letter-spacing: 1.5px;
           transition: all 0.3s ease;
+          pointer-events: auto;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
         }
 
         .death-btn:hover {
@@ -410,8 +414,11 @@ export default function MinecraftPage() {
         muted
         loop
         playsInline
+        preload="auto"
+        onError={(e) => console.error('Video failed to load:', e)}
       >
         <source src="/minecraft loop video.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
       </video>
 
       <div className="mc-world">
@@ -478,12 +485,17 @@ export default function MinecraftPage() {
                 <button
                   className="death-btn"
                   onClick={() => {
+                    console.log('RESPAWN clicked')
                     setShowDeathScreen(false)
-                    setIsLoaded(false)
-                    setTimeout(() => setIsLoaded(true), 100)
-                    setTimeout(() => setShowGallery(true), 3200)
-                    setScrollY(0)
+                    // Reset scroll position immediately
                     window.scrollTo(0, 0)
+                    setScrollY(0)
+                    // Reset entrance animation
+                    setIsLoaded(false)
+                    setTimeout(() => {
+                      setIsLoaded(true)
+                      setTimeout(() => setShowGallery(true), 3000)
+                    }, 100)
                   }}
                 >
                   {isMobile ? 'CONTINUE' : 'RESPAWN'}
@@ -492,6 +504,7 @@ export default function MinecraftPage() {
                   <button
                     className="death-btn"
                     onClick={() => {
+                      console.log('MAIN MENU clicked')
                       router.push('/')
                     }}
                   >
