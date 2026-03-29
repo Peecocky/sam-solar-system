@@ -40,10 +40,10 @@ export default function MinecraftPage() {
   const [killInput, setKillInput] = useState('')
   const [isKillMode, setIsKillMode] = useState(false)
 
-  const sceneRef = useRef<THREE.Scene>()
-  const rendererRef = useRef<THREE.WebGLRenderer>()
-  const materialRef = useRef<THREE.ShaderMaterial>()
-  const clockRef = useRef<THREE.Clock>()
+  const sceneRef = useRef<THREE.Scene | null>(null)
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
+  const materialRef = useRef<THREE.ShaderMaterial | null>(null)
+  const clockRef = useRef<THREE.Clock | null>(null)
 
   useEffect(() => {
     if (!canvasRef.current) return
