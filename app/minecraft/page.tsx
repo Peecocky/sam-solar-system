@@ -31,210 +31,188 @@ const VIDEO_CLIPS = [
 
 export default function MinecraftPage() {
   const router = useRouter()
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
-  const [isHovering, setIsHovering] = useState(false)
+  const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([])
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
   const [showDeathScreen, setShowDeathScreen] = useState(false)
   const [killInput, setKillInput] = useState('')
   const [isKillMode, setIsKillMode] = useState(false)
 
-  const sceneRef = useRef<THREE.Scene | null>(null)
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
-  const materialRef = useRef<THREE.ShaderMaterial | null>(null)
-  const clockRef = useRef<THREE.Clock | null>(null)
+  const scenesRef = useRef<(THREE.Scene | null)[]>([])
+  const renderersRef = useRef<(THREE.WebGLRenderer | null)[]>([])
+  const materialsRef = useRef<(THREE.ShaderMaterial | null)[]>([])
+  const clocksRef = useRef<(THREE.Clock | null)[]>([])
 
+  // Initialize canvas refs array
   useEffect(() => {
-    if (!canvasRef.current) return
+    canvasRefs.current = canvasRefs.current.slice(0, MINECRAFT_IMAGES.length)
+    videoRefs.current = videoRefs.current.slice(0, VIDEO_CLIPS.length)
+    scenesRef.current = scenesRef.current.slice(0, MINECRAFT_IMAGES.length)
+    renderersRef.current = renderersRef.current.slice(0, MINECRAFT_IMAGES.length)
+    materialsRef.current = materialsRef.current.slice(0, MINECRAFT_IMAGES.length)
+    clocksRef.current = clocksRef.current.slice(0, MINECRAFT_IMAGES.length)
+  }, [])
 
-    // Scene setup
-    const scene = new THREE.Scene()
-    sceneRef.current = scene
+  // Initialize all scenes
+  useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return
 
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-    camera.position.z = 5
+    const cleanupFunctions: (() => void)[] = []
 
-    const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, alpha: true })
-    renderer.setSize(window.innerWidth, window.innerHeight)
-    rendererRef.current = renderer
+    const initShaderScene = (index: number, canvas: HTMLCanvasElement) => {
+      // Scene setup
+      const scene = new THREE.Scene()
+      scenesRef.current[index] = scene
 
-    const clock = new THREE.Clock()
-    clockRef.current = clock
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+      camera.position.z = 5
 
-    // Load texture
-    const textureLoader = new THREE.TextureLoader()
-    const texture = textureLoader.load(`/${MINECRAFT_IMAGES[currentImageIndex]}`)
-
-    // Shader uniforms
-    const uniforms = {
-      uTime: { value: 0 },
-      uTexture: { value: texture },
-      uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-      uHover: { value: 0.0 },
-      uOpacity: { value: 0.0 },
-    }
-
-    // Vertex shader
-    const vertexShader = `
-      varying vec2 vUv;
-      uniform float uTime;
-      uniform vec2 uMouse;
-      uniform float uHover;
-
-      void main() {
-        vUv = uv;
-
-        vec3 pos = position;
-
-        // Calculate distance to mouse
-        float distToMouse = distance(uv, uMouse);
-
-        // Create ripple effect
-        float ripple = sin(distToMouse * 28.0 - uTime * 4.0) * 0.08;
-        float falloff = smoothstep(0.42, 0.0, distToMouse);
-
-        // Apply z displacement
-        pos.z += ripple * falloff * uHover * 1.8;
-
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-      }
-    `
-
-    // Fragment shader
-    const fragmentShader = `
-      varying vec2 vUv;
-      uniform sampler2D uTexture;
-      uniform float uTime;
-      uniform vec2 uMouse;
-      uniform float uHover;
-      uniform float uOpacity;
-
-      void main() {
-        vec2 uv = vUv;
-
-        // Calculate distance to mouse
-        float distToMouse = distance(uv, uMouse);
-
-        // Create wave distortion
-        float wave = sin(distToMouse * 35.0 - uTime * 5.0) * 0.012;
-        float falloff = smoothstep(0.36, 0.0, distToMouse);
-
-        // Direction from mouse to current pixel
-        vec2 dir = normalize(uv - uMouse + 0.0001);
-
-        // Apply UV distortion
-        uv += dir * wave * falloff * uHover * 2.0;
-
-        // Sample texture
-        vec4 tex = texture2D(uTexture, uv);
-
-        // Apply opacity
-        tex.a *= uOpacity;
-
-        gl_FragColor = tex;
-      }
-    `
-
-    // Create material
-    const material = new THREE.ShaderMaterial({
-      uniforms,
-      vertexShader,
-      fragmentShader,
-      transparent: true,
-    })
-    materialRef.current = material
-
-    // Create plane geometry
-    const geometry = new THREE.PlaneGeometry(7.6, 4.7, 220, 220)
-    const mesh = new THREE.Mesh(geometry, material)
-    scene.add(mesh)
-
-    // Mouse tracking
-    const mouse = new THREE.Vector2(0.5, 0.5)
-
-    const handleMouseMove = (event: MouseEvent) => {
-      mouse.x = event.clientX / window.innerWidth
-      mouse.y = event.clientY / window.innerHeight
-      uniforms.uMouse.value.set(mouse.x, 1.0 - mouse.y)
-      uniforms.uHover.value = 1.0
-    }
-
-    const handleMouseLeave = () => {
-      uniforms.uHover.value = 0.0
-    }
-
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('mouseleave', handleMouseLeave)
-
-    // Animation loop
-    const animate = () => {
-      requestAnimationFrame(animate)
-
-      uniforms.uTime.value = clock.getElapsedTime()
-
-      // Update opacity based on hover state
-      if (isHovering) {
-        uniforms.uOpacity.value = Math.min(uniforms.uOpacity.value + 0.02, 1.0)
-      } else {
-        uniforms.uOpacity.value = Math.max(uniforms.uOpacity.value - 0.02, 0.0)
-      }
-
-      renderer.render(scene, camera)
-    }
-    animate()
-
-    // Handle resize
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight
-      camera.updateProjectionMatrix()
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: false })
       renderer.setSize(window.innerWidth, window.innerHeight)
-    }
-    window.addEventListener('resize', handleResize)
+      renderersRef.current[index] = renderer
 
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseleave', handleMouseLeave)
-      window.removeEventListener('resize', handleResize)
-      renderer.dispose()
-      geometry.dispose()
-      material.dispose()
-      texture.dispose()
-    }
-  }, [currentImageIndex])
+      const clock = new THREE.Clock()
+      clocksRef.current[index] = clock
 
-  // Handle hover state
-  useEffect(() => {
-    let hoverTimeout: NodeJS.Timeout
+      // Load texture
+      const textureLoader = new THREE.TextureLoader()
+      const texture = textureLoader.load(MINECRAFT_IMAGES[index])
 
-    const handleMouseEnter = () => {
-      setIsHovering(true)
-      clearTimeout(hoverTimeout)
-    }
-
-    const handleMouseLeave = () => {
-      hoverTimeout = setTimeout(() => {
-        setIsHovering(false)
-        // Change image/video after fade out
-        setTimeout(() => {
-          setCurrentImageIndex((prev) => (prev + 1) % MINECRAFT_IMAGES.length)
-          setCurrentVideoIndex((prev) => (prev + 1) % VIDEO_CLIPS.length)
-        }, 1000)
-      }, 2000) // Stay visible for 2 seconds after mouse leave
-    }
-
-    const canvas = canvasRef.current
-    if (canvas) {
-      canvas.addEventListener('mouseenter', handleMouseEnter)
-      canvas.addEventListener('mouseleave', handleMouseLeave)
-    }
-
-    return () => {
-      if (canvas) {
-        canvas.removeEventListener('mouseenter', handleMouseEnter)
-        canvas.removeEventListener('mouseleave', handleMouseLeave)
+      // Shader uniforms
+      const uniforms = {
+        uTime: { value: 0 },
+        uTexture: { value: texture },
+        uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+        uHover: { value: 0.0 },
       }
-      clearTimeout(hoverTimeout)
+
+      // Vertex shader
+      const vertexShader = `
+        varying vec2 vUv;
+        uniform float uTime;
+        uniform vec2 uMouse;
+        uniform float uHover;
+
+        void main() {
+          vUv = uv;
+
+          vec3 pos = position;
+
+          // Calculate distance to mouse
+          float distToMouse = distance(uv, uMouse);
+
+          // Create ripple effect
+          float ripple = sin(distToMouse * 28.0 - uTime * 4.0) * 0.08;
+          float falloff = smoothstep(0.42, 0.0, distToMouse);
+
+          // Apply z displacement
+          pos.z += ripple * falloff * uHover * 1.8;
+
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+        }
+      `
+
+      // Fragment shader
+      const fragmentShader = `
+        varying vec2 vUv;
+        uniform sampler2D uTexture;
+        uniform float uTime;
+        uniform vec2 uMouse;
+        uniform float uHover;
+
+        void main() {
+          vec2 uv = vUv;
+
+          // Calculate distance to mouse
+          float distToMouse = distance(uv, uMouse);
+
+          // Create wave distortion
+          float wave = sin(distToMouse * 35.0 - uTime * 5.0) * 0.012;
+          float falloff = smoothstep(0.36, 0.0, distToMouse);
+
+          // Direction from mouse to current pixel
+          vec2 dir = normalize(uv - uMouse + 0.0001);
+
+          // Apply UV distortion
+          uv += dir * wave * falloff * uHover * 2.0;
+
+          // Sample texture
+          vec4 tex = texture2D(uTexture, uv);
+
+          gl_FragColor = tex;
+        }
+      `
+
+      // Create material
+      const material = new THREE.ShaderMaterial({
+        uniforms,
+        vertexShader,
+        fragmentShader,
+      })
+      materialsRef.current[index] = material
+
+      // Create plane geometry
+      const geometry = new THREE.PlaneGeometry(7.6, 4.7, 220, 220)
+      const mesh = new THREE.Mesh(geometry, material)
+      scene.add(mesh)
+
+      // Mouse tracking
+      let mouse = new THREE.Vector2(0.5, 0.5)
+
+      const handleMouseMove = (event: MouseEvent) => {
+        const rect = canvas.getBoundingClientRect()
+        mouse.x = (event.clientX - rect.left) / rect.width
+        mouse.y = (event.clientY - rect.top) / rect.height
+        uniforms.uMouse.value.set(mouse.x, 1.0 - mouse.y)
+        uniforms.uHover.value = 1.0
+      }
+
+      const handleMouseLeave = () => {
+        uniforms.uHover.value = 0.0
+      }
+
+      canvas.addEventListener('mousemove', handleMouseMove)
+      canvas.addEventListener('mouseleave', handleMouseLeave)
+
+      // Animation loop
+      const animate = () => {
+        requestAnimationFrame(animate)
+
+        uniforms.uTime.value = clock.getElapsedTime()
+
+        renderer.render(scene, camera)
+      }
+      animate()
+
+      // Handle resize
+      const handleResize = () => {
+        camera.aspect = window.innerWidth / window.innerHeight
+        camera.updateProjectionMatrix()
+        renderer.setSize(window.innerWidth, window.innerHeight)
+      }
+      window.addEventListener('resize', handleResize)
+
+      return () => {
+        canvas.removeEventListener('mousemove', handleMouseMove)
+        canvas.removeEventListener('mouseleave', handleMouseLeave)
+        window.removeEventListener('resize', handleResize)
+        renderer.dispose()
+        geometry.dispose()
+        material.dispose()
+        texture.dispose()
+      }
+    }
+
+    MINECRAFT_IMAGES.forEach((_, index) => {
+      const canvas = canvasRefs.current[index]
+      if (canvas) {
+        const cleanup = initShaderScene(index, canvas)
+        cleanupFunctions.push(cleanup)
+      }
+    })
+
+    return () => {
+      cleanupFunctions.forEach(cleanup => cleanup())
     }
   }, [])
 
@@ -279,14 +257,22 @@ export default function MinecraftPage() {
         }
 
         body {
-          overflow: hidden;
           background: #000;
         }
 
-        .minecraft-container {
-          position: fixed;
-          inset: 0;
+        .minecraft-page {
+          min-height: 100vh;
           background: #000;
+        }
+
+        .section {
+          position: relative;
+          width: 100%;
+          height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
         }
 
         .canvas-container {
@@ -299,21 +285,19 @@ export default function MinecraftPage() {
 
         canvas {
           display: block;
-          cursor: none;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
         }
 
-        .video-overlay {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 400px;
-          height: 225px;
-          opacity: ${isHovering ? 1 : 0};
-          transition: opacity 0.5s ease;
-          pointer-events: none;
-          border-radius: 8px;
-          overflow: hidden;
+        .video-section {
+          position: relative;
+          width: 100%;
+          height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #000;
         }
 
         video {
@@ -326,7 +310,7 @@ export default function MinecraftPage() {
           position: fixed;
           top: 20px;
           left: 20px;
-          background: rgba(0, 0, 0, 0.5);
+          background: rgba(0, 0, 0, 0.8);
           border: 2px solid #7bc259;
           color: #7bc259;
           padding: 8px 12px;
@@ -335,7 +319,7 @@ export default function MinecraftPage() {
           letter-spacing: 1.2px;
           cursor: pointer;
           transition: all 0.3s ease;
-          z-index: 100;
+          z-index: 1000;
         }
 
         .back-btn:hover {
@@ -351,7 +335,7 @@ export default function MinecraftPage() {
           font: 11px 'IBM Plex Mono', monospace;
           text-transform: uppercase;
           letter-spacing: 1px;
-          z-index: 100;
+          z-index: 1000;
           opacity: ${isKillMode ? 0 : 1};
           transition: opacity 0.3s ease;
           animation: pulse 2s infinite;
@@ -372,7 +356,7 @@ export default function MinecraftPage() {
           padding: 12px 16px;
           font: 12px 'IBM Plex Mono', monospace;
           color: #7bc259;
-          z-index: 200;
+          z-index: 1000;
           min-width: 300px;
           text-transform: uppercase;
           letter-spacing: 2px;
@@ -394,7 +378,7 @@ export default function MinecraftPage() {
           position: fixed;
           inset: 0;
           background: rgba(0, 0, 0, 0.95);
-          z-index: 300;
+          z-index: 2000;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -455,7 +439,7 @@ export default function MinecraftPage() {
           pointer-events: none;
           opacity: 0;
           transition: opacity 0.3s ease;
-          z-index: 400;
+          z-index: 2001;
         }
 
         .respawn-tooltip {
@@ -471,27 +455,7 @@ export default function MinecraftPage() {
         }
       `}</style>
 
-      <div className="minecraft-container">
-        <div className="canvas-container">
-          <canvas ref={canvasRef} />
-          <div className="video-overlay">
-            <video
-              ref={videoRef}
-              autoPlay
-              muted
-              loop
-              playsInline
-              onLoadedData={() => {
-                if (videoRef.current) {
-                  videoRef.current.currentTime = VIDEO_CLIPS[currentVideoIndex].start
-                }
-              }}
-            >
-              <source src={VIDEO_CLIPS[currentVideoIndex].src} type="video/mp4" />
-            </video>
-          </div>
-        </div>
-
+      <div className="minecraft-page">
         <button className="back-btn" onClick={() => router.push('/')}>
           ← BACK
         </button>
@@ -510,6 +474,44 @@ export default function MinecraftPage() {
             </div>
           </div>
         )}
+
+        {/* Image sections with shader effects */}
+        {MINECRAFT_IMAGES.map((image, index) => (
+          <div key={`image-${index}`} className="section">
+            <div className="canvas-container">
+              <canvas
+                ref={(el) => {
+                  if (el) canvasRefs.current[index] = el
+                }}
+                width={typeof window !== 'undefined' ? window.innerWidth : 1920}
+                height={typeof window !== 'undefined' ? window.innerHeight : 1080}
+              />
+            </div>
+          </div>
+        ))}
+
+        {/* Video sections */}
+        {VIDEO_CLIPS.map((video, index) => (
+          <div key={`video-${index}`} className="video-section">
+            <video
+              ref={(el) => {
+                if (el) videoRefs.current[index] = el
+              }}
+              autoPlay
+              muted
+              loop
+              playsInline
+              onLoadedData={() => {
+                const videoEl = videoRefs.current[index]
+                if (videoEl) {
+                  videoEl.currentTime = video.start
+                }
+              }}
+            >
+              <source src={video.src} type="video/mp4" />
+            </video>
+          </div>
+        ))}
 
         <div className="death-screen">
           {showDeathScreen && (
@@ -556,10 +558,6 @@ export default function MinecraftPage() {
                     setShowDeathScreen(false)
                     setKillInput('')
                     setIsKillMode(false)
-                    // Reset to initial state
-                    setCurrentImageIndex(0)
-                    setCurrentVideoIndex(0)
-                    setIsHovering(false)
                   }}
                   onMouseEnter={() => {
                     document.querySelector('.respawn-tooltip')?.classList.add('show')
