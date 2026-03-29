@@ -268,19 +268,23 @@ export default function MinecraftPage() {
         .section {
           position: relative;
           width: 100%;
-          height: 50vh;
+          height: 100vh;
           display: flex;
           flex-wrap: wrap;
           overflow: hidden;
+          margin: 0;
+          padding: 0;
         }
 
         .canvas-container {
           position: relative;
           width: 50%;
-          height: 100%;
+          height: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
+          margin: 0;
+          padding: 0;
         }
 
         canvas {
@@ -293,11 +297,13 @@ export default function MinecraftPage() {
         .video-section {
           position: relative;
           width: 100%;
-          height: 50vh;
+          height: 100vh;
           display: flex;
           align-items: center;
           justify-content: center;
           background: #000;
+          margin: 0;
+          padding: 0;
         }
 
         video {
