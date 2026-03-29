@@ -1,7 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import * as THREE from 'three'
 
 const MINECRAFT_IMAGES = [
   '011998d2df857ae99f454ec380543eba.jpg',
@@ -20,172 +21,313 @@ const MINECRAFT_IMAGES = [
   'f8908d4997710e35b1a1a849a5982f59.jpg',
 ]
 
-// Generate scattered positions for images
-const generateImageLayout = () => {
-  const positions = MINECRAFT_IMAGES.map((_, idx) => ({
-    id: idx,
-    top: Math.random() * 200 + 100 + idx * 200,
-    left: Math.random() * 50 + (idx % 3) * 30,
-    rotation: Math.random() * 3 - 1.5,
-    delay: idx * 0.1,
-  }))
-  return positions
-}
+const VIDEO_CLIPS = [
+  { src: '/minecraft loop video.mp4', start: 0, duration: 10 },
+  { src: '/minecraft loop video.mp4', start: 10, duration: 10 },
+  { src: '/minecraft loop video.mp4', start: 20, duration: 10 },
+  { src: '/minecraft loop video.mp4', start: 30, duration: 10 },
+  { src: '/minecraft loop video.mp4', start: 40, duration: 10 },
+]
 
 export default function MinecraftPage() {
   const router = useRouter()
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [showGallery, setShowGallery] = useState(false)
-  const [isKillMode, setIsKillMode] = useState(false)
-  const [killInput, setKillInput] = useState('')
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
+  const [isHovering, setIsHovering] = useState(false)
   const [showDeathScreen, setShowDeathScreen] = useState(false)
-  const [scrollY, setScrollY] = useState(0)
-  const [isMobile, setIsMobile] = useState(false)
-  const imageLayoutRef = useRef(generateImageLayout())
-  const killInputRef = useRef('')
+  const [killInput, setKillInput] = useState('')
+  const [isKillMode, setIsKillMode] = useState(false)
+
+  const sceneRef = useRef<THREE.Scene>()
+  const rendererRef = useRef<THREE.WebGLRenderer>()
+  const materialRef = useRef<THREE.ShaderMaterial>()
+  const clockRef = useRef<THREE.Clock>()
 
   useEffect(() => {
-    setIsMobile(window.innerWidth < 768)
-    
-    // Trigger entrance animation
-    setTimeout(() => setIsLoaded(true), 100)
-    
-    // Show gallery after animation
-    setTimeout(() => setShowGallery(true), 3200)
-    
-    // Handle scroll
-    const handleScroll = () => setScrollY(window.scrollY)
-    window.addEventListener('scroll', handleScroll)
-    
-    // Handle keyboard for kill command
+    if (!canvasRef.current) return
+
+    // Scene setup
+    const scene = new THREE.Scene()
+    sceneRef.current = scene
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+    camera.position.z = 5
+
+    const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, alpha: true })
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    rendererRef.current = renderer
+
+    const clock = new THREE.Clock()
+    clockRef.current = clock
+
+    // Load texture
+    const textureLoader = new THREE.TextureLoader()
+    const texture = textureLoader.load(`/${MINECRAFT_IMAGES[currentImageIndex]}`)
+
+    // Shader uniforms
+    const uniforms = {
+      uTime: { value: 0 },
+      uTexture: { value: texture },
+      uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+      uHover: { value: 0.0 },
+      uOpacity: { value: 0.0 },
+    }
+
+    // Vertex shader
+    const vertexShader = `
+      varying vec2 vUv;
+      uniform float uTime;
+      uniform vec2 uMouse;
+      uniform float uHover;
+
+      void main() {
+        vUv = uv;
+
+        vec3 pos = position;
+
+        // Calculate distance to mouse
+        float distToMouse = distance(uv, uMouse);
+
+        // Create ripple effect
+        float ripple = sin(distToMouse * 28.0 - uTime * 4.0) * 0.08;
+        float falloff = smoothstep(0.42, 0.0, distToMouse);
+
+        // Apply z displacement
+        pos.z += ripple * falloff * uHover * 1.8;
+
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+      }
+    `
+
+    // Fragment shader
+    const fragmentShader = `
+      varying vec2 vUv;
+      uniform sampler2D uTexture;
+      uniform float uTime;
+      uniform vec2 uMouse;
+      uniform float uHover;
+      uniform float uOpacity;
+
+      void main() {
+        vec2 uv = vUv;
+
+        // Calculate distance to mouse
+        float distToMouse = distance(uv, uMouse);
+
+        // Create wave distortion
+        float wave = sin(distToMouse * 35.0 - uTime * 5.0) * 0.012;
+        float falloff = smoothstep(0.36, 0.0, distToMouse);
+
+        // Direction from mouse to current pixel
+        vec2 dir = normalize(uv - uMouse + 0.0001);
+
+        // Apply UV distortion
+        uv += dir * wave * falloff * uHover * 2.0;
+
+        // Sample texture
+        vec4 tex = texture2D(uTexture, uv);
+
+        // Apply opacity
+        tex.a *= uOpacity;
+
+        gl_FragColor = tex;
+      }
+    `
+
+    // Create material
+    const material = new THREE.ShaderMaterial({
+      uniforms,
+      vertexShader,
+      fragmentShader,
+      transparent: true,
+    })
+    materialRef.current = material
+
+    // Create plane geometry
+    const geometry = new THREE.PlaneGeometry(7.6, 4.7, 220, 220)
+    const mesh = new THREE.Mesh(geometry, material)
+    scene.add(mesh)
+
+    // Mouse tracking
+    const mouse = new THREE.Vector2(0.5, 0.5)
+
+    const handleMouseMove = (event: MouseEvent) => {
+      mouse.x = event.clientX / window.innerWidth
+      mouse.y = event.clientY / window.innerHeight
+      uniforms.uMouse.value.set(mouse.x, 1.0 - mouse.y)
+      uniforms.uHover.value = 1.0
+    }
+
+    const handleMouseLeave = () => {
+      uniforms.uHover.value = 0.0
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseleave', handleMouseLeave)
+
+    // Animation loop
+    const animate = () => {
+      requestAnimationFrame(animate)
+
+      uniforms.uTime.value = clock.getElapsedTime()
+
+      // Update opacity based on hover state
+      if (isHovering) {
+        uniforms.uOpacity.value = Math.min(uniforms.uOpacity.value + 0.02, 1.0)
+      } else {
+        uniforms.uOpacity.value = Math.max(uniforms.uOpacity.value - 0.02, 0.0)
+      }
+
+      renderer.render(scene, camera)
+    }
+    animate()
+
+    // Handle resize
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight
+      camera.updateProjectionMatrix()
+      renderer.setSize(window.innerWidth, window.innerHeight)
+    }
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseleave', handleMouseLeave)
+      window.removeEventListener('resize', handleResize)
+      renderer.dispose()
+      geometry.dispose()
+      material.dispose()
+      texture.dispose()
+    }
+  }, [currentImageIndex])
+
+  // Handle hover state
+  useEffect(() => {
+    let hoverTimeout: NodeJS.Timeout
+
+    const handleMouseEnter = () => {
+      setIsHovering(true)
+      clearTimeout(hoverTimeout)
+    }
+
+    const handleMouseLeave = () => {
+      hoverTimeout = setTimeout(() => {
+        setIsHovering(false)
+        // Change image/video after fade out
+        setTimeout(() => {
+          setCurrentImageIndex((prev) => (prev + 1) % MINECRAFT_IMAGES.length)
+          setCurrentVideoIndex((prev) => (prev + 1) % VIDEO_CLIPS.length)
+        }, 1000)
+      }, 2000) // Stay visible for 2 seconds after mouse leave
+    }
+
+    const canvas = canvasRef.current
+    if (canvas) {
+      canvas.addEventListener('mouseenter', handleMouseEnter)
+      canvas.addEventListener('mouseleave', handleMouseLeave)
+    }
+
+    return () => {
+      if (canvas) {
+        canvas.removeEventListener('mouseenter', handleMouseEnter)
+        canvas.removeEventListener('mouseleave', handleMouseLeave)
+      }
+      clearTimeout(hoverTimeout)
+    }
+  }, [])
+
+  // Handle kill command
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 't' && !isKillMode && showGallery) {
+      if (e.key.toLowerCase() === 't' && !isKillMode && !showDeathScreen) {
         e.preventDefault()
         setIsKillMode(true)
       }
-      
+
       if (isKillMode) {
         if (e.key === 'Enter') {
-          if (killInputRef.current === '/kill') {
+          if (killInput === '/kill') {
             setShowDeathScreen(true)
             setIsKillMode(false)
+            setKillInput('')
           }
-          killInputRef.current = ''
           setKillInput('')
         } else if (e.key === 'Escape') {
           setIsKillMode(false)
-          killInputRef.current = ''
           setKillInput('')
         } else if (e.key === 'Backspace') {
-          killInputRef.current = killInputRef.current.slice(0, -1)
-          setKillInput(killInputRef.current)
+          setKillInput(killInput.slice(0, -1))
         } else if (e.key.length === 1) {
-          killInputRef.current += e.key
-          setKillInput(killInputRef.current)
+          setKillInput(killInput + e.key)
         }
       }
     }
-    
+
     window.addEventListener('keydown', handleKeyDown)
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [isKillMode, showGallery])
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isKillMode, killInput, showDeathScreen])
 
   return (
     <>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
-
         * {
           margin: 0;
           padding: 0;
           box-sizing: border-box;
         }
 
-        html {
-          scroll-behavior: smooth;
-        }
-
         body {
-          overflow-x: hidden;
+          overflow: hidden;
+          background: #000;
         }
 
-        .mc-world {
+        .minecraft-container {
           position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100vh;
-          background: #020202;
-          font-family: 'IBM Plex Sans', sans-serif;
+          inset: 0;
+          background: #000;
         }
 
-        .bg-video {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          opacity: 0.15;
-          z-index: 1;
-        }
-
-        .entrance-screen {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
+        .canvas-container {
+          position: absolute;
+          inset: 0;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #000;
-          color: #7bc259;
-          font-family: 'Press Start 2P', cursive;
-          font-size: clamp(32px, 10vw, 120px);
-          text-align: center;
-          z-index: 100;
-          letter-spacing: 8px;
-          opacity: ${isLoaded ? 0 : 1};
-          visibility: ${isLoaded ? 'hidden' : 'visible'};
-          transition: opacity 2s ease-out, visibility 2s ease-out;
-          text-shadow: 0 0 20px #7bc259;
-          pointer-events: none;
         }
 
-        .content-wrapper {
-          position: relative;
-          z-index: 2;
-          width: 100%;
-          min-height: 300vh;
-          padding-top: 100vh;
+        canvas {
+          display: block;
+          cursor: none;
         }
 
-        .topbar {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 20px 24px;
-          background: rgba(2, 2, 2, 0.7);
-          backdrop-filter: blur(10px);
-          z-index: 50;
-          border-bottom: 1px solid rgba(123, 194, 89, 0.2);
-          opacity: ${showGallery ? 1 : 0};
+        .video-overlay {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 400px;
+          height: 225px;
+          opacity: ${isHovering ? 1 : 0};
           transition: opacity 0.5s ease;
-          pointer-events: ${showGallery ? 'auto' : 'none'};
+          pointer-events: none;
+          border-radius: 8px;
+          overflow: hidden;
+        }
+
+        video {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
         }
 
         .back-btn {
+          position: fixed;
+          top: 20px;
+          left: 20px;
+          background: rgba(0, 0, 0, 0.5);
           border: 2px solid #7bc259;
-          background: transparent;
           color: #7bc259;
           padding: 8px 12px;
           font: 500 11px 'IBM Plex Mono', monospace;
@@ -193,6 +335,7 @@ export default function MinecraftPage() {
           letter-spacing: 1.2px;
           cursor: pointer;
           transition: all 0.3s ease;
+          z-index: 100;
         }
 
         .back-btn:hover {
@@ -200,65 +343,7 @@ export default function MinecraftPage() {
           box-shadow: 0 0 8px rgba(123, 194, 89, 0.5);
         }
 
-        .title {
-          font-family: 'Press Start 2P', cursive;
-          font-size: 11px;
-          text-transform: uppercase;
-          color: #7bc259;
-          letter-spacing: 2px;
-        }
-
-        .gallery-container {
-          position: relative;
-          width: 100%;
-          height: 200vh;
-        }
-
-        .gallery-item {
-          position: fixed;
-          width: 280px;
-          height: 200px;
-          border-radius: 8px;
-          overflow: hidden;
-          background: rgba(255, 255, 255, 0.07);
-          backdrop-filter: blur(8px);
-          border: 1px solid rgba(123, 194, 89, 0.3);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-          transition: all 0.3s ease;
-          cursor: pointer;
-          opacity: 0;
-          animation: slideIn 0.6s ease-out forwards;
-        }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .gallery-item img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 0.4s ease;
-        }
-
-        .gallery-item:hover {
-          transform: translateZ(10px) scale(1.02);
-          border-color: rgba(123, 194, 89, 0.6);
-          box-shadow: 0 12px 48px rgba(123, 194, 89, 0.2);
-        }
-
-        .gallery-item:hover img {
-          transform: scale(1.08);
-        }
-
-        .exit-hint {
+        .hint {
           position: fixed;
           bottom: 20px;
           right: 20px;
@@ -266,9 +351,9 @@ export default function MinecraftPage() {
           font: 11px 'IBM Plex Mono', monospace;
           text-transform: uppercase;
           letter-spacing: 1px;
-          z-index: 40;
-          opacity: ${showGallery ? 1 : 0};
-          transition: opacity 0.5s ease;
+          z-index: 100;
+          opacity: ${isKillMode ? 0 : 1};
+          transition: opacity 0.3s ease;
           animation: pulse 2s infinite;
           pointer-events: none;
         }
@@ -287,7 +372,7 @@ export default function MinecraftPage() {
           padding: 12px 16px;
           font: 12px 'IBM Plex Mono', monospace;
           color: #7bc259;
-          z-index: 60;
+          z-index: 200;
           min-width: 300px;
           text-transform: uppercase;
           letter-spacing: 2px;
@@ -309,11 +394,11 @@ export default function MinecraftPage() {
           position: fixed;
           inset: 0;
           background: rgba(0, 0, 0, 0.95);
-          z-index: 200;
+          z-index: 300;
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
-          flex-direction: column;
           gap: 40px;
           opacity: ${showDeathScreen ? 1 : 0};
           visibility: ${showDeathScreen ? 'visible' : 'hidden'};
@@ -321,32 +406,12 @@ export default function MinecraftPage() {
           pointer-events: ${showDeathScreen ? 'auto' : 'none'};
         }
 
-        .death-title {
-          font-family: 'Press Start 2P', cursive;
-          font-size: clamp(32px, 8vw, 72px);
-          color: #7bc259;
-          text-align: center;
-          text-shadow: 0 0 20px rgba(123, 194, 89, 0.5);
-          letter-spacing: 3px;
-          animation: fadeInScale 0.5s ease-out;
-        }
-
-        @keyframes fadeInScale {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        .death-subtitle {
-          font-family: 'IBM Plex Mono', monospace;
-          font-size: 14px;
-          color: rgba(123, 194, 89, 0.7);
-          letter-spacing: 2px;
+        .death-image {
+          width: 80vw;
+          max-width: 600px;
+          height: auto;
+          border: 2px solid #7bc259;
+          border-radius: 8px;
         }
 
         .death-buttons {
@@ -377,91 +442,63 @@ export default function MinecraftPage() {
           box-shadow: 0 0 12px rgba(123, 194, 89, 0.4);
         }
 
-        @media (max-width: 768px) {
-          .gallery-item {
-            width: 200px;
-            height: 140px;
-          }
+        .respawn-tooltip,
+        .title-tooltip {
+          position: absolute;
+          background: rgba(0, 0, 0, 0.8);
+          color: #7bc259;
+          padding: 8px 12px;
+          border-radius: 4px;
+          font: 10px 'IBM Plex Mono', monospace;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          z-index: 400;
+        }
 
-          .exit-hint {
-            bottom: 10px;
-            right: 10px;
-            font-size: 10px;
-          }
+        .respawn-tooltip {
+          bottom: 120px;
+          left: 50%;
+          transform: translateX(-50%);
+        }
 
-          .title {
-            font-size: 10px;
-          }
-
-          .back-btn {
-            padding: 6px 10px;
-            font-size: 9px;
-          }
-
-          .kill-mode-overlay {
-            font-size: 10px;
-            min-width: 250px;
-            bottom: 10px;
-            left: 10px;
-            padding: 10px 14px;
-          }
+        .title-tooltip {
+          bottom: 120px;
+          right: 50%;
+          transform: translateX(50%);
         }
       `}</style>
 
-      <video
-        className="bg-video"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        onError={(e) => console.error('Video failed to load:', e)}
-      >
-        <source src="/minecraft loop video.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-
-      <div className="mc-world">
-        <div className="entrance-screen">MINECRAFT</div>
-
-        <div className="topbar">
-          <button className="back-btn" onClick={() => router.push('/')}>
-            {isMobile ? '← BACK' : '← BACK'}
-          </button>
-          <div className="title">MINECRAFT</div>
-          <div />
-        </div>
-
-        <div className="content-wrapper">
-          <div className="gallery-container">
-            {imageLayoutRef.current.map((layout) => {
-              const offsetY = scrollY * (0.3 + layout.id * 0.02)
-              return (
-                <div
-                  key={layout.id}
-                  className="gallery-item"
-                  style={{
-                    top: `${layout.top - offsetY}px`,
-                    left: `${layout.left}%`,
-                    transform: `rotate(${layout.rotation}deg)`,
-                    animationDelay: `${layout.delay}s`,
-                    opacity: showGallery ? 1 : 0,
-                  }}
-                >
-                  <img
-                    src={`/${MINECRAFT_IMAGES[layout.id]}`}
-                    alt={`Build ${layout.id + 1}`}
-                    loading="lazy"
-                  />
-                </div>
-              )
-            })}
+      <div className="minecraft-container">
+        <div className="canvas-container">
+          <canvas ref={canvasRef} />
+          <div className="video-overlay">
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              loop
+              playsInline
+              onLoadedData={() => {
+                if (videoRef.current) {
+                  videoRef.current.currentTime = VIDEO_CLIPS[currentVideoIndex].start
+                }
+              }}
+            >
+              <source src={VIDEO_CLIPS[currentVideoIndex].src} type="video/mp4" />
+            </video>
           </div>
         </div>
 
-        {showGallery && (
-          <div className="exit-hint">
-            press T to {isKillMode ? 'enter command' : 'exit'}
+        <button className="back-btn" onClick={() => router.push('/')}>
+          ← BACK
+        </button>
+
+        {!isKillMode && !showDeathScreen && (
+          <div className="hint">
+            press T to enter command
           </div>
         )}
 
@@ -477,40 +514,80 @@ export default function MinecraftPage() {
         <div className="death-screen">
           {showDeathScreen && (
             <>
-              <div className="death-title">YOU DIED</div>
-              <div className="death-subtitle">
-                {isMobile ? 'Continue?' : 'Respawn or return to Solar System?'}
-              </div>
+              <img
+                src="/minecraft_you_died.jpg"
+                alt="You Died"
+                className="death-image"
+                onMouseEnter={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  const respawnBtn = document.querySelector('.death-btn:first-child') as HTMLElement
+                  const titleBtn = document.querySelector('.death-btn:last-child') as HTMLElement
+
+                  if (respawnBtn && titleBtn) {
+                    const respawnRect = respawnBtn.getBoundingClientRect()
+                    const titleRect = titleBtn.getBoundingClientRect()
+
+                    // Check if mouse is over respawn button area
+                    if (e.clientX >= respawnRect.left && e.clientX <= respawnRect.right &&
+                        e.clientY >= respawnRect.top && e.clientY <= respawnRect.bottom) {
+                      document.querySelector('.respawn-tooltip')?.classList.add('show')
+                    } else {
+                      document.querySelector('.respawn-tooltip')?.classList.remove('show')
+                    }
+
+                    // Check if mouse is over title screen button area
+                    if (e.clientX >= titleRect.left && e.clientX <= titleRect.right &&
+                        e.clientY >= titleRect.top && e.clientY <= titleRect.bottom) {
+                      document.querySelector('.title-tooltip')?.classList.add('show')
+                    } else {
+                      document.querySelector('.title-tooltip')?.classList.remove('show')
+                    }
+                  }
+                }}
+                onMouseLeave={() => {
+                  document.querySelector('.respawn-tooltip')?.classList.remove('show')
+                  document.querySelector('.title-tooltip')?.classList.remove('show')
+                }}
+              />
               <div className="death-buttons">
                 <button
                   className="death-btn"
                   onClick={() => {
-                    console.log('RESPAWN clicked')
                     setShowDeathScreen(false)
-                    // Reset scroll position immediately
-                    window.scrollTo(0, 0)
-                    setScrollY(0)
-                    // Reset entrance animation
-                    setIsLoaded(false)
-                    setTimeout(() => {
-                      setIsLoaded(true)
-                      setTimeout(() => setShowGallery(true), 3000)
-                    }, 100)
+                    setKillInput('')
+                    setIsKillMode(false)
+                    // Reset to initial state
+                    setCurrentImageIndex(0)
+                    setCurrentVideoIndex(0)
+                    setIsHovering(false)
+                  }}
+                  onMouseEnter={() => {
+                    document.querySelector('.respawn-tooltip')?.classList.add('show')
+                  }}
+                  onMouseLeave={() => {
+                    document.querySelector('.respawn-tooltip')?.classList.remove('show')
                   }}
                 >
-                  {isMobile ? 'CONTINUE' : 'RESPAWN'}
+                  RESPAWN
                 </button>
-                {!isMobile && (
-                  <button
-                    className="death-btn"
-                    onClick={() => {
-                      console.log('MAIN MENU clicked')
-                      router.push('/')
-                    }}
-                  >
-                    MAIN MENU
-                  </button>
-                )}
+                <button
+                  className="death-btn"
+                  onClick={() => router.push('/')}
+                  onMouseEnter={() => {
+                    document.querySelector('.title-tooltip')?.classList.add('show')
+                  }}
+                  onMouseLeave={() => {
+                    document.querySelector('.title-tooltip')?.classList.remove('show')
+                  }}
+                >
+                  TITLE SCREEN
+                </button>
+              </div>
+              <div className="respawn-tooltip">
+                Continue your adventure
+              </div>
+              <div className="title-tooltip">
+                Return to main menu
               </div>
             </>
           )}
