@@ -22,11 +22,11 @@ const MINECRAFT_IMAGES = [
 ]
 
 const VIDEO_CLIPS = [
-  { src: '/minecraft loop video.mp4', start: 0, duration: 10 },
-  { src: '/minecraft loop video.mp4', start: 10, duration: 10 },
-  { src: '/minecraft loop video.mp4', start: 20, duration: 10 },
-  { src: '/minecraft loop video.mp4', start: 30, duration: 10 },
-  { src: '/minecraft loop video.mp4', start: 40, duration: 10 },
+  { src: '/minecraft loop video.mp4' },
+  { src: '/minecraft loop video.mp4' },
+  { src: '/minecraft loop video.mp4' },
+  { src: '/minecraft loop video.mp4' },
+  { src: '/minecraft loop video.mp4' },
 ]
 
 export default function MinecraftPage() {
@@ -506,14 +506,12 @@ export default function MinecraftPage() {
               muted
               loop
               playsInline
-              onLoadedData={() => {
-                const videoEl = videoRefs.current[index]
-                if (videoEl) {
-                  videoEl.currentTime = video.start
-                }
+              onError={(e) => {
+                console.error('Video failed to load:', video.src, e)
               }}
             >
               <source src={video.src} type="video/mp4" />
+              Your browser does not support the video tag.
             </video>
           </div>
         ))}
