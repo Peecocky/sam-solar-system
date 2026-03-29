@@ -64,11 +64,11 @@ export default function MinecraftPage() {
       const scene = new THREE.Scene()
       scenesRef.current[index] = scene
 
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+      const camera = new THREE.PerspectiveCamera(75, (window.innerWidth / 2) / (window.innerHeight / 2), 0.1, 1000)
       camera.position.z = 5
 
       const renderer = new THREE.WebGLRenderer({ canvas, alpha: false })
-      renderer.setSize(window.innerWidth, window.innerHeight)
+      renderer.setSize(window.innerWidth / 2, window.innerHeight / 2)
       renderersRef.current[index] = renderer
 
       const clock = new THREE.Clock()
@@ -186,9 +186,9 @@ export default function MinecraftPage() {
 
       // Handle resize
       const handleResize = () => {
-        camera.aspect = window.innerWidth / window.innerHeight
+        camera.aspect = (window.innerWidth / 2) / (window.innerHeight / 2)
         camera.updateProjectionMatrix()
-        renderer.setSize(window.innerWidth, window.innerHeight)
+        renderer.setSize(window.innerWidth / 2, window.innerHeight / 2)
       }
       window.addEventListener('resize', handleResize)
 
@@ -268,16 +268,16 @@ export default function MinecraftPage() {
         .section {
           position: relative;
           width: 100%;
-          height: 100vh;
+          height: 50vh;
           display: flex;
-          align-items: center;
-          justify-content: center;
+          flex-wrap: wrap;
           overflow: hidden;
         }
 
         .canvas-container {
-          position: absolute;
-          inset: 0;
+          position: relative;
+          width: 50%;
+          height: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -293,7 +293,7 @@ export default function MinecraftPage() {
         .video-section {
           position: relative;
           width: 100%;
-          height: 100vh;
+          height: 50vh;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -475,18 +475,23 @@ export default function MinecraftPage() {
           </div>
         )}
 
-        {/* Image sections with shader effects */}
-        {MINECRAFT_IMAGES.map((image, index) => (
-          <div key={`image-${index}`} className="section">
-            <div className="canvas-container">
-              <canvas
-                ref={(el) => {
-                  if (el) canvasRefs.current[index] = el
-                }}
-                width={typeof window !== 'undefined' ? window.innerWidth : 1920}
-                height={typeof window !== 'undefined' ? window.innerHeight : 1080}
-              />
-            </div>
+        {/* Image sections with shader effects - grouped in 2x2 grids */}
+        {Array.from({ length: Math.ceil(MINECRAFT_IMAGES.length / 4) }, (_, groupIndex) => (
+          <div key={`group-${groupIndex}`} className="section">
+            {MINECRAFT_IMAGES.slice(groupIndex * 4, (groupIndex + 1) * 4).map((image, index) => {
+              const globalIndex = groupIndex * 4 + index
+              return (
+                <div key={`image-${globalIndex}`} className="canvas-container">
+                  <canvas
+                    ref={(el) => {
+                      if (el) canvasRefs.current[globalIndex] = el
+                    }}
+                    width={typeof window !== 'undefined' ? window.innerWidth / 2 : 960}
+                    height={typeof window !== 'undefined' ? window.innerHeight / 2 : 540}
+                  />
+                </div>
+              )
+            })}
           </div>
         ))}
 
