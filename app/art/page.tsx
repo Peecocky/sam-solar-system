@@ -6,6 +6,29 @@ import styles from './art.module.css'
 
 const RIBBON_PATH = 'M-60 50 C380 150 135 370 505 414 C810 450 1040 390 990 650 C955 842 750 758 710 617 C675 485 917 500 1012 668 C1090 810 1020 990 1510 1090'
 
+const PALM_LAYOUT = [
+  { bx: -0.03, by: 1.07, ang: -1.10, len: 1.08, curl: 0.012, leaf: 0.58, hue: 132, sat: 40, lit: 54 },
+  { bx: -0.07, by: 0.55, ang: -0.30, len: 0.58, curl: 0.020, leaf: 0.50, hue: 92, sat: 52, lit: 60 },
+  { bx: 0.15, by: 1.12, ang: -1.46, len: 0.92, curl: 0.010, leaf: 0.54, hue: 112, sat: 46, lit: 56 },
+  { bx: 0.68, by: 1.10, ang: -1.74, len: 0.50, curl: 0.012, leaf: 0.46, hue: 78, sat: 56, lit: 62 },
+  { bx: 1.06, by: 0.94, ang: -2.10, len: 0.84, curl: -0.013, leaf: 0.55, hue: 138, sat: 38, lit: 50 },
+]
+
+type PalmFrond = {
+  bx: number
+  by: number
+  ang: number
+  len: number
+  curl: number
+  leaf: number
+  segs: number
+  phase: number
+  bend: number
+  vel: number
+  leafFill: string
+  stemFill: string
+}
+
 const gallerySlots = [
   { file: 'art-01.jpg', title: 'First Light', ratio: 'portrait' },
   { file: 'art-02.jpg', title: 'Soft Geometry', ratio: 'landscape' },
@@ -34,7 +57,7 @@ function ImageSlot({
   className?: string
 }) {
   return (
-    <div className={`${styles.imageSlot} ${className}`}>
+    <div className={`${styles.imageSlot} ${className}`} data-art-hover>
       <div className={styles.slotGuide}>
         <span>{label}</span>
         <code>public/gallery/{file}</code>
@@ -51,70 +74,207 @@ function ImageSlot({
 }
 
 function ArtPointerEffects() {
-  const dotRef = useRef<HTMLDivElement>(null)
-  const ringRef = useRef<HTMLDivElement>(null)
-  const rippleLayerRef = useRef<HTMLDivElement>(null)
+  const cursorRef = useRef<HTMLDivElement>(null)
+  const palmRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    let targetX = -100
-    let targetY = -100
-    let ringX = -100
-    let ringY = -100
+    const cursor = cursorRef.current
+    const canvas = palmRef.current
+    const context = canvas?.getContext('2d')
+    if (!cursor || !canvas || !context) return
+
+    const coarsePointer = window.matchMedia('(pointer: coarse)').matches
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const pointer = {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      tx: window.innerWidth / 2,
+      ty: window.innerHeight / 2,
+      vx: 0,
+      vy: 0,
+    }
+
+    let width = 0
+    let height = 0
+    let fronds: PalmFrond[] = []
+    let active = true
     let frame = 0
 
-    const animate = () => {
-      ringX += (targetX - ringX) * 0.16
-      ringY += (targetY - ringY) * 0.16
-      if (ringRef.current) {
-        ringRef.current.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`
+    const buildFronds = () => {
+      fronds = PALM_LAYOUT.map((item) => ({
+        bx: item.bx * width,
+        by: item.by * height,
+        ang: item.ang,
+        len: item.len * height,
+        curl: item.curl,
+        leaf: item.leaf,
+        segs: Math.round(18 + item.len * 8),
+        phase: Math.random() * Math.PI * 2,
+        bend: 0,
+        vel: 0,
+        leafFill: `hsla(${item.hue}, ${item.sat}%, ${item.lit}%, 0.20)`,
+        stemFill: `hsla(${item.hue}, ${item.sat}%, ${Math.round(item.lit * 0.8)}%, 0.40)`,
+      }))
+    }
+
+    const resize = () => {
+      width = Math.max(1, canvas.clientWidth)
+      height = Math.max(1, canvas.clientHeight)
+      canvas.width = width
+      canvas.height = height
+      buildFronds()
+    }
+
+    const drawFoliage = (now: number) => {
+      const t = now / 1000
+      context.clearRect(0, 0, width, height)
+      const mouseX = pointer.x
+      const mouseY = pointer.y + window.scrollY
+
+      context.lineCap = 'round'
+      context.lineJoin = 'round'
+
+      for (const frond of fronds) {
+        const breeze = 0.12 * Math.sin(t * 0.8 + frond.phase)
+        const middleX = frond.bx + Math.cos(frond.ang) * frond.len * 0.5
+        const middleY = frond.by + Math.sin(frond.ang) * frond.len * 0.5
+        const proximity = Math.max(
+          0,
+          1 - Math.hypot(mouseX - middleX, mouseY - middleY) / (frond.len * 0.75),
+        )
+
+        frond.vel += proximity * pointer.vx * 0.0008
+        frond.vel += (breeze - frond.bend) * 0.02
+        frond.vel *= 0.92
+        frond.bend += frond.vel
+
+        let x = frond.bx
+        let y = frond.by
+        let direction = frond.ang
+        const segmentLength = frond.len / frond.segs
+        const pointsX = [x]
+        const pointsY = [y]
+        const directions = [direction]
+        const stem = new Path2D()
+        stem.moveTo(x, y)
+
+        for (let index = 1; index <= frond.segs; index += 1) {
+          const progress = index / frond.segs
+          direction += frond.curl + frond.bend * progress * 0.14
+          x += Math.cos(direction) * segmentLength
+          y += Math.sin(direction) * segmentLength
+          stem.lineTo(x, y)
+          pointsX.push(x)
+          pointsY.push(y)
+          directions.push(direction)
+        }
+
+        const blades = new Path2D()
+        const leafBase = frond.len * frond.leaf * 0.4
+        for (let index = 2; index < frond.segs; index += 1) {
+          const progress = index / frond.segs
+          const leafLength = leafBase * (1 - progress * 0.5)
+          const leafAngle = 0.6 * (1 - progress * 0.2)
+          const leafWidth = leafLength * 0.22
+          const shimmer = Math.sin(t * 1.8 + index * 0.5 + frond.phase) * 0.06
+            + frond.bend * 0.3 * progress
+
+          for (const side of [-1, 1]) {
+            const angle = directions[index] + side * leafAngle + shimmer * side
+            const cos = Math.cos(angle)
+            const sin = Math.sin(angle)
+            const perpendicularX = -sin
+            const perpendicularY = cos
+            const baseX = pointsX[index]
+            const baseY = pointsY[index]
+            const tipX = baseX + cos * leafLength
+            const tipY = baseY + sin * leafLength
+            const controlOneX = baseX + cos * leafLength * 0.5 + perpendicularX * leafWidth
+            const controlOneY = baseY + sin * leafLength * 0.5 + perpendicularY * leafWidth
+            const controlTwoX = baseX + cos * leafLength * 0.5 - perpendicularX * leafWidth
+            const controlTwoY = baseY + sin * leafLength * 0.5 - perpendicularY * leafWidth
+
+            blades.moveTo(baseX, baseY)
+            blades.quadraticCurveTo(controlOneX, controlOneY, tipX, tipY)
+            blades.quadraticCurveTo(controlTwoX, controlTwoY, baseX, baseY)
+          }
+        }
+
+        context.fillStyle = frond.leafFill
+        context.fill(blades)
+        context.strokeStyle = frond.stemFill
+        context.lineWidth = 2.2
+        context.stroke(stem)
       }
-      frame = requestAnimationFrame(animate)
     }
 
     const onMove = (event: PointerEvent) => {
-      targetX = event.clientX
-      targetY = event.clientY
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) translate(-50%, -50%)`
-      }
+      pointer.tx = event.clientX
+      pointer.ty = event.clientY
     }
 
     const onOver = (event: PointerEvent) => {
       const target = event.target instanceof Element ? event.target : null
-      const interactive = target?.closest('a, button, [role="button"], .art-pointer-target')
-      ringRef.current?.toggleAttribute('data-active', Boolean(interactive))
+      const interactive = target?.closest('a, button, [role="button"], [data-art-hover]')
+      cursor.toggleAttribute('data-active', Boolean(interactive))
     }
 
-    const onDown = (event: PointerEvent) => {
-      const layer = rippleLayerRef.current
-      if (!layer) return
-      const ripple = document.createElement('i')
-      ripple.className = styles.clickRipple
-      ripple.style.left = `${event.clientX}px`
-      ripple.style.top = `${event.clientY}px`
-      layer.appendChild(ripple)
-      window.setTimeout(() => ripple.remove(), 900)
+    const onOut = (event: PointerEvent) => {
+      const next = event.relatedTarget instanceof Element ? event.relatedTarget : null
+      if (!next?.closest('a, button, [role="button"], [data-art-hover]')) {
+        cursor.removeAttribute('data-active')
+      }
     }
+
+    const animate = (now: number) => {
+      const previousX = pointer.x
+      const previousY = pointer.y
+      pointer.x += (pointer.tx - pointer.x) * 0.18
+      pointer.y += (pointer.ty - pointer.y) * 0.18
+      pointer.vx = pointer.x - previousX
+      pointer.vy = pointer.y - previousY
+
+      if (!coarsePointer) {
+        cursor.style.transform = `translate3d(${pointer.x}px, ${pointer.y}px, 0)`
+      }
+      if (active && !reducedMotion) drawFoliage(now)
+      frame = requestAnimationFrame(animate)
+    }
+
+    resize()
+    if (reducedMotion) drawFoliage(0)
+
+    const hero = document.getElementById('top')
+    const observer = hero && 'IntersectionObserver' in window
+      ? new IntersectionObserver((entries) => {
+          active = entries[0]?.isIntersecting ?? true
+        })
+      : null
+    if (hero && observer) observer.observe(hero)
 
     frame = requestAnimationFrame(animate)
-    window.addEventListener('pointermove', onMove, { passive: true })
-    window.addEventListener('pointerover', onOver, { passive: true })
-    window.addEventListener('pointerdown', onDown, { passive: true })
+    window.addEventListener('resize', resize)
+    if (!coarsePointer) {
+      window.addEventListener('pointermove', onMove, { passive: true })
+      window.addEventListener('pointerover', onOver, { passive: true })
+      window.addEventListener('pointerout', onOut, { passive: true })
+    }
 
     return () => {
       cancelAnimationFrame(frame)
+      observer?.disconnect()
+      window.removeEventListener('resize', resize)
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerover', onOver)
-      window.removeEventListener('pointerdown', onDown)
+      window.removeEventListener('pointerout', onOut)
     }
   }, [])
 
   return (
-    <div className={styles.pointerEffects} aria-hidden="true">
-      <div ref={rippleLayerRef} className={styles.rippleLayer} />
-      <div ref={ringRef} className={styles.cursorRing} />
-      <div ref={dotRef} className={styles.cursorDot} />
-    </div>
+    <>
+      <canvas ref={palmRef} className={styles.palmCanvas} aria-hidden="true" />
+      <div ref={cursorRef} className={styles.cursor} aria-hidden="true" />
+    </>
   )
 }
 

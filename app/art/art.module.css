@@ -104,14 +104,36 @@
   animation: ribbonSheen 7s linear infinite;
 }
 
-.pointerEffects,
-.rippleLayer { position: fixed; z-index: 200; inset: 0; pointer-events: none; }
-.cursorDot,
-.cursorRing { position: fixed; z-index: 202; top: 0; left: 0; pointer-events: none; border-radius: 50%; will-change: transform; }
-.cursorDot { width: 7px; height: 7px; background: #121217; mix-blend-mode: difference; }
-.cursorRing { width: 38px; height: 38px; border: 1px solid rgba(20,20,24,.58); transition: width .24s ease, height .24s ease, background .24s ease, border-color .24s ease; }
-.cursorRing[data-active] { width: 72px; height: 72px; border-color: rgba(215,58,37,.85); background: rgba(215,58,37,.1); }
-.clickRipple { position: fixed; width: 18px; height: 18px; border: 2px solid #d63a25; border-radius: 50%; transform: translate(-50%, -50%); animation: clickBloom .85s cubic-bezier(.16,1,.3,1) forwards; }
+.palmCanvas {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100svh;
+  pointer-events: none;
+}
+.cursor {
+  position: fixed;
+  z-index: 12000;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.65);
+  mix-blend-mode: difference;
+  pointer-events: none;
+  transition: width .25s cubic-bezier(.16,1,.3,1), height .25s cubic-bezier(.16,1,.3,1), margin .25s cubic-bezier(.16,1,.3,1), background .25s ease;
+  will-change: transform;
+}
+.cursor[data-active] {
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  background: rgba(255,255,255,.85);
+}
 
 @keyframes ribbonDrift {
   0% { transform: translate3d(-1.2%, -.8%, 0) rotate(-.35deg) scale(1.015); }
@@ -123,10 +145,6 @@
   50% { stroke-width: clamp(39px, 5.35vw, 84px); filter: saturate(1.18) brightness(.9); }
 }
 @keyframes ribbonSheen { to { stroke-dashoffset: -608; } }
-@keyframes clickBloom {
-  0% { opacity: .9; transform: translate(-50%, -50%) scale(.4); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(8); }
-}
 
 .imageSlot { position: relative; overflow: hidden; background: #d4d3dd; }
 .imageSlot::before {
@@ -264,5 +282,5 @@
   .page,
   .page a,
   .page button { cursor: auto; }
-  .pointerEffects { display: none; }
+  .cursor { display: none; }
 }
