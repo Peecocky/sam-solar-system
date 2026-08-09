@@ -241,6 +241,15 @@ export default function SolarSystem({
 
       <TransientComet
         href="https://jiaotong-university-koguan-law-scho.vercel.app/"
+        label="Internship Project / TimeLimit"
+        setHoverText={setHoverText}
+      />
+
+      <TransientComet
+        href={process.env.NEXT_PUBLIC_LAB_SHOWCASE_URL || 'https://sjtu-smart-judiciary-showcase.vercel.app/'}
+        label="实验室项目展示中台 / Lab Showcase"
+        glowColor="#ffb36f"
+        initialDelay={13}
         setHoverText={setHoverText}
       />
     </>

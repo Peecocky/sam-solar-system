@@ -80,6 +80,7 @@ export async function GET() {
       watchLogDate: WATCH_LOG_DATE,
       fiftyTwoWeekHigh: result.meta?.fiftyTwoWeekHigh ?? null,
       fiftyTwoWeekLow: result.meta?.fiftyTwoWeekLow ?? null,
+      history: points.slice(-90),
     })
   } catch (error) {
     return NextResponse.json(

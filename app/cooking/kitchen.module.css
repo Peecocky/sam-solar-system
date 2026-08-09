@@ -1,0 +1,98 @@
+.page {
+  --cream: #eeeade;
+  --paper: #f6f3eb;
+  --ink: #20241e;
+  --sage: #68725f;
+  --rust: #9d4835;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.nav {
+  position: fixed;
+  z-index: 20;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px clamp(20px, 4vw, 58px);
+  color: #fff;
+  mix-blend-mode: difference;
+}
+.nav a { color: inherit; text-decoration: none; }
+.brand { font: 700 12px/1 monospace; letter-spacing: .2em; }
+.nav nav { display: flex; gap: 26px; font: 600 10px/1 monospace; letter-spacing: .13em; text-transform: uppercase; }
+
+.hero { min-height: 100svh; position: relative; display: grid; align-items: end; overflow: hidden; color: #f8f5ec; }
+.hero > img { object-fit: cover; }
+.heroShade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(18,24,17,.78) 0, rgba(18,24,17,.2) 58%, rgba(18,24,17,.08)), linear-gradient(0deg, rgba(17,22,16,.62), transparent 60%); }
+.heroCopy { position: relative; z-index: 2; padding: 18vh clamp(24px, 6vw, 96px) 10vh; }
+.heroCopy > p,
+.eyebrow,
+.sectionTitle > p { margin: 0 0 22px; font: 600 10px/1.4 monospace; letter-spacing: .2em; }
+.heroCopy h1 { margin: 0; font: 400 clamp(76px, 13vw, 190px)/.76 Georgia, serif; letter-spacing: -.07em; }
+.heroCopy > div { width: min(370px, 80vw); margin: 7vh 0 0 clamp(0px, 33vw, 500px); }
+.heroCopy > div span { font: 600 9px/1 monospace; letter-spacing: .18em; }
+.heroCopy > div p { color: rgba(255,255,255,.72); font-size: 13px; line-height: 1.8; }
+.scroll { position: absolute; z-index: 3; right: clamp(20px, 4vw, 58px); bottom: 30px; color: #fff; text-decoration: none; font: 600 9px/1 monospace; letter-spacing: .18em; }
+
+.intro { min-height: 80svh; padding: 15vh clamp(24px, 8vw, 130px); display: grid; align-content: center; grid-template-columns: 1fr minmax(220px, 380px); gap: 40px; background: var(--cream); }
+.intro .eyebrow { grid-column: 1 / -1; color: var(--sage); }
+.intro h2 { margin: 0; font: 400 clamp(58px, 8vw, 115px)/.92 Georgia, serif; letter-spacing: -.06em; }
+.introText { align-self: end; margin: 0 0 12px; color: #64675f; font-size: 15px; line-height: 1.9; }
+
+.menu { padding: 14vh clamp(20px, 4vw, 60px) 18vh; }
+.sectionTitle { max-width: 1400px; margin: 0 auto 9vh; display: flex; justify-content: space-between; align-items: end; }
+.sectionTitle > p { color: var(--sage); }
+.sectionTitle h2 { margin: 0; font: 400 clamp(48px, 7vw, 102px)/.9 Georgia, serif; letter-spacing: -.055em; text-align: right; }
+.menuGrid { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 2.4vw, 34px); }
+.menuCard { color: inherit; text-decoration: none; border-top: 1px solid #b9b8ae; padding-top: 12px; }
+.cardImage { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: #d8d4c8; }
+.cardImage img { object-fit: cover; transition: transform .7s cubic-bezier(.16,1,.3,1); }
+.menuCard:hover img { transform: scale(1.035); }
+.cardImage > span { position: absolute; z-index: 2; top: 14px; left: 14px; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: rgba(247,244,236,.92); font: 700 10px/1 monospace; }
+.cardCopy { position: relative; padding: 22px 0 0; }
+.cardCopy small { color: #77786f; font: 9px/1 monospace; letter-spacing: .14em; }
+.cardCopy h3 { max-width: 80%; margin: 18px 0 6px; font: 400 clamp(25px, 3vw, 40px)/1.05 Georgia, serif; }
+.cardCopy p { margin: 0; color: #74766e; font-size: 12px; }
+.cardCopy b { display: block; margin-top: 28px; font: 600 9px/1 monospace; letter-spacing: .14em; }
+
+.recipes { background: #1e261d; color: #edf0e7; }
+.recipe { min-height: 100svh; display: grid; grid-template-columns: minmax(340px, 46vw) 1fr; border-bottom: 1px solid rgba(255,255,255,.1); scroll-margin-top: 0; }
+.recipeImage { min-height: 100svh; position: sticky; top: 0; overflow: hidden; }
+.recipeImage img { object-fit: cover; }
+.recipeImage::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(16,22,15,.45), transparent 45%); }
+.recipeImage span { position: absolute; z-index: 2; left: 28px; bottom: 26px; font: 600 10px/1 monospace; letter-spacing: .18em; }
+.recipeBody { padding: 14vh clamp(28px, 5vw, 82px) 11vh; }
+.recipeBody .eyebrow { color: #9eaa96; }
+.recipeBody > h2 { margin: 0 0 8px; font: 400 clamp(45px, 6vw, 86px)/.94 Georgia, serif; letter-spacing: -.055em; }
+.recipeBody > h3 { margin: 0; color: #98a18f; font: 400 italic 22px/1.3 Georgia, serif; }
+.note { max-width: 520px; margin: 34px 0 70px; color: #bdc4b6; line-height: 1.8; font-size: 14px; }
+.recipeColumns { display: grid; grid-template-columns: minmax(170px, .7fr) 1.3fr; gap: clamp(30px, 5vw, 76px); border-top: 1px solid rgba(255,255,255,.18); padding-top: 28px; }
+.recipeColumns h4 { margin: 0 0 24px; color: #8d9a84; font: 600 9px/1 monospace; letter-spacing: .18em; }
+.recipeColumns ul,
+.recipeColumns ol { list-style: none; padding: 0; margin: 0; }
+.recipeColumns ul li { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.08); color: #d9ded3; font-size: 13px; line-height: 1.45; }
+.recipeColumns ol li { display: grid; grid-template-columns: 27px 1fr; gap: 13px; margin-bottom: 23px; color: #d9ded3; font-size: 13px; line-height: 1.72; }
+.recipeColumns ol span { color: #84917b; font: 10px/1.8 monospace; }
+.next { display: inline-block; margin-top: 50px; color: #e7eadf; text-decoration: none; border-bottom: 1px solid #7e8878; padding-bottom: 8px; font: 600 10px/1 monospace; letter-spacing: .12em; }
+
+.footer { min-height: 80svh; display: grid; align-content: center; padding: 14vh clamp(24px, 8vw, 130px); background: #a44935; color: #fbefe4; }
+.footer p { font: 600 10px/1 monospace; letter-spacing: .2em; }
+.footer h2 { margin: 28px 0 60px; font: 400 clamp(60px, 10vw, 150px)/.84 Georgia, serif; letter-spacing: -.07em; }
+.footer a { width: fit-content; color: inherit; text-decoration: none; border-bottom: 1px solid; padding-bottom: 8px; }
+
+@media (max-width: 800px) {
+  .nav nav a:not(:last-child) { display: none; }
+  .heroCopy h1 { font-size: 22vw; }
+  .heroCopy > div { margin-left: 0; }
+  .intro { grid-template-columns: 1fr; }
+  .menuGrid { grid-template-columns: 1fr; gap: 70px; }
+  .cardImage { aspect-ratio: 4 / 3; }
+  .recipe { display: block; }
+  .recipeImage { min-height: 62vh; position: relative; }
+  .recipeColumns { grid-template-columns: 1fr; }
+  .sectionTitle { display: block; }
+  .sectionTitle h2 { text-align: left; margin-top: 30px; }
+}

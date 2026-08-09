@@ -23,18 +23,26 @@ function randomEdgePoint() {
 export default function TransientComet({
   setHoverText,
   href,
+  label = 'Internship Project / TimeLimit',
+  textureUrl = '/planet-internship.svg',
+  glowColor = '#84e4ff',
+  initialDelay = 7,
 }: {
   setHoverText: (t: string | null) => void
   href: string
+  label?: string
+  textureUrl?: string
+  glowColor?: string
+  initialDelay?: number
 }) {
-  const texture = useLoader(TextureLoader, '/planet-internship.svg')
+  const texture = useLoader(TextureLoader, textureUrl)
   const headRef = useRef<Mesh>(null!)
   const auraRef = useRef<MeshBasicMaterial>(null!)
   const trailRefs = useRef<MeshBasicMaterial[]>([])
   const trailMeshRefs = useRef<Mesh[]>([])
   const activeRef = useRef(false)
   const hoveredRef = useRef(false)
-  const timerRef = useRef(7)
+  const timerRef = useRef(initialDelay)
   const visibleForRef = useRef(0)
   const startRef = useRef(new Vector3())
   const velocityRef = useRef(new Vector3())
@@ -147,7 +155,7 @@ export default function TransientComet({
             ref={(node) => {
               if (node) trailRefs.current[i] = node
             }}
-            color={i === 0 ? '#d2f9ff' : '#88dfff'}
+            color={i === 0 ? '#ffffff' : glowColor}
             transparent
             depthWrite={false}
             blending={AdditiveBlending}
@@ -163,7 +171,7 @@ export default function TransientComet({
           if (!activeRef.current) return
           hoveredRef.current = true
           document.body.style.cursor = 'pointer'
-          setHoverText('Internship Project / TimeLimit')
+          setHoverText(label)
         }}
         onPointerOut={() => {
           hoveredRef.current = false
@@ -182,7 +190,7 @@ export default function TransientComet({
           <sphereGeometry args={[0.78, 24, 24]} />
           <meshBasicMaterial
             ref={auraRef}
-            color="#84e4ff"
+          color={glowColor}
             transparent
             depthWrite={false}
             blending={AdditiveBlending}

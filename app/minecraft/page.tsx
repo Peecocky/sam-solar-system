@@ -157,7 +157,7 @@ export default function MinecraftPage() {
       scene.add(mesh)
 
       // Mouse tracking
-      let mouse = new THREE.Vector2(0.5, 0.5)
+      const mouse = new THREE.Vector2(0.5, 0.5)
 
       const handleMouseMove = (event: MouseEvent) => {
         const rect = canvas.getBoundingClientRect()
