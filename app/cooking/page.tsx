@@ -80,10 +80,6 @@ export default function CookingPage() {
         <div className={styles.heroCopy}>
           <p>SEASON · LATE SUMMER / 2026</p>
           <h1>Sam&apos;s<br />Kitchen</h1>
-          <div>
-            <span>SHANGHAI · HOME TABLE</span>
-            <p>北欧式的克制，家常菜的温度。每道菜都有清楚步骤，也允许临场发挥。</p>
-          </div>
         </div>
         <a className={styles.scroll} href="#menu">TODAY&apos;S MENU ↓</a>
       </section>

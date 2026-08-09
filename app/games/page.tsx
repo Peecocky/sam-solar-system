@@ -204,6 +204,22 @@ const WHISPERWOOD_TREES = [
 
 const EASTWOOD_TREES = createForest(1034, 116, 4, 5, 26, 24)
 
+const NORTHWOOD_TREES = createForest(372, 104, 7, 3, 27, 22)
+
+const ASHEN_PEAKS = [
+  [1068, 504, 0.68],
+  [1110, 478, 0.82],
+  [1162, 462, 0.94],
+  [1218, 474, 0.84],
+  [1262, 504, 0.7],
+] as const
+
+const SOUTHERN_PEAKS = [
+  [676, 744, 0.58],
+  [718, 756, 0.68],
+  [766, 750, 0.61],
+] as const
+
 const MOUNTAINS = [
   [504, 254, 0.84],
   [552, 226, 1.04],
@@ -350,6 +366,25 @@ function WaveGlyph({ x, y, scale = 1 }: { x: number; y: number; scale?: number }
   )
 }
 
+function HillGlyph({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${scale})`} opacity="0.58">
+      <path d="M0 18 C12 -8 32 -8 46 18 C58 -2 76 0 88 18" fill="none" stroke="#786950" strokeWidth="1.5" />
+      <path d="M8 22 C26 12 50 13 80 22" fill="none" stroke="#9a896a" strokeWidth="1" strokeDasharray="3 5" />
+    </g>
+  )
+}
+
+function RuinGlyph({ x, y }: { x: number; y: number }) {
+  return (
+    <g transform={`translate(${x} ${y})`} opacity="0.74">
+      <path d="M-13 11 L-10 -11 L-3 -7 L1 -18 L7 -10 L12 11" fill="none" stroke="#5f513f" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M-17 12 H17 M-7 3 H7" fill="none" stroke="#5f513f" strokeWidth="1.3" />
+      <circle cx="0" cy="-1" r="2.4" fill="none" stroke="#5f513f" strokeWidth="1" />
+    </g>
+  )
+}
+
 function Sparkle({
   x,
   y,
@@ -399,7 +434,8 @@ export default function GamesHub() {
         .fantasy-page {
           min-height: 100vh;
           background:
-            radial-gradient(circle at top, rgba(255,245,221,0.86) 0%, rgba(232,213,176,0.95) 30%, rgba(212,186,142,1) 100%);
+            radial-gradient(circle at 50% 15%, rgba(255,246,218,.9) 0%, rgba(223,198,153,.96) 42%, rgba(125,89,50,1) 132%),
+            #c7a978;
           color: #4b4134;
           padding: 22px;
           box-sizing: border-box;
@@ -456,13 +492,14 @@ export default function GamesHub() {
         .fantasy-map {
           position: relative;
           background:
-            radial-gradient(circle at top left, rgba(255,255,255,0.22), transparent 26%),
-            radial-gradient(circle at bottom right, rgba(255,255,255,0.14), transparent 28%),
-            linear-gradient(180deg, #efe3c5 0%, #e4d0aa 100%);
-          border: 1px solid rgba(97, 78, 53, 0.28);
+            radial-gradient(circle at 18% 15%, rgba(255,255,255,.32), transparent 27%),
+            radial-gradient(circle at 82% 76%, rgba(91,53,23,.16), transparent 31%),
+            linear-gradient(155deg, #eee0bc 0%, #dbc49a 52%, #cfac77 100%);
+          border: 5px double rgba(72, 53, 33, .54);
           box-shadow:
-            inset 0 0 0 2px rgba(255,251,239,0.54),
-            0 28px 56px rgba(76, 53, 23, 0.14);
+            inset 0 0 0 2px rgba(255,248,226,.4),
+            inset 0 0 90px rgba(77,46,20,.2),
+            0 30px 70px rgba(55,35,14,.28);
           overflow: hidden;
         }
 
@@ -472,11 +509,22 @@ export default function GamesHub() {
           inset: 0;
           pointer-events: none;
           background-image:
-            radial-gradient(rgba(95,73,37,0.08) 1px, transparent 1px),
-            radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
-          background-size: 18px 18px, 26px 26px;
-          opacity: 0.4;
+            repeating-linear-gradient(7deg, rgba(82,54,25,.025) 0 1px, transparent 1px 7px),
+            radial-gradient(rgba(78,53,28,.14) .8px, transparent 1px),
+            radial-gradient(rgba(255,255,255,.11) .8px, transparent 1px);
+          background-size: auto, 17px 19px, 29px 31px;
+          opacity: .55;
           mix-blend-mode: multiply;
+        }
+
+        .fantasy-map::after {
+          content: '';
+          position: absolute;
+          z-index: 3;
+          inset: 13px;
+          border: 1px solid rgba(83,61,37,.3);
+          box-shadow: inset 0 0 34px rgba(60,38,17,.12);
+          pointer-events: none;
         }
 
         .fantasy-svg {
@@ -485,6 +533,7 @@ export default function GamesHub() {
           display: block;
           position: relative;
           z-index: 1;
+          filter: sepia(.08) contrast(1.035) saturate(.88);
         }
 
         .realm-shape {
@@ -571,17 +620,6 @@ export default function GamesHub() {
           text-transform: uppercase;
         }
 
-        .map-note {
-          position: absolute;
-          left: 22px;
-          bottom: 22px;
-          max-width: 300px;
-          color: rgba(88, 74, 55, 0.76);
-          font-size: 14px;
-          line-height: 1.72;
-          z-index: 2;
-        }
-
         @keyframes sparklePulse {
           0%, 100% {
             opacity: 0.48;
@@ -612,8 +650,7 @@ export default function GamesHub() {
             align-items: stretch;
           }
 
-          .map-info,
-          .map-note {
+          .map-info {
             position: static;
             width: auto;
             max-width: none;
@@ -640,6 +677,19 @@ export default function GamesHub() {
           <div className="fantasy-map">
             <svg className="fantasy-svg" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet">
               <defs>
+                <radialGradient id="seaWash" cx="48%" cy="38%" r="72%">
+                  <stop offset="0" stopColor="#e7d9b6" />
+                  <stop offset=".72" stopColor="#d0b887" />
+                  <stop offset="1" stopColor="#b58e59" />
+                </radialGradient>
+                <linearGradient id="landWash" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stopColor="#eadcba" />
+                  <stop offset=".48" stopColor="#d9c294" />
+                  <stop offset="1" stopColor="#c7a46d" />
+                </linearGradient>
+                <pattern id="terrainHatch" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(18)">
+                  <path d="M0 2 H22" stroke="#6d5638" strokeWidth=".55" opacity=".18" />
+                </pattern>
                 <filter id="hoverGlow">
                   <feGaussianBlur stdDeviation="8" result="blur" />
                   <feMerge>
@@ -653,13 +703,20 @@ export default function GamesHub() {
                 <path id="lake-label" d="M710 548 C760 528 830 532 888 574" />
                 <path id="river-label" d="M824 184 C860 262 858 338 834 430" />
                 <path id="road-label" d="M290 336 C482 346 644 370 884 438" />
+                <path id="western-sea-label" d="M85 440 C120 388 130 328 120 274" />
+                <path id="ashen-label" d="M1080 560 C1150 538 1230 544 1288 582" />
               </defs>
+
+              <rect x="0" y="0" width="1400" height="900" fill="url(#seaWash)" />
+              <rect x="18" y="18" width="1364" height="864" rx="2" fill="none" stroke="#5b4934" strokeWidth="1.4" opacity=".58" />
+              <path d="M34 92 V34 H92 M1308 34 H1366 V92 M34 808 V866 H92 M1308 866 H1366 V808" fill="none" stroke="#5b4934" strokeWidth="3" opacity=".7" />
 
               <path
                 d="M116 156 C176 82 292 54 426 72 C534 86 623 61 756 59 C900 56 1029 90 1142 160 C1263 234 1330 347 1328 496 C1327 630 1245 741 1112 808 C992 868 850 865 714 835 C601 809 507 800 390 816 C266 834 163 807 104 739 C45 670 43 563 63 473 C82 388 52 246 116 156 Z"
-                fill="#efe1bf"
+                fill="url(#landWash)"
                 stroke="#5a4d3c"
-                strokeWidth="3.2"
+                strokeWidth="4.4"
+                filter="url(#hoverGlow)"
               />
               <path
                 d="M128 171 C186 98 298 70 427 87 C540 102 626 75 756 73 C895 71 1020 103 1128 172 C1235 241 1311 352 1311 490 C1311 618 1231 726 1100 791 C983 851 847 848 714 820 C601 794 510 786 397 801 C279 816 178 790 121 724 C66 661 64 560 84 477 C104 393 77 255 128 171 Z"
@@ -667,6 +724,17 @@ export default function GamesHub() {
                 stroke="rgba(255,249,236,0.72)"
                 strokeWidth="1.7"
               />
+              <path
+                d="M151 183 C216 121 309 105 422 118 C531 131 633 106 747 105 C877 102 1002 132 1097 194 C1189 254 1258 353 1264 478 C1266 588 1204 682 1082 746"
+                fill="none"
+                stroke="#6f5d45"
+                strokeWidth="1.2"
+                strokeDasharray="2 8"
+                opacity=".38"
+              />
+              <path d="M170 408 C300 380 428 402 552 472 C650 528 724 548 820 522" fill="none" stroke="#856f50" strokeWidth="1.1" strokeDasharray="3 10" opacity=".35" />
+              <path d="M194 432 C326 408 432 438 544 500" fill="none" stroke="#856f50" strokeWidth="1" strokeDasharray="3 9" opacity=".26" />
+              <path d="M930 258 C1054 284 1142 350 1175 420" fill="none" stroke="#856f50" strokeWidth="1.1" strokeDasharray="3 10" opacity=".34" />
 
               <path
                 d="M790 166 C830 225 855 306 852 380 C849 448 828 500 803 550"
@@ -689,6 +757,16 @@ export default function GamesHub() {
               {MOUNTAINS.map(([x, y, scale]) => (
                 <MountainGlyph key={`${x}-${y}`} x={x} y={y} scale={scale} />
               ))}
+              {ASHEN_PEAKS.map(([x, y, scale]) => (
+                <MountainGlyph key={`ash-${x}-${y}`} x={x} y={y} scale={scale} />
+              ))}
+              {SOUTHERN_PEAKS.map(([x, y, scale]) => (
+                <MountainGlyph key={`south-${x}-${y}`} x={x} y={y} scale={scale} />
+              ))}
+              <HillGlyph x={360} y={392} scale={.85} />
+              <HillGlyph x={458} y={424} scale={.72} />
+              <HillGlyph x={610} y={548} scale={.88} />
+              <HillGlyph x={942} y={542} scale={.82} />
 
               <path
                 d="M714 510 C760 494 824 500 866 530 C905 559 924 612 915 654 C874 674 828 677 784 664 C739 651 696 627 674 588 C678 551 694 523 714 510 Z"
@@ -749,11 +827,17 @@ export default function GamesHub() {
                   scale={0.8 + (index % 3) * 0.04}
                 />
               ))}
+              {NORTHWOOD_TREES.map(([x, y], index) => (
+                <TreeGlyph key={`north-${x}-${y}`} x={x} y={y} scale={0.72 + (index % 3) * .04} />
+              ))}
 
               <SettlementGlyph x={1006} y={414} kind="city" />
               <SettlementGlyph x={265} y={278} />
               <SettlementGlyph x={1128} y={268} />
               <SettlementGlyph x={572} y={760} />
+              <RuinGlyph x={492} y={536} />
+              <RuinGlyph x={1180} y={618} />
+              <RuinGlyph x={882} y={250} />
 
               <text fill="#5c4d3b" fontFamily="'IM Fell English SC', serif" fontSize="58" letterSpacing="4">
                 <textPath href="#spine-label" startOffset="18%">
@@ -783,6 +867,13 @@ export default function GamesHub() {
                 <textPath href="#road-label" startOffset="24%">
                   Pilgrim Road
                 </textPath>
+              </text>
+
+              <text fill="#6b5a43" fontFamily="'Cormorant Garamond', serif" fontSize="28" fontStyle="italic" letterSpacing="5" opacity=".7">
+                <textPath href="#western-sea-label" startOffset="5%">The Western Sea</textPath>
+              </text>
+              <text fill="#5a4938" fontFamily="'IM Fell English SC', serif" fontSize="30" letterSpacing="3" opacity=".8">
+                <textPath href="#ashen-label" startOffset="8%">The Ashen March</textPath>
               </text>
 
               {REALMS.map((realm) => {
@@ -900,24 +991,7 @@ export default function GamesHub() {
                 <text x="70" y="4" textAnchor="middle" fontFamily="'IBM Plex Mono', monospace" fontSize="11" fill="#5a4d3c">E</text>
               </g>
 
-              <g transform="translate(76 812)" opacity="0.76">
-                <line x1="0" y1="0" x2="132" y2="0" stroke="#5a4d3c" strokeWidth="3" />
-                <line x1="0" y1="-8" x2="0" y2="8" stroke="#5a4d3c" strokeWidth="3" />
-                <line x1="44" y1="-8" x2="44" y2="8" stroke="#5a4d3c" strokeWidth="3" />
-                <line x1="88" y1="-8" x2="88" y2="8" stroke="#5a4d3c" strokeWidth="3" />
-                <line x1="132" y1="-8" x2="132" y2="8" stroke="#5a4d3c" strokeWidth="3" />
-                <text x="0" y="-16" fontFamily="'IBM Plex Mono', monospace" fontSize="10" fill="#5a4d3c">0</text>
-                <text x="38" y="-16" fontFamily="'IBM Plex Mono', monospace" fontSize="10" fill="#5a4d3c">20</text>
-                <text x="82" y="-16" fontFamily="'IBM Plex Mono', monospace" fontSize="10" fill="#5a4d3c">40</text>
-                <text x="136" y="4" fontFamily="'IBM Plex Mono', monospace" fontSize="10" fill="#5a4d3c">miles</text>
-              </g>
             </svg>
-
-            <div className="map-note">
-              Built toward a Tolkien-like fantasy-map language: hand-drawn mountain fences,
-              repeated forest symbols, ringed water, road labels, settlement icons, and a more
-              illustrative parchment hierarchy than the previous UI-style map.
-            </div>
 
             {hoveredRealm && (
               <div className="map-info">

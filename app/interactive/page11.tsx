@@ -476,7 +476,7 @@ export default function InteractivePage() {
       {/* ── back button ── */}
       <button
         onClick={() => router.push('/')}
-        style={{ position: 'fixed', top: 14, left: 14, zIndex: 500, background: 'rgba(2,4,7,0.85)', border: '1px solid #0a1e2a', borderRadius: 3, color: '#0a2535', fontFamily: "'Share Tech Mono', monospace", fontSize: 11, padding: '5px 10px', cursor: 'pointer', letterSpacing: 2 }}
+        style={{ position: 'fixed', top: 14, left: 14, zIndex: 500, background: 'rgba(2,8,14,0.94)', border: '1px solid #2a86ad', borderRadius: 3, color: '#91e6ff', fontFamily: "'Share Tech Mono', monospace", fontSize: 12, padding: '7px 12px', cursor: 'pointer', letterSpacing: 2, boxShadow: '0 0 18px rgba(0,229,255,0.2)', textShadow: '0 0 10px rgba(0,229,255,0.55)' }}
       >
         ← BACK
       </button>

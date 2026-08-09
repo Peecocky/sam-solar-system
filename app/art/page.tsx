@@ -1,7 +1,10 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import styles from './art.module.css'
+
+const RIBBON_PATH = 'M-60 50 C380 150 135 370 505 414 C810 450 1040 390 990 650 C955 842 750 758 710 617 C675 485 917 500 1012 668 C1090 810 1020 990 1510 1090'
 
 const gallerySlots = [
   { file: 'art-01.jpg', title: 'First Light', ratio: 'portrait' },
@@ -47,9 +50,78 @@ function ImageSlot({
   )
 }
 
+function ArtPointerEffects() {
+  const dotRef = useRef<HTMLDivElement>(null)
+  const ringRef = useRef<HTMLDivElement>(null)
+  const rippleLayerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    let targetX = -100
+    let targetY = -100
+    let ringX = -100
+    let ringY = -100
+    let frame = 0
+
+    const animate = () => {
+      ringX += (targetX - ringX) * 0.16
+      ringY += (targetY - ringY) * 0.16
+      if (ringRef.current) {
+        ringRef.current.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`
+      }
+      frame = requestAnimationFrame(animate)
+    }
+
+    const onMove = (event: PointerEvent) => {
+      targetX = event.clientX
+      targetY = event.clientY
+      if (dotRef.current) {
+        dotRef.current.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) translate(-50%, -50%)`
+      }
+    }
+
+    const onOver = (event: PointerEvent) => {
+      const target = event.target instanceof Element ? event.target : null
+      const interactive = target?.closest('a, button, [role="button"], .art-pointer-target')
+      ringRef.current?.toggleAttribute('data-active', Boolean(interactive))
+    }
+
+    const onDown = (event: PointerEvent) => {
+      const layer = rippleLayerRef.current
+      if (!layer) return
+      const ripple = document.createElement('i')
+      ripple.className = styles.clickRipple
+      ripple.style.left = `${event.clientX}px`
+      ripple.style.top = `${event.clientY}px`
+      layer.appendChild(ripple)
+      window.setTimeout(() => ripple.remove(), 900)
+    }
+
+    frame = requestAnimationFrame(animate)
+    window.addEventListener('pointermove', onMove, { passive: true })
+    window.addEventListener('pointerover', onOver, { passive: true })
+    window.addEventListener('pointerdown', onDown, { passive: true })
+
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerover', onOver)
+      window.removeEventListener('pointerdown', onDown)
+    }
+  }, [])
+
+  return (
+    <div className={styles.pointerEffects} aria-hidden="true">
+      <div ref={rippleLayerRef} className={styles.rippleLayer} />
+      <div ref={ringRef} className={styles.cursorRing} />
+      <div ref={dotRef} className={styles.cursorDot} />
+    </div>
+  )
+}
+
 export default function ArtPage() {
   return (
     <main className={styles.page}>
+      <ArtPointerEffects />
       <header className={styles.nav}>
         <a className={styles.logo} href="#top">SAM / ART</a>
         <nav>
@@ -61,7 +133,23 @@ export default function ArtPage() {
 
       <section className={styles.hero} id="top">
         <svg className={styles.ribbon} viewBox="0 0 1440 1100" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M-60 50 C380 150 135 370 505 414 C810 450 1040 390 990 650 C955 842 750 758 710 617 C675 485 917 500 1012 668 C1090 810 1020 990 1510 1090" />
+          <defs>
+            <linearGradient id="artRibbonGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#ef4b31">
+                <animate attributeName="stop-color" values="#ef4b31;#aa321d;#ef4b31" dur="7s" repeatCount="indefinite" />
+              </stop>
+              <stop offset="0.56" stopColor="#d63a25">
+                <animate attributeName="stop-color" values="#d63a25;#6f2012;#d63a25" dur="8.4s" repeatCount="indefinite" />
+              </stop>
+              <stop offset="1" stopColor="#43170d">
+                <animate attributeName="stop-color" values="#43170d;#bd321e;#43170d" dur="6.2s" repeatCount="indefinite" />
+              </stop>
+            </linearGradient>
+          </defs>
+          <g className={styles.ribbonFlow}>
+            <path className={styles.ribbonMain} d={RIBBON_PATH} />
+            <path className={styles.ribbonSheen} d={RIBBON_PATH} />
+          </g>
         </svg>
         <div className={styles.heroCopy}>
           <p>PERSONAL ARCHIVE · 2026</p>

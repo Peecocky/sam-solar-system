@@ -4,6 +4,7 @@ import { Canvas } from '@react-three/fiber'
 import { useState } from 'react'
 import { Stars, OrbitControls } from '@react-three/drei'
 import SolarSystem from '@/components/SolarSystem'
+import AccessibleNavigation from '@/components/AccessibleNavigation'
 
 /* ===== Notifications ===== */
 const NOTIFICATIONS = [
@@ -117,6 +118,8 @@ export default function Home() {
 
         <SolarSystem setHoverText={setHoverText} />
       </Canvas>
+
+      <AccessibleNavigation />
 
       {/* ===== Notification Overlay ===== */}
       {showNotice && (
