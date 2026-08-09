@@ -16,6 +16,7 @@ export default function MusicPlayer() {
   const sourceRef = useRef(source)
   const [playing, setPlaying] = useState(() => getStoredMusicPreference() === 'on')
   const [visibleByPreference, setVisibleByPreference] = useState(() => getStoredMusicPreference() !== null)
+  const [hiddenByPage, setHiddenByPage] = useState(false)
   const visible = isArt || visibleByPreference
   const volume = 0.35
 
@@ -66,6 +67,15 @@ export default function MusicPlayer() {
     return () => window.removeEventListener('sam-music-choice', onMusicChoice)
   }, [])
 
+  useEffect(() => {
+    function onArtFoliageMode(event: Event) {
+      setHiddenByPage((event as CustomEvent<boolean>).detail)
+    }
+
+    window.addEventListener('art-foliage-mode', onArtFoliageMode)
+    return () => window.removeEventListener('art-foliage-mode', onArtFoliageMode)
+  }, [])
+
   function toggle() {
     const next = !playing
     setVisibleByPreference(true)
@@ -79,6 +89,7 @@ export default function MusicPlayer() {
     <>
       <audio ref={audioRef} src={source} loop preload="auto" />
       <div
+        data-music-player
         onClick={toggle}
         style={{
           position: 'fixed',
@@ -93,7 +104,7 @@ export default function MusicPlayer() {
             : (playing ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.02)'),
           border: `1px solid ${isArt ? 'rgba(255,255,255,0.5)' : (playing ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)')}`,
           color: isArt ? '#fff' : 'inherit',
-          display: 'flex',
+          display: hiddenByPage ? 'none' : 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: isArt ? 'none' : 'pointer',

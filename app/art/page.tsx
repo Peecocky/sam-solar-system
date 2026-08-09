@@ -75,11 +75,10 @@ function ImageSlot({
 
 function ArtPointerEffects() {
   const cursorRef = useRef<HTMLDivElement>(null)
-  const palmRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     const cursor = cursorRef.current
-    const canvas = palmRef.current
+    const canvas = document.getElementById('art-foliage-canvas') as HTMLCanvasElement | null
     const context = canvas?.getContext('2d')
     if (!cursor || !canvas || !context) return
 
@@ -97,7 +96,6 @@ function ArtPointerEffects() {
     let width = 0
     let height = 0
     let fronds: PalmFrond[] = []
-    let active = true
     let frame = 0
 
     const buildFronds = () => {
@@ -128,8 +126,9 @@ function ArtPointerEffects() {
     const drawFoliage = (now: number) => {
       const t = now / 1000
       context.clearRect(0, 0, width, height)
-      const mouseX = pointer.x
-      const mouseY = pointer.y + window.scrollY
+      const canvasBounds = canvas.getBoundingClientRect()
+      const mouseX = pointer.x - canvasBounds.left
+      const mouseY = pointer.y - canvasBounds.top
 
       context.lineCap = 'round'
       context.lineJoin = 'round'
@@ -237,23 +236,27 @@ function ArtPointerEffects() {
       if (!coarsePointer) {
         cursor.style.transform = `translate3d(${pointer.x}px, ${pointer.y}px, 0)`
       }
-      if (active && !reducedMotion) drawFoliage(now)
+      if (!reducedMotion) drawFoliage(now)
       frame = requestAnimationFrame(animate)
     }
 
     resize()
     if (reducedMotion) drawFoliage(0)
 
-    const hero = document.getElementById('top')
-    const observer = hero && 'IntersectionObserver' in window
-      ? new IntersectionObserver((entries) => {
-          active = entries[0]?.isIntersecting ?? true
-        })
-      : null
-    if (hero && observer) observer.observe(hero)
+    const foliage = document.getElementById('foliage')
+    const updateSoloFoliage = () => {
+      if (!foliage) return
+      const bounds = foliage.getBoundingClientRect()
+      const soloFoliage = bounds.top <= window.innerHeight * 0.2
+        && bounds.bottom >= window.innerHeight * 0.8
+      document.documentElement.toggleAttribute('data-art-foliage', soloFoliage)
+      window.dispatchEvent(new CustomEvent('art-foliage-mode', { detail: soloFoliage }))
+    }
 
     frame = requestAnimationFrame(animate)
+    updateSoloFoliage()
     window.addEventListener('resize', resize)
+    window.addEventListener('scroll', updateSoloFoliage, { passive: true })
     if (!coarsePointer) {
       window.addEventListener('pointermove', onMove, { passive: true })
       window.addEventListener('pointerover', onOver, { passive: true })
@@ -262,8 +265,10 @@ function ArtPointerEffects() {
 
     return () => {
       cancelAnimationFrame(frame)
-      observer?.disconnect()
+      document.documentElement.removeAttribute('data-art-foliage')
+      window.dispatchEvent(new CustomEvent('art-foliage-mode', { detail: false }))
       window.removeEventListener('resize', resize)
+      window.removeEventListener('scroll', updateSoloFoliage)
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerover', onOver)
       window.removeEventListener('pointerout', onOut)
@@ -271,10 +276,7 @@ function ArtPointerEffects() {
   }, [])
 
   return (
-    <>
-      <canvas ref={palmRef} className={styles.palmCanvas} aria-hidden="true" />
-      <div ref={cursorRef} className={styles.cursor} aria-hidden="true" />
-    </>
+    <div ref={cursorRef} className={styles.cursor} aria-hidden="true" />
   )
 }
 
@@ -410,6 +412,10 @@ export default function ArtPage() {
         <strong>More work will land here.</strong>
         <Link href="/">Return to the solar system →</Link>
       </footer>
+
+      <section className={styles.foliageOnly} id="foliage" aria-hidden="true">
+        <canvas id="art-foliage-canvas" className={styles.palmCanvas} />
+      </section>
     </main>
   )
 }
