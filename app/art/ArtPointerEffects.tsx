@@ -3,6 +3,8 @@
 import { useEffect, useRef } from 'react'
 import styles from './art.module.css'
 
+const RIBBON_START = 0.05
+
 const PALM_LAYOUT = [
   { bx: -0.03, by: 1.07, ang: -1.10, len: 1.08, curl: 0.012, leaf: 0.58, hue: 132, sat: 40, lit: 54 },
   { bx: -0.07, by: 0.55, ang: -0.30, len: 0.58, curl: 0.020, leaf: 0.50, hue: 92, sat: 52, lit: 60 },
@@ -32,8 +34,8 @@ export default function ArtPointerEffects() {
   useEffect(() => {
     const cursor = cursorRef.current
     const canvas = document.getElementById('art-foliage-canvas') as HTMLCanvasElement | null
-    const context = canvas?.getContext('2d')
-    if (!cursor || !canvas || !context) return
+    const context = canvas?.getContext('2d') ?? null
+    if (!cursor) return
 
     const coarsePointer = window.matchMedia('(pointer: coarse)').matches
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -69,6 +71,7 @@ export default function ArtPointerEffects() {
     }
 
     const resize = () => {
+      if (!canvas) return
       width = Math.max(1, canvas.clientWidth)
       height = Math.max(1, canvas.clientHeight)
       canvas.width = width
@@ -77,6 +80,8 @@ export default function ArtPointerEffects() {
     }
 
     const drawFoliage = (now: number) => {
+      // Subpages have no foliage screen; they only use the cursor.
+      if (!canvas || !context) return
       const t = now / 1000
       context.clearRect(0, 0, width, height)
       const canvasBounds = canvas.getBoundingClientRect()
@@ -189,19 +194,34 @@ export default function ArtPointerEffects() {
       if (!coarsePointer) {
         cursor.style.transform = `translate3d(${pointer.x}px, ${pointer.y}px, 0)`
       }
+      if (ribbon && Math.abs(ribbonProgress.target - ribbonProgress.current) > 0.0005) {
+        ribbonProgress.current += (ribbonProgress.target - ribbonProgress.current) * 0.12
+        ribbon.style.setProperty('--ribbon-progress', ribbonProgress.current.toFixed(4))
+      }
       if (!reducedMotion) drawFoliage(now)
       frame = requestAnimationFrame(animate)
+    }
+
+    // The ribbon draws itself along its path as the hero scrolls away.
+    const ribbon = document.getElementById('art-ribbon')
+    const ribbonProgress = { current: RIBBON_START, target: RIBBON_START }
+    const updateRibbon = () => {
+      if (!ribbon) return
+      if (reducedMotion) {
+        ribbon.style.setProperty('--ribbon-progress', '1')
+        return
+      }
+      const distance = ribbon.getBoundingClientRect().height * 0.7
+      const scrolled = Math.min(1, Math.max(0, window.scrollY / distance))
+      ribbonProgress.target = RIBBON_START + (1 - RIBBON_START) * scrolled
     }
 
     resize()
     if (reducedMotion) drawFoliage(0)
 
     const foliage = document.getElementById('foliage')
-    const ribbon = document.getElementById('art-ribbon')
     const updateSoloFoliage = () => {
-      if (ribbon) {
-        ribbon.style.setProperty('--ribbon-scroll', `${Math.min(window.scrollY * 0.7, 640)}px`)
-      }
+      updateRibbon()
       if (!foliage) return
       const bounds = foliage.getBoundingClientRect()
       const soloFoliage = bounds.top <= window.innerHeight * 0.2

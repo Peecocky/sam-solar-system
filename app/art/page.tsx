@@ -33,10 +33,15 @@ export default function ArtPage() {
               <stop offset=".56" stopColor="#d63a25" />
               <stop offset="1" stopColor="#43170d" />
             </linearGradient>
+            <mask id="artRibbonReveal" maskUnits="userSpaceOnUse" x="-300" y="-300" width="2100" height="1700">
+              <path className={styles.ribbonReveal} d={RIBBON_PATH} pathLength={1} />
+            </mask>
           </defs>
           <g className={styles.ribbonFlow}>
-            <path className={styles.ribbonMain} d={RIBBON_PATH} />
-            <path className={styles.ribbonSheen} d={RIBBON_PATH} />
+            <g mask="url(#artRibbonReveal)">
+              <path className={styles.ribbonMain} d={RIBBON_PATH} />
+              <path className={styles.ribbonSheen} d={RIBBON_PATH} />
+            </g>
           </g>
         </svg>
         <div className={styles.heroCopy}>

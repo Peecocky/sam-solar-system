@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { artProjects, projectBySlug } from '@/lib/art-projects'
 import sourceRecords from '@/lib/art-document-content.json'
 import ModelPanel from './ModelPanel'
+import ArtPointerEffects from '../ArtPointerEffects'
 import styles from '../art.module.css'
 
 export function generateStaticParams() {
@@ -39,6 +40,7 @@ export default async function ArtProjectPage({ params }: { params: Promise<{ slu
 
   return (
     <main className={styles.page}>
+      <ArtPointerEffects />
       <header className={styles.nav}>
         <Link className={styles.logo} href="/art">SAM / ART</Link>
         <nav aria-label="Project navigation">
