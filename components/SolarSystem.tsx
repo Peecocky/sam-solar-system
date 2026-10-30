@@ -59,7 +59,7 @@ export default function SolarSystem({
       <mesh
         onPointerOver={() => {
           document.body.style.cursor = 'pointer'
-          setHoverText('About Me')
+          setHoverText('前往 Sam')
         }}
         onPointerOut={() => {
           document.body.style.cursor = 'default'
@@ -216,6 +216,24 @@ export default function SolarSystem({
         onHoverIn={() => slowOrbit('Minecraft Planet')}
         onHoverOut={resumeOrbit}
         onClick={() => router.push('/minecraft')}
+      />
+
+      <Planet
+        textureUrl="/planet-villas.svg"
+        size={1.25}
+        a={21.8}
+        b={16.8}
+        speed={0.082}
+        timeScale={timeScale}
+        orbitTiltX={-0.14}
+        orbitTiltZ={0.1}
+        orbitColor="#d9a066"
+        orbitOpacity={0.08}
+        glowColor="#ffd8a8"
+        glowIntensity={0.14}
+        onHoverIn={() => slowOrbit("Sam's Villas")}
+        onHoverOut={resumeOrbit}
+        onClick={() => window.open('https://villa-map.samsamsam.workers.dev/', '_blank', 'noopener,noreferrer')}
       />
 
       <group position={[42, 4, -25]}>

@@ -14,6 +14,7 @@ const destinations = [
   { cn: '留言墙', en: 'Message Wall', href: '/interactive', marker: '06' },
   { cn: 'Minecraft 星球', en: 'Minecraft', href: '/minecraft', marker: '07' },
   { cn: '神秘视觉实验', en: 'Mystery Vision', href: '/vision', marker: '08' },
+  { cn: 'Sam 的别墅', en: "Sam's Villas", href: 'https://villa-map.samsamsam.workers.dev/', marker: '09' },
 ]
 
 export default function AccessibleNavigation() {
@@ -53,16 +54,23 @@ export default function AccessibleNavigation() {
             </header>
 
             <nav aria-label="所有星球的大字列表">
-              {destinations.map((item) => (
-                <Link href={item.href} key={item.href}>
-                  <span className={styles.marker}>{item.marker}</span>
-                  <span className={styles.names}>
-                    <strong>{item.cn}</strong>
-                    <small>{item.en}</small>
-                  </span>
-                  <b aria-hidden="true">→</b>
-                </Link>
-              ))}
+              {destinations.map((item) => {
+                const content = (
+                  <>
+                    <span className={styles.marker}>{item.marker}</span>
+                    <span className={styles.names}>
+                      <strong>{item.cn}</strong>
+                      <small>{item.en}</small>
+                    </span>
+                    <b aria-hidden="true">→</b>
+                  </>
+                )
+                return item.href.startsWith('http') ? (
+                  <a href={item.href} target="_blank" rel="noreferrer" key={item.href}>{content}</a>
+                ) : (
+                  <Link href={item.href} key={item.href}>{content}</Link>
+                )
+              })}
             </nav>
           </div>
         </div>
