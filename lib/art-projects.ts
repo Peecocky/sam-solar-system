@@ -50,7 +50,6 @@ export const artProjects: ArtProject[] = [
     links: [doc(1), { label: 'Fusion cloud design · F3D', href: '/art-course/week-1/model.f3d' }, { label: 'Fusion mesh · STL', href: '/art-course/week-1/model.stl' }],
     gallery: all('week-1'),
     model: [{ label: 'Week 1 Fusion model', url: '/art-course/week-1/model.stl' }],
-    modelNote: 'Exported from the cloud file “hw week1”. Its current saved geometry is smaller than the 74 × 53 × 41.16 mm object documented in the original Word file; use the document for the submitted size evidence.',
   },
   {
     slug: 'week-2',
