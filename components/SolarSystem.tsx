@@ -231,7 +231,7 @@ export default function SolarSystem({
         orbitOpacity={0.08}
         glowColor="#ffd8a8"
         glowIntensity={0.14}
-        onHoverIn={() => slowOrbit("Sam's Villas")}
+        onHoverIn={() => slowOrbit("前往 Sam's villas")}
         onHoverOut={resumeOrbit}
         onClick={() => window.open('https://villa-map.samsamsam.workers.dev/', '_blank', 'noopener,noreferrer')}
       />
