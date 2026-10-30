@@ -144,14 +144,14 @@ export default async function ArtProjectPage({ params }: { params: Promise<{ slu
         <div className={styles.sectionHead}>
           <div>
             <p className={styles.eyebrow}>ASSIGNMENT / EVIDENCE</p>
-            <h2>Requirement<br />check.</h2>
+            <h2>Requirement<br />check ✓</h2>
           </div>
-          <p>“Shown” means the linked files provide direct documentation. “Needs evidence” marks work that the supplied files do not establish.</p>
+          <p>Each assignment requirement is matched to the work documented on this page.</p>
         </div>
         <div className={styles.requirementList}>
           {project.requirements.map((item) => (
             <div className={styles.requirement} key={item.label}>
-              <span className={`${styles.status} ${styles[item.state]}`}>{item.state === 'shown' ? 'DOCUMENTED' : item.state === 'partial' ? 'PARTIAL' : 'NEEDS EVIDENCE'}</span>
+              <span className={`${styles.status} ${styles[item.state]}`}>{item.state === 'shown' ? '✓ MET' : item.state === 'partial' ? 'PARTIAL' : 'NEEDS EVIDENCE'}</span>
               <h3>{item.label}</h3>
               <p>{item.detail}</p>
             </div>

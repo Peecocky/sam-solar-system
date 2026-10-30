@@ -111,21 +111,6 @@ def main():
     final_dir = SOURCE / "final project fusion" / "final_documentation"
     final_out = TARGET / "final"
     final_out.mkdir(parents=True, exist_ok=True)
-    for src, name in [
-        (final_dir / "Final_Project_Process_and_Design_Notes.pdf", "process-notes.pdf"),
-        (final_dir / "Final_Project_Four_Part_Technical_Drawings.pdf", "technical-drawings.pdf"),
-        (final_dir / "Complete_Fusion_Timeline_111_Steps.pdf", "fusion-timeline.pdf"),
-        (final_dir / "Final_Project_Original_Fusion_Model.f3d", "original-model.f3d"),
-        (final_dir / "Final_Project_Four_Component_Drawing_Source.f3d", "drawing-source.f3d"),
-        (final_dir / "body_contact_sheet.jpg", "body-contact.jpg"),
-        (final_dir / "student_notes_contact_sheet.jpg", "sketch-contact.jpg"),
-        (final_dir / "Technical_Sheet_01.png", "technical-sheet-01.png"),
-        (final_dir / "Technical_Sheet_02.png", "technical-sheet-02.png"),
-        (final_dir / "Technical_Sheet_03.png", "technical-sheet-03.png"),
-        (final_dir / "Technical_Sheet_04.png", "technical-sheet-04.png"),
-        (final_dir / "current_model_view.png", "model-view.png"),
-    ]:
-        shutil.copy2(src, final_out / name)
     original_final = SOURCE / "intro to 3d modelling final project"
     for src, name in [
         (original_final / "documentation.docx", "original-documentation.docx"),
@@ -150,6 +135,7 @@ def main():
         shutil.copy2(src, final_out / name)
     for src, name in [
         (models / "bolts.stl", "bolt.stl"),
+        (models / "Bolts2.stl", "bolts-2.stl"),
         (final_dir / "bolttt.stl", "bolt-detail.stl"),
     ]:
         shutil.copy2(src, final_out / name)

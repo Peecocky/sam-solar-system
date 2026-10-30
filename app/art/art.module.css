@@ -140,7 +140,9 @@
   background: #2d3341;
   box-shadow: 0 45px 95px #15131f35;
 }
-.heroMedia img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
+.heroMedia img { position: relative; display: block; width: 100%; height: 100%; object-fit: contain; }
+/* Blurred copy fills the landscape frame around the portrait print photo. */
+.heroMedia .heroMediaBackdrop { position: absolute; inset: 0; object-fit: cover; filter: blur(30px) brightness(.72) saturate(1.15); transform: scale(1.15); }
 .heroMedia span {
   position: absolute;
   left: 20px;

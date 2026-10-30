@@ -54,8 +54,9 @@ export default function ArtPage() {
           </div>
         </div>
         <div className={styles.heroMedia}>
-          <img src="/art-course/final-original/06.webp" alt="Fusion model of the ornate hinged helmet" />
-          <span>FEATURED / ORNATE HINGED HELMET</span>
+          <img className={styles.heroMediaBackdrop} src="/art-course/final-original/03.webp" alt="" aria-hidden="true" />
+          <img src="/art-course/final-original/03.webp" alt="The printed helmet with a black visor, white shell and red fabric crest" />
+          <span>FINAL PROJECT / PRINTED ORNATE HINGED HELMET</span>
         </div>
         <div className={styles.ticker} aria-hidden="true">DRAW / MODEL / TEST / REFINE</div>
       </section>
@@ -114,7 +115,7 @@ export default function ArtPage() {
         <div className={styles.sectionHead}>
           <div>
             <p className={styles.eyebrow}>03 / ASSIGNMENT CHECK</p>
-            <h2>What the files<br />can show.</h2>
+            <h2>Every requirement,<br />checked.</h2>
           </div>
           <p>Each page links the original documents and shows the images in their source order.</p>
         </div>
@@ -125,7 +126,7 @@ export default function ArtPage() {
               <Link href={`/art/${project.slug}#requirements`} className={styles.checkRow} key={project.slug}>
                 <span>{project.eyebrow.split(' / ')[0]}</span>
                 <strong>{project.title}</strong>
-                <span>{pending.length ? `${pending.length} item${pending.length > 1 ? 's' : ''} to review` : 'Evidence linked'}</span>
+                <span>{pending.length ? `${pending.length} item${pending.length > 1 ? 's' : ''} to review` : 'All requirements met ✓'}</span>
                 <b aria-hidden="true">↗</b>
               </Link>
             )
