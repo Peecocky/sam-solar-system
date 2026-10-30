@@ -14,8 +14,10 @@ import TransientComet from './TransientComet'
 
 export default function SolarSystem({
   setHoverText,
+  onSunClick,
 }: {
   setHoverText: (t: string | null) => void
+  onSunClick: () => void
 }) {
   const router = useRouter()
 
@@ -59,13 +61,18 @@ export default function SolarSystem({
       <mesh
         onPointerOver={() => {
           document.body.style.cursor = 'pointer'
-          setHoverText('前往 Sam')
+          setHoverText('Guide')
         }}
         onPointerOut={() => {
           document.body.style.cursor = 'default'
           setHoverText(null)
         }}
-        onClick={() => router.push('/sam')}
+        onClick={() => {
+          // The guide overlay covers the canvas, so pointer-out never fires.
+          document.body.style.cursor = 'default'
+          setHoverText(null)
+          onSunClick()
+        }}
       >
         <sphereGeometry args={[2.7, 72, 72]} />
         <meshStandardMaterial

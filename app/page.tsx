@@ -1,7 +1,7 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Stars, OrbitControls } from '@react-three/drei'
 import SolarSystem from '@/components/SolarSystem'
 import AccessibleNavigation from '@/components/AccessibleNavigation'
@@ -30,6 +30,9 @@ const NOTICE_STORAGE_KEY = 'sam-notices-seen-v2'
 
 export default function Home() {
   const [hoverText, setHoverText] = useState<string | null>(null)
+  const [guideOpen, setGuideOpen] = useState(false)
+  const openGuide = useCallback(() => setGuideOpen(true), [])
+  const closeGuide = useCallback(() => setGuideOpen(false), [])
   const [showNotice, setShowNotice] = useState(
     () =>
       typeof window !== 'undefined' &&
@@ -116,10 +119,10 @@ export default function Home() {
           rotateSpeed={0.6}
         />
 
-        <SolarSystem setHoverText={setHoverText} />
+        <SolarSystem setHoverText={setHoverText} onSunClick={openGuide} />
       </Canvas>
 
-      <AccessibleNavigation />
+      <AccessibleNavigation open={guideOpen} onOpen={openGuide} onClose={closeGuide} />
 
       {/* ===== Notification Overlay ===== */}
       {showNotice && (

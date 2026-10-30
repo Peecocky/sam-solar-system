@@ -280,9 +280,45 @@
 .checkRow strong { font-size: clamp(20px, 2.5vw, 31px); letter-spacing: -.04em; }
 .checkRow b { font-size: 23px; font-weight: 400; }
 .auditNote { max-width: 1500px; margin: 34px auto 0; color: #6a3e37; line-height: 1.5; }
-.otherWork { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; padding: 40px clamp(22px, 4vw, 64px); background: #d8d5df; }
-.otherWork span { font: 700 11px 'Courier New', monospace; letter-spacing: .15em; }
-.otherWork a { font-size: clamp(19px, 2.4vw, 28px); letter-spacing: -.04em; text-decoration: none; border-bottom: 1px solid; padding-bottom: 6px; }
+.villasBand {
+  display: grid;
+  gap: 22px;
+  padding: clamp(80px, 10vw, 150px) clamp(22px, 4vw, 64px);
+  color: var(--ink);
+  background: linear-gradient(120deg, #ef4b31, #d63a25 56%, #43170d);
+  text-decoration: none;
+}
+.villasBand span { font: 700 11px/1.5 'Courier New', monospace; letter-spacing: .17em; }
+.villasBand strong { font-size: clamp(52px, 9vw, 150px); line-height: .9; letter-spacing: -.075em; }
+.villasBand em { justify-self: start; padding-bottom: 7px; border-bottom: 1px solid; font: 400 clamp(19px, 2vw, 26px)/1.2 Arial, sans-serif; letter-spacing: -.03em; }
+.villasBand b { display: inline-block; font-weight: 400; transition: transform .3s cubic-bezier(.16,1,.3,1); }
+.villasBand:hover b, .villasBand:focus-visible b { transform: translate(6px, -6px); }
+.villasBand:focus-visible { outline: 4px solid var(--ink); outline-offset: -8px; }
+.nav nav a.villasPill { border-color: #d63a25; background: #d63a25; color: #fff; }
+.nav nav a.villasPill:hover, .nav nav a.villasPill:focus-visible { border-color: var(--ink); background: var(--ink); }
+.welcome {
+  position: fixed;
+  z-index: 11000;
+  top: 22px;
+  left: 50%;
+  display: grid;
+  gap: 8px;
+  padding: 22px 34px 24px;
+  border-radius: 16px;
+  color: #fffdf8;
+  background: rgba(17, 16, 22, .82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px #15131f55;
+  text-align: center;
+  pointer-events: none;
+  transform: translate(-50%, -150%);
+  transition: transform .75s cubic-bezier(.16,1,.3,1), opacity .6s ease;
+}
+.welcome[data-phase='in'] { transform: translate(-50%, 0); }
+.welcome[data-phase='out'] { transform: translate(-50%, -30%); opacity: 0; }
+.welcome span { font: 700 10px/1.4 'Courier New', monospace; letter-spacing: .2em; color: #ffb8a6; }
+.welcome strong { font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -.06em; }
 .footer { min-height: 450px; display: flex; flex-direction: column; justify-content: center; align-items: start; gap: 25px; padding: 70px clamp(22px, 5vw, 80px); background: #252398; color: #f8f5f7; }
 .footer span { font: 700 11px 'Courier New', monospace; letter-spacing: .17em; }
 .footer strong { font-size: clamp(56px, 9vw, 145px); line-height: .88; letter-spacing: -.075em; }
@@ -396,6 +432,7 @@
 }
 @media (max-width: 760px) {
   .nav nav a:not(:last-child) { display: none; }
+  .nav nav a.villasPill { display: inline-flex; }
   .hero { min-height: 0; padding-top: 80px; }
   .hero h1 { font-size: clamp(46px, 11.7vw, 82px); }
   .ribbon { top: 0; height: 640px; }
@@ -442,4 +479,5 @@
   .ribbonReveal { stroke-dashoffset: 0; }
   .projectImage img, .finalImage img { transition: none; }
   .projectHover { transition: none; }
+  .welcome { transition: opacity .3s ease; }
 }

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { artProjects } from '@/lib/art-projects'
 import ArtPointerEffects from './ArtPointerEffects'
+import WelcomeBanner from './WelcomeBanner'
 import styles from './art.module.css'
 
 export const metadata = {
@@ -15,12 +16,14 @@ export default function ArtPage() {
   return (
     <main className={styles.page} id="top">
       <ArtPointerEffects />
+      <WelcomeBanner />
       <header className={styles.nav}>
         <Link className={styles.logo} href="/art">SAM / ART</Link>
         <nav aria-label="Art navigation">
           <a href="#weeks">WEEKS 01—05</a>
           <a href="#final">FINAL PROJECT</a>
           <a href="#checklist">REQUIREMENTS</a>
+          <a className={styles.villasPill} href="https://villa-map.samsamsam.workers.dev/" target="_blank" rel="noreferrer">前往 SAM&apos;S VILLAS ↗</a>
           <Link href="/">BACK TO ORBIT ↗</Link>
         </nav>
       </header>
@@ -135,10 +138,11 @@ export default function ArtPage() {
         <p className={styles.auditNote}>The final project documentation includes the assembled print, fabric details, bolts, technical drawings and sanding notes.</p>
       </section>
 
-      <aside className={styles.otherWork}>
-        <span>ELSEWHERE IN THE ARCHIVE</span>
-        <a href="https://villa-map.samsamsam.workers.dev/" target="_blank" rel="noreferrer">Villas / interactive architectural map ↗</a>
-      </aside>
+      <a className={styles.villasBand} href="https://villa-map.samsamsam.workers.dev/" target="_blank" rel="noreferrer">
+        <span>ELSEWHERE IN THE ARCHIVE / INTERACTIVE ARCHITECTURAL MAP</span>
+        <strong>前往 Sam&apos;s Villas</strong>
+        <em>Open the villa map <b aria-hidden="true">↗</b></em>
+      </a>
 
       <footer className={styles.footer}>
         <span>SAM / ART ARCHIVE</span>

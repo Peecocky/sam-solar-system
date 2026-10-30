@@ -20,6 +20,8 @@
 
 .launcher span { font-size: 25px; }
 .launcher:focus-visible { outline: 4px solid #63c7ff; outline-offset: 4px; }
+/* The sun opens the guide; this button stays out of sight until a keyboard user tabs to it. */
+.launcher:not(:focus-visible) { opacity: 0; pointer-events: none; transform: translateY(12px); }
 
 .overlay {
   position: fixed;
@@ -60,6 +62,8 @@
   font: 800 clamp(32px, 5vw, 58px)/1.1 Arial, 'Microsoft YaHei', sans-serif;
   letter-spacing: -.035em;
 }
+
+.headerActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
 
 .panel header button {
   flex: 0 0 auto;
