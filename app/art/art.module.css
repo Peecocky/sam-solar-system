@@ -299,14 +299,14 @@
 .welcome {
   position: fixed;
   z-index: 11000;
-  top: 22px;
+  top: 104px;
   left: 50%;
   display: grid;
   gap: 8px;
   padding: 22px 34px 24px;
   border-radius: 16px;
   color: #fffdf8;
-  background: rgba(17, 16, 22, .82);
+  background: rgba(17, 16, 22, .94);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   box-shadow: 0 24px 60px #15131f55;
