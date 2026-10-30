@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useMemo, useRef, useState } from 'react'
-import { useFrame, useLoader } from '@react-three/fiber'
+import { useFrame, useLoader, type ThreeEvent } from '@react-three/fiber'
 import {
   TextureLoader,
   Mesh,
@@ -27,7 +27,7 @@ interface PlanetProps {
   timeScale: React.MutableRefObject<number>
   onHoverIn: () => void
   onHoverOut: () => void
-  onClick?: () => void
+  onClick?: (event: ThreeEvent<MouseEvent>) => void
   showOrbit?: boolean
   orbitColor?: string
   orbitOpacity?: number

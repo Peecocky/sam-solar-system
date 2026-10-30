@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import MusicPlayer from "@/components/MusicPlayer";
+import WarpTransition from "@/components/WarpTransition";
 
 export const metadata: Metadata = {
   title: "Sam's Solar System",
@@ -15,8 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        {children}
+        <div className="warp-shell">{children}</div>
         <MusicPlayer />
+        <WarpTransition />
       </body>
     </html>
   );

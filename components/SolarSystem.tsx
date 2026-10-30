@@ -1,12 +1,16 @@
 'use client'
 
-import { useLoader, useFrame } from '@react-three/fiber'
+import { useLoader, useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import {
   TextureLoader,
   MeshBasicMaterial,
   AdditiveBlending,
   Color,
+  Mesh,
+  PerspectiveCamera,
+  Vector3,
 } from 'three'
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Planet from './Planet'
@@ -32,8 +36,64 @@ export default function SolarSystem({
   const glowRef = useRef<MeshBasicMaterial>(null!)
   const pulseTime = useRef(0)
   const sunTexture = useLoader(TextureLoader, '/avatar.jpg')
+  const getThree = useThree((state) => state.get)
+  const warp = useRef<{
+    start: number
+    from: Vector3
+    to: Vector3
+    fromTarget: Vector3
+    planet: Vector3
+    fromFov: number
+  } | null>(null)
 
-  useFrame((_, delta) => {
+  /** Fly the camera into the clicked planet, then hand over to the warp overlay and the next page. */
+  function warpTo(event: ThreeEvent<MouseEvent>, route: string, color: string) {
+    event.stopPropagation()
+    if (warp.current) return
+    router.prefetch(route)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      router.push(route)
+      return
+    }
+    const { camera, controls } = getThree() as { camera: PerspectiveCamera; controls: OrbitControlsImpl | null }
+    const mesh = event.eventObject as Mesh
+    const planet = mesh.getWorldPosition(new Vector3())
+    if (!mesh.geometry.boundingSphere) mesh.geometry.computeBoundingSphere()
+    const radius = mesh.geometry.boundingSphere?.radius ?? 1
+    const toward = camera.position.clone().sub(planet).normalize()
+    warp.current = {
+      start: performance.now(),
+      from: camera.position.clone(),
+      to: planet.clone().add(toward.multiplyScalar(radius * 1.15)),
+      fromTarget: controls ? controls.target.clone() : new Vector3(),
+      planet,
+      fromFov: camera.fov,
+    }
+    timeScale.current = 0
+    targetTimeScale.current = 0
+    if (controls) controls.enabled = false
+    document.body.style.cursor = 'default'
+    setHoverText(null)
+    window.dispatchEvent(new CustomEvent('planet-warp', {
+      detail: { x: event.nativeEvent.clientX, y: event.nativeEvent.clientY, color },
+    }))
+    window.setTimeout(() => router.push(route), 760)
+  }
+
+  useFrame((state, delta) => {
+    const w = warp.current
+    if (w) {
+      const camera = state.camera as PerspectiveCamera
+      const controls = state.controls as OrbitControlsImpl | null
+      const t = Math.min(1, (performance.now() - w.start) / 950)
+      const ease = t * t * t
+      camera.position.lerpVectors(w.from, w.to, ease)
+      const look = w.fromTarget.clone().lerp(w.planet, Math.min(1, t * 2.4))
+      if (controls) controls.target.copy(look)
+      camera.lookAt(look)
+      camera.fov = w.fromFov + (82 - w.fromFov) * ease
+      camera.updateProjectionMatrix()
+    }
     timeScale.current +=
       (targetTimeScale.current - timeScale.current) * 0.08
     pulseTime.current += delta
@@ -47,11 +107,13 @@ export default function SolarSystem({
   })
 
   function slowOrbit(label: string) {
+    if (warp.current) return
     targetTimeScale.current = 0.16
     setHoverText(label)
   }
 
   function resumeOrbit() {
+    if (warp.current) return
     targetTimeScale.current = 1
     setHoverText(null)
   }
@@ -112,7 +174,7 @@ export default function SolarSystem({
         glowIntensity={0.14}
         onHoverIn={() => slowOrbit('Art Gallery')}
         onHoverOut={resumeOrbit}
-        onClick={() => router.push('/art')}
+        onClick={(event) => warpTo(event, '/art', '#ffb3d9')}
       />
 
       <Planet
@@ -130,7 +192,7 @@ export default function SolarSystem({
         glowIntensity={0.1}
         onHoverIn={() => slowOrbit('My CV')}
         onHoverOut={resumeOrbit}
-        onClick={() => router.push('/cv')}
+        onClick={(event) => warpTo(event, '/cv', '#9cd2f3')}
       />
 
       <Planet
@@ -150,7 +212,7 @@ export default function SolarSystem({
         rainbow={infiniteLottery}
         onHoverIn={() => slowOrbit('Mini Game / Fantasy Map')}
         onHoverOut={resumeOrbit}
-        onClick={() => router.push('/games')}
+        onClick={(event) => warpTo(event, '/games', '#f4b37f')}
       />
 
       <Planet
@@ -168,7 +230,7 @@ export default function SolarSystem({
         glowIntensity={0.12}
         onHoverIn={() => slowOrbit("Sam's Kitchen")}
         onHoverOut={resumeOrbit}
-        onClick={() => router.push('/cooking')}
+        onClick={(event) => warpTo(event, '/cooking', '#ffd09c')}
       />
 
       <Planet
@@ -186,7 +248,7 @@ export default function SolarSystem({
         glowIntensity={0.12}
         onHoverIn={() => slowOrbit('Stock Research')}
         onHoverOut={resumeOrbit}
-        onClick={() => router.push('/stocks')}
+        onClick={(event) => warpTo(event, '/stocks', '#c9ffd1')}
       />
 
       <Planet
@@ -204,7 +266,7 @@ export default function SolarSystem({
         glowIntensity={0.18}
         onHoverIn={() => slowOrbit('Message Wall')}
         onHoverOut={resumeOrbit}
-        onClick={() => router.push('/interactive')}
+        onClick={(event) => warpTo(event, '/interactive', '#aff6ea')}
       />
 
       <Planet
@@ -222,7 +284,7 @@ export default function SolarSystem({
         glowIntensity={0.14}
         onHoverIn={() => slowOrbit('Minecraft Planet')}
         onHoverOut={resumeOrbit}
-        onClick={() => router.push('/minecraft')}
+        onClick={(event) => warpTo(event, '/minecraft', '#c6ff9f')}
       />
 
       <Planet
@@ -260,7 +322,7 @@ export default function SolarSystem({
           rainbow
           onHoverIn={() => slowOrbit('Mystery Vision')}
           onHoverOut={resumeOrbit}
-          onClick={() => router.push('/vision')}
+          onClick={(event) => warpTo(event, '/vision', '#deb8ff')}
         />
       </group>
 

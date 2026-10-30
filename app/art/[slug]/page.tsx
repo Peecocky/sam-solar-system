@@ -3,8 +3,13 @@ import { notFound } from 'next/navigation'
 import { artProjects, projectBySlug } from '@/lib/art-projects'
 import sourceRecords from '@/lib/art-document-content.json'
 import ModelPanel from './ModelPanel'
+import HorizontalRecord from './HorizontalRecord'
 import ArtPointerEffects from '../ArtPointerEffects'
 import styles from '../art.module.css'
+
+// Final document blocks grouped into the modules of the horizontal record.
+const FINAL_PANELS = [[0], [1, 2], [3, 4], [5, 6], [7, 8, 9], [10], [11, 12, 13], [14, 15, 16, 17, 18], [19, 20, 21], [22], [23, 24], [25], [26, 27], [28, 29, 30], [31, 32], [33]]
+const ORBIT_FRAMES = Array.from({ length: 96 }, (_, index) => `/art-course/final/orbit/${String(index + 1).padStart(3, '0')}.webp`)
 
 export function generateStaticParams() {
   return artProjects.map(({ slug }) => ({ slug }))
@@ -55,7 +60,7 @@ export default async function ArtProjectPage({ params }: { params: Promise<{ slu
 
       <section className={styles.detailHero}>
         <div>
-          <p className={styles.eyebrow}>{project.eyebrow}</p>
+          <p className={styles.eyebrow}>{project.eyebrow.split(' / ')[0]}</p>
           <h1>{project.title}</h1>
           <p className={styles.detailSubtitle}>{project.subtitle}</p>
           <div className={styles.detailMeta}>
@@ -67,13 +72,11 @@ export default async function ArtProjectPage({ params }: { params: Promise<{ slu
       </section>
 
       <section className={styles.detailSummary}>
-        <p>THE IDEA</p>
         <h2>{project.summary}</h2>
       </section>
 
       <section className={styles.process} id="process">
         <div className={styles.processLead}>
-          <p className={styles.eyebrow}>PROCESS / FROM THE SOURCE DOCUMENT</p>
           <h2>How it<br />took shape.</h2>
         </div>
         <div className={styles.processSections}>
@@ -108,21 +111,26 @@ export default async function ArtProjectPage({ params }: { params: Promise<{ slu
       {project.model && (
         <section className={styles.modelSection} id="model">
           <div className={styles.modelHead}>
-            <p className={styles.eyebrow}>BROWSER MODEL / EXPLORE THE GEOMETRY</p>
             <h2>See the object<br />in three dimensions.</h2>
           </div>
           <ModelPanel parts={project.model} note={project.modelNote} />
         </section>
       )}
 
+      {slug === 'final' ? (
+        <HorizontalRecord
+          title="The finished object."
+          docHref={sourceFile}
+          panels={FINAL_PANELS.map((indices) => indices.map((blockIndex) => sourceRecord[blockIndex]))}
+          frames={ORBIT_FRAMES}
+        />
+      ) : (
       <section className={styles.originalRecord} id="original-record">
         <div className={styles.originalRecordHead}>
           <div>
-            <p className={styles.eyebrow}>ORIGINAL DOCUMENT / TEXT &amp; IMAGES IN ORDER</p>
-            <h2>{slug === 'final' ? 'The finished object.' : 'The complete week.'}</h2>
+            <h2>The complete week.</h2>
           </div>
           <div>
-            <p>All {sourceRecord.filter((block) => block.type === 'image').length} images and the document text appear below in the order of the original file.</p>
             <a href={sourceFile} target="_blank" rel="noreferrer">OPEN ORIGINAL DOCX ↗</a>
           </div>
         </div>
@@ -132,21 +140,19 @@ export default async function ArtProjectPage({ params }: { params: Promise<{ slu
               <a href={block.src} target="_blank" rel="noreferrer" aria-label={`Open original document image ${block.number}`}>
                 <img src={block.src} width={block.width} height={block.height} alt={`${project.title}, original document image ${block.number}`} loading="lazy" />
               </a>
-              <figcaption>ORIGINAL DOCUMENT / IMAGE {String(block.number).padStart(2, '0')} ↗</figcaption>
             </figure>
           ) : block.text ? (
             <p className={block.style?.toLowerCase().includes('heading') || block.style?.toLowerCase() === 'title' ? styles.originalRecordHeading : styles.originalRecordText} key={blockIndex}>{block.text}</p>
           ) : null)}
         </div>
       </section>
+      )}
 
       <section className={styles.evidence} id="requirements">
         <div className={styles.sectionHead}>
           <div>
-            <p className={styles.eyebrow}>ASSIGNMENT / EVIDENCE</p>
             <h2>Requirement<br />check ✓</h2>
           </div>
-          <p>Each assignment requirement is matched to the work documented on this page.</p>
         </div>
         <div className={styles.requirementList}>
           {project.requirements.map((item) => (
@@ -161,7 +167,6 @@ export default async function ArtProjectPage({ params }: { params: Promise<{ slu
 
       <section className={styles.filesSection}>
         <div>
-          <p className={styles.eyebrow}>SOURCE FILES / DOWNLOADS</p>
           <h2>Open the<br />original work.</h2>
         </div>
         <div className={styles.fileList}>

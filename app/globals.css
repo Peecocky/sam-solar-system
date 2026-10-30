@@ -24,3 +24,28 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+/* Planet warp: covers the screen from the clicked planet, then the new page settles in. */
+.warp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--warp-x) var(--warp-y), #fffaf0 0%, var(--warp-color) 16%, #0b0b16 72%);
+  clip-path: circle(0 at var(--warp-x) var(--warp-y));
+  animation: warpCover .7s cubic-bezier(.7, 0, .25, 1) .35s forwards;
+}
+.warp-overlay[data-phase='reveal'] {
+  clip-path: circle(150vmax at var(--warp-x) var(--warp-y));
+  animation: warpReveal 1s cubic-bezier(.16, 1, .3, 1) forwards;
+}
+@keyframes warpCover { to { clip-path: circle(150vmax at var(--warp-x) var(--warp-y)); } }
+@keyframes warpReveal { to { opacity: 0; transform: scale(1.3); } }
+html[data-warp='arrive'] .warp-shell {
+  transform-origin: 50% 45vh;
+  animation: warpArrive 1.05s cubic-bezier(.16, 1, .3, 1) backwards;
+}
+@keyframes warpArrive {
+  from { transform: scale(1.18); filter: blur(14px); }
+  to { transform: scale(1); filter: blur(0); }
+}

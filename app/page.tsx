@@ -107,6 +107,7 @@ export default function Home() {
         />
 
         <OrbitControls
+          makeDefault
           enablePan
           enableZoom
           enableRotate

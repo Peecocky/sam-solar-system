@@ -37,7 +37,6 @@ export default function ModelViewer({ parts, note }: { parts: Part[]; note?: str
   return (
     <div className={styles.viewerShell}>
       <div className={styles.viewerHeader}>
-        <span>INTERACTIVE 3D / STL</span>
         <span>DRAG TO ROTATE · SCROLL TO ZOOM</span>
       </div>
       <div className={styles.viewerCanvas}>
