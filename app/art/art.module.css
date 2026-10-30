@@ -10,6 +10,9 @@
 }
 .page * { box-sizing: border-box; }
 .page a { color: inherit; }
+@media (hover: hover) and (pointer: fine) {
+  .page, .page a, .page button { cursor: none; }
+}
 .nav {
   height: 88px;
   position: relative;
@@ -69,15 +72,39 @@
   pointer-events: none;
   overflow: visible;
   filter: drop-shadow(0 20px 26px #551a1130);
+  transform: translate3d(0, var(--ribbon-scroll, 0px), 0);
+  will-change: transform;
 }
-.ribbon path {
+.ribbonFlow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ribbonDrift 9s cubic-bezier(.45, 0, .3, 1) infinite alternate;
+}
+.ribbonMain {
   fill: none;
   stroke: url(#artRibbonGradient);
   stroke-width: 62;
   stroke-linecap: round;
-  animation: ribbonFloat 8s ease-in-out infinite alternate;
+  animation: ribbonPulse 6s ease-in-out infinite;
 }
-@keyframes ribbonFloat { to { transform: translate(0, 16px) scale(1.018); } }
+.ribbonSheen {
+  fill: none;
+  stroke: rgba(255, 192, 165, .42);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 2 150;
+  animation: ribbonSheen 7s linear infinite;
+}
+@keyframes ribbonDrift {
+  0% { transform: translate3d(-1.2%, -.8%, 0) rotate(-.35deg) scale(1.015); }
+  45% { transform: translate3d(.8%, 1.1%, 0) rotate(.25deg) scale(.995); }
+  100% { transform: translate3d(-.2%, 2%, 0) rotate(-.1deg) scale(1.025); }
+}
+@keyframes ribbonPulse {
+  0%, 100% { stroke-width: 62; filter: saturate(1); }
+  50% { stroke-width: 68; filter: saturate(1.18) brightness(.9); }
+}
+@keyframes ribbonSheen { to { stroke-dashoffset: -608; } }
 .heroIntro {
   width: min(470px, 90%);
   margin: 90px 6vw 120px auto;
@@ -175,16 +202,38 @@
 }
 .projectImage img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
 .projectCard:hover img, .projectCard:focus-visible img { transform: scale(1.055); }
-.projectImage span {
+.weekBadge {
   position: absolute;
-  right: 18px;
+  left: 18px;
   top: 18px;
-  padding: 10px 13px;
+  z-index: 3;
+  padding: 10px 16px;
   border-radius: 50px;
-  background: #f2f0f4e9;
-  font: 700 10px/1.2 'Courier New', monospace;
+  background: #f2f0f4f2;
+  font: 800 13px/1.2 'Courier New', monospace;
   letter-spacing: .12em;
 }
+.projectHover {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: #111115;
+  background: #f2f0f479;
+  backdrop-filter: blur(17px) saturate(.8);
+  -webkit-backdrop-filter: blur(17px) saturate(.8);
+  font-size: clamp(48px, 7vw, 108px);
+  font-weight: 800;
+  letter-spacing: -.08em;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+.projectHover small { font: 700 11px 'Courier New', monospace; letter-spacing: .14em; }
+.projectCard:hover .projectHover, .projectCard:focus-visible .projectHover { opacity: 1; }
 .projectCaption { display: grid; grid-template-columns: 100px 1fr; gap: 3px 20px; padding-top: 18px; }
 .projectCaption > span { grid-row: span 3; color: #6c6972; font: 700 10px/1.4 'Courier New', monospace; letter-spacing: .08em; }
 .projectCaption h3 { margin: 0; font-size: clamp(27px, 3.5vw, 50px); line-height: 1; letter-spacing: -.055em; }
@@ -229,6 +278,18 @@
 .footer span { font: 700 11px 'Courier New', monospace; letter-spacing: .17em; }
 .footer strong { font-size: clamp(56px, 9vw, 145px); line-height: .88; letter-spacing: -.075em; }
 .footer a { padding-bottom: 7px; border-bottom: 1px solid; text-decoration: none; }
+.foliageOnly { position: relative; min-height: 100svh; background: var(--paper); }
+.palmCanvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.cursor {
+  position: fixed; z-index: 12000; top: 0; left: 0;
+  width: 14px; height: 14px; margin: -7px 0 0 -7px;
+  border-radius: 50%; background: rgba(255,255,255,.65);
+  mix-blend-mode: difference; pointer-events: none;
+  transition: width .25s cubic-bezier(.16,1,.3,1), height .25s cubic-bezier(.16,1,.3,1), margin .25s cubic-bezier(.16,1,.3,1), background .25s ease;
+  will-change: transform;
+}
+.cursor[data-active] { width: 56px; height: 56px; margin: -28px 0 0 -28px; background: rgba(255,255,255,.85); }
+@media (hover: none), (pointer: coarse) { .cursor { display: none; } }
 
 /* Project page */
 .detailHero {
@@ -258,6 +319,19 @@
 .processSection figure a { display: block; background: #d5d2dc; }
 .processSection figure img { width: 100%; height: auto; max-height: 520px; object-fit: contain; display: block; }
 .processSection figcaption { margin-top: 12px; color: #726d77; font: 11px/1.5 'Courier New', monospace; }
+.originalRecord { padding: 120px clamp(22px, 4vw, 64px) 145px; background: #eeecf1; }
+.originalRecordHead { max-width: 1450px; margin: 0 auto 80px; display: flex; align-items: end; justify-content: space-between; gap: 50px; }
+.originalRecordHead h2 { max-width: 750px; margin: 0; font-size: clamp(53px, 7vw, 105px); line-height: .9; letter-spacing: -.075em; }
+.originalRecordHead > div:last-child { max-width: 320px; }
+.originalRecordHead > div:last-child p { color: #5c5761; line-height: 1.6; }
+.originalRecordHead a { display: inline-block; padding: 9px 0; border-bottom: 1px solid; font: 700 11px 'Courier New', monospace; letter-spacing: .08em; text-decoration: none; }
+.originalRecordBody { max-width: 900px; margin: 0 auto; display: flow-root; }
+.originalRecordText { margin: 0 0 18px; font-size: clamp(17px, 1.65vw, 21px); line-height: 1.72; white-space: pre-wrap; overflow-wrap: anywhere; }
+.originalRecordHeading { margin: 65px 0 22px; font-size: clamp(27px, 3.3vw, 44px); line-height: 1.08; letter-spacing: -.04em; font-weight: 750; overflow-wrap: anywhere; }
+.originalRecordImage { margin: 42px 0 55px; }
+.originalRecordImage a { display: block; background: #d8d6dd; }
+.originalRecordImage img { display: block; max-width: 100%; max-height: 760px; width: auto; height: auto; margin: 0 auto; object-fit: contain; }
+.originalRecordImage figcaption { margin-top: 11px; color: #746f78; font: 700 11px 'Courier New', monospace; letter-spacing: .08em; }
 .modelAvailability { display: flex; align-items: center; gap: 25px; padding: 35px clamp(22px, 4vw, 64px); background: #dcd9e1; }
 .modelAvailability span { flex: 0 0 180px; font: 700 11px 'Courier New', monospace; letter-spacing: .14em; }
 .modelAvailability p { flex: 1; margin: 0; color: #514d56; line-height: 1.55; }
@@ -342,6 +416,9 @@
   .process { padding: 100px 22px; }
   .processSection { display: block; }
   .processSection figure { margin-top: 27px; }
+  .originalRecord { padding: 90px 22px; }
+  .originalRecordHead { display: block; margin-bottom: 55px; }
+  .originalRecordHead > div:last-child { margin-top: 30px; }
   .modelAvailability { display: block; }
   .modelAvailability p { margin: 15px 0; }
   .requirement { margin-bottom: 12px; }
@@ -351,6 +428,8 @@
   .viewerHeader span:last-child { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ribbon path { animation: none; }
+  .ribbonFlow, .ribbonMain, .ribbonSheen { animation: none; }
+  .ribbon { transform: none; }
   .projectImage img, .finalImage img { transition: none; }
+  .projectHover { transition: none; }
 }

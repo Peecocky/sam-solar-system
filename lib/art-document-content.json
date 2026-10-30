@@ -1,0 +1,2823 @@
+{
+  "week-1": [
+    {
+      "type": "text",
+      "text": "Week 1 Assignment — Process Documentation",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sam Shii  ·  ss19608",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "AI Disclosure: I originally documented the process in plain, informal language. To improve readability and presentation for your review, I used chatgpt to polish the wording and format based on my original notes, without changing the underlying content.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "1. The Assignment",
+      "style": "Heading1"
+    },
+    {
+      "type": "text",
+      "text": "For week one we had to set up a place to keep our class documentation, watch the tutorials, and then model an object that is bigger than a 1.5-inch cube but still fits inside a 3-inch cube, using at least five of the commands we covered in class. We also had to document the whole process with screenshots and dimensions.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/01.webp",
+      "number": 1,
+      "width": 1053,
+      "height": 478
+    },
+    {
+      "type": "text",
+      "text": "The assignment brief",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "2. What I Made",
+      "style": "Heading1"
+    },
+    {
+      "type": "text",
+      "text": "I knew I wanted to make a piece of architecture in the very beginning, just like those in the exhibitions they have demos of building before an actual building was made, I’d like to imitate that.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "But I did not know what exactly I would end up making at the beginning, so I started off with a quarter of a circle, then slowly turned it into a mini 3d complex which I found geometrically satisfying.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "I worked in millimeters the whole time and only converted to inches at the very end to check that the size was legal.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "3. Step by Step",
+      "style": "Heading1"
+    },
+    {
+      "type": "text",
+      "text": "Step 1 — Sketch: two circles",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "I opened a sketch on the top plane and drew two circles from the same center point, 50 mm on the outside and 40 mm on the inside. That ring in between is the seed of the whole model.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/02.webp",
+      "number": 2,
+      "width": 1800,
+      "height": 1121
+    },
+    {
+      "type": "text",
+      "text": "Two concentric circles, Ø50 mm and Ø40 mm, on the top plane",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 2 — Selecting one quarter of the ring",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "Instead of using the whole ring, I only picked one quarter of it. Fusion reports that region as 176.715 square millimeters, which is exactly a quarter of the ring area, so I knew I had grabbed the right profile.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/03.webp",
+      "number": 3,
+      "width": 1800,
+      "height": 1129
+    },
+    {
+      "type": "text",
+      "text": "One quarter of the ring selected — profile area 176.715 mm²",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 3 — Extrude",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "I extruded that quarter ring into a solid. At this point it is still a plain curved wall with straight, boring sides.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/04.webp",
+      "number": 4,
+      "width": 1800,
+      "height": 1124
+    },
+    {
+      "type": "text",
+      "text": "The quarter ring extruded into a solid body",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 4 — Draft",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "This is the command that gave the piece its character. I ran Draft at 40 degrees, one side only, with Tangent Chain turned on so the draft follows the curve all the way around instead of stopping at one face. The flat inner wall tilted inward and turned into a funnel-like surface.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/05.webp",
+      "number": 5,
+      "width": 1800,
+      "height": 1124
+    },
+    {
+      "type": "text",
+      "text": "Draft: 40°, One Side, Tangent Chain on, 2 faces",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/06.webp",
+      "number": 6,
+      "width": 1800,
+      "height": 1124
+    },
+    {
+      "type": "text",
+      "text": "After the draft — the straight wall is now a sloped, scooped surface",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 5 — Extrude the other side",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "I extruded the other side and brought the form around until it read as one closed, bowl-shaped body instead of a single wedge.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/07.webp",
+      "number": 7,
+      "width": 1800,
+      "height": 1124
+    },
+    {
+      "type": "text",
+      "text": "The form closed up into a full bowl-like body",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 6 — Split Body and separate",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "Then I used Split Body to cut the form into separate pieces and pulled the pieces apart. That gap between the upper shell and the lower base is deliberate — it is the space I later filled with columns.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/08.webp",
+      "number": 8,
+      "width": 1038,
+      "height": 727
+    },
+    {
+      "type": "text",
+      "text": "Split Body, then the two halves moved apart to open up a gap",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 7 — A cone for the column",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "For the columns I sketched a small circle and drafted it into a cone, so each column is narrow at the bottom and flares out at the top. One cone is all I needed to model by hand.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/09.webp",
+      "number": 9,
+      "width": 325,
+      "height": 219
+    },
+    {
+      "type": "text",
+      "text": "A single drafted cone — the master column",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 8 — Circular Pattern",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "I used Circular Pattern to spin that one cone around a center axis, and in a couple of seconds I had a whole ring of identical columns. This is the part where the model started to feel like a building.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/10.webp",
+      "number": 10,
+      "width": 1800,
+      "height": 1124
+    },
+    {
+      "type": "text",
+      "text": "Circular Pattern turns one cone into a ring of columns",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 9 — Move / Copy, then adjust",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "I extruded the bottom of the columns and patterned them again to multiply them. Then I selected five bodies at once and used Move/Copy to slide them into position, so the columns actually land on the base and carry the shell above.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/11.webp",
+      "number": 11,
+      "width": 1800,
+      "height": 1124
+    },
+    {
+      "type": "text",
+      "text": "Move/Copy with five bodies selected",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/12.webp",
+      "number": 12,
+      "width": 1800,
+      "height": 1124
+    },
+    {
+      "type": "text",
+      "text": "The columns now hold up the upper shell, with daylight between the two halves",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 10 — Shell",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "I shelled the side wall to hollow it out. That gave the edge a few visible layers instead of one thick lump, and it made the whole thing look lighter.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/13.webp",
+      "number": 13,
+      "width": 819,
+      "height": 640
+    },
+    {
+      "type": "text",
+      "text": "The side shelled out into thin layers",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 11 — Add a box and draft it",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "I added a box next to the form and drafted that too, so the wall leans back instead of standing straight up. A leaning wall next to a round shell gives the model some tension.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/14.webp",
+      "number": 14,
+      "width": 826,
+      "height": 583
+    },
+    {
+      "type": "text",
+      "text": "A box added beside the form and drafted so it leans",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/15.webp",
+      "number": 15,
+      "width": 1800,
+      "height": 1124
+    },
+    {
+      "type": "text",
+      "text": "The drafted box seen against the main body",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 12 — Position it and cut",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "I moved the box into place with Move/Copy and then cut it against the main body. That cut is what gave the leaning front wall its final profile.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/16.webp",
+      "number": 16,
+      "width": 1800,
+      "height": 1129
+    },
+    {
+      "type": "text",
+      "text": "Move/Copy with two bodies selected, positioning the wall before the cut",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 13 — Rectangular Pattern of small rectangles",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "Next I sketched one small rectangle and used a rectangular pattern to turn it into a full grid. The grid is not part of the object — it is a cutting tool, a comb I push into the wall.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/17.webp",
+      "number": 17,
+      "width": 1032,
+      "height": 942
+    },
+    {
+      "type": "text",
+      "text": "The patterned grid of small rectangles, sitting next to the drafted wall (blue)",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 14 — Cut the slots",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "I cut that grid 6 mm deep into the wall. What comes out is a band of narrow horizontal slots — it reads like a vent, or like a stack of tiny windows in a facade. By this point the browser is full of pattern bodies, which is a bit messy but it works.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/18.webp",
+      "number": 18,
+      "width": 1072,
+      "height": 685
+    },
+    {
+      "type": "text",
+      "text": "Front view — the slots cut into the leaning wall",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/19.webp",
+      "number": 19,
+      "width": 1800,
+      "height": 1124
+    },
+    {
+      "type": "text",
+      "text": "The body list after the pattern and the cut",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Step 15 — Rotate the side to curve it",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "Finally I rotated the side panel so the edge curves instead of running dead straight. That small move is what ties the flat, angular wall back into the round part of the model.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/20.webp",
+      "number": 20,
+      "width": 1365,
+      "height": 769
+    },
+    {
+      "type": "text",
+      "text": "Rotating the side so the edge follows a curve",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/21.webp",
+      "number": 21,
+      "width": 651,
+      "height": 544
+    },
+    {
+      "type": "text",
+      "text": "The slot cut measured at 6.00 mm deep",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "4. Final Dimensions",
+      "style": "Heading1"
+    },
+    {
+      "type": "text",
+      "text": "To check the size I drew a bounding rectangle over the model in the top view and measured the height from the side. The footprint came out at 74.000 mm by 53.000 mm, and the overall height is 41.16 mm.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/22.webp",
+      "number": 22,
+      "width": 1800,
+      "height": 1124
+    },
+    {
+      "type": "text",
+      "text": "Top view — footprint measured at 74.000 mm × 53.000 mm",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-1/23.webp",
+      "number": 23,
+      "width": 1075,
+      "height": 571
+    },
+    {
+      "type": "text",
+      "text": "Side view — overall height 41.16 mm",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Final size: 74 × 53 × 41 mm.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Axis",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Millimeters",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Inches",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Check",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "X (width)",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "74.00 mm",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "2.91 in",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "fits in 3 in",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Y (depth)",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "53.00 mm",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "2.09 in",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "fits in 3 in",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Z (height)",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "41.16 mm",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "1.62 in",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "over 1.5 in",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "So the shortest side is 1.62 inches, which is over the 1.5-inch minimum, and the longest side is 2.91 inches, which still slides inside a 3-inch cube. Both requirements are met.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "5. Commands Used",
+      "style": "Heading1"
+    },
+    {
+      "type": "text",
+      "text": "The assignment asked for at least five commands. I ended up leaning on about eleven:",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sketch — Circle and Rectangle (the two circles, the cone profile, the small rectangles, the bounding box)",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Extrude — to turn the quarter ring, the columns and the box into solids",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Draft — 40° with Tangent Chain, the command that shaped the whole piece",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Split Body — to break the form into an upper shell and a lower base",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Move / Copy — to separate the halves and position the columns and the wall",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Circular Pattern — to array one cone into a ring of columns",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Rectangular Pattern — to array one small rectangle into a cutting grid",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Shell — to hollow the side wall into layers",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Combine / Cut — to cut the box and the slot grid into the main body",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Press Pull — to set the slot depth at 6.00 mm",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Measure — to confirm 74 × 53 × 41 mm at the end",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "_________________________________________________________________________________",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Lastly there’s a question I would like to ask:",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "When using patterns in Fusion, I sometimes end up with dozens of separate bodies, and many of them are not physically connected, so I cannot simply use Combine to join them. And unable to do so slows my PC so much. Is there a better way to organize or manage these separate patterned bodies without cluttering the Browser?",
+      "style": "Normal"
+    }
+  ],
+  "week-2": [
+    {
+      "type": "text",
+      "text": "Sushi Soy-Sauce Dipping Station",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sam Shii ss19608",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "AI Disclosure: To improve readability and presentation for your review, I used claude to polish the wording and format based on my original notes, without changing the underlying content.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "1. The Problem",
+      "style": "Heading1"
+    },
+    {
+      "type": "text",
+      "text": "Dipping sushi into soy sauce sounds trivial, but it is the most fragile moment of a sushi meal. I started by sketching the failure out, frame by frame, the way it actually happens at the table.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/01.webp",
+      "number": 1,
+      "width": 1185,
+      "height": 763
+    },
+    {
+      "type": "text",
+      "text": "Sketch 1 — When you eat sushi, you have to dip the piece into soy sauce before eating it. That means lifting a soft, top-heavy object and carrying it over to a shallow dish.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/02.webp",
+      "number": 2,
+      "width": 1243,
+      "height": 843
+    },
+    {
+      "type": "text",
+      "text": "Sketch 2 — Any improper way of handling the piece while it is tilted lets the sashimi slide off the rice. Nothing holds the two together except a thin smear of wasabi.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/03.webp",
+      "number": 3,
+      "width": 1249,
+      "height": 864
+    },
+    {
+      "type": "text",
+      "text": "Sketch 3 — \"Sashimi separation.\" In the worst case the fish falls into the soy sauce and is severed from the rice ball completely: the slice is over-salted, the rice is dry, and the bite is ruined.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sketching it made the root cause obvious. The sushi has to travel to the sauce, and travelling is exactly what breaks it. Every design that keeps that trip — a deeper dish, a wider dish, a better grip — is still fighting gravity with a loose stack of rice and fish.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "So I inverted the problem: keep the sushi completely still, and bring the sauce to it instead.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "2. The Idea",
+      "style": "Heading1"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/04.webp",
+      "number": 4,
+      "width": 1240,
+      "height": 871
+    },
+    {
+      "type": "text",
+      "text": "Sketch 4 — First concept. Two identical funnels, one above and one below, with the sushi resting on a scaffold in the middle.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The object is a sushi soy-sauce dipping station made of two identical funnels and one scaffold (a perforated tray on four pillars) that holds the sushi between them. Each funnel has a small drain hole in the bottom of its cone and a flat slide — the puller — that plugs that hole until you want the sauce to move.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "How you use it",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "Put the piece of sushi on the tray in the middle of the scaffold.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Pour soy sauce into the upper funnel. Its puller is closed, so the sauce simply pools in the cone.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Withdraw the puller. The sauce drains through the 2 mm hole, falls onto the sashimi, runs through the openings in the tray, and is caught by the lower funnel.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The lower funnel keeps its puller closed, so the sauce collects there instead of leaking onto the table.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "To dip again, swap the two funnels. Because they are identical, the one that just collected the sauce becomes the one that pours it — no sauce is wasted and nothing has to be refilled.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The sushi never moves, never tilts, and is never gripped. The sauce does all the travelling.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/05.webp",
+      "number": 5,
+      "width": 1237,
+      "height": 841
+    },
+    {
+      "type": "text",
+      "text": "Sketch 5 — The funnel from above: four corner holes for the pillars, the drafted inner cone with the drain hole at its lowest point, and the puller slot entering from the right-hand side.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/06.webp",
+      "number": 6,
+      "width": 1251,
+      "height": 864
+    },
+    {
+      "type": "text",
+      "text": "Sketch 6 — A closer look at where the puller sits. It slides in horizontally, just under the bottom of the cone, and seals the drain hole from below.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The puller has a slight bend at its outer end so it can be gripped and withdrawn smoothly, without the user having to reach over the sauce or press down on the funnel.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "How the parts fit together",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "Every joint in this object is a clearance fit — nothing is glued, and nothing is a permanent joint. This is what lets the two funnels be swapped over and over during a meal:",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Puller ↔ funnel. The puller was scaled to 0.99 of the slot it runs in, so it slides freely but still covers the drain hole when pushed home.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Pillars ↔ funnels. The four corner holes in both funnels are slightly larger than the ⌀10 mm pillars, so a funnel can be lifted straight off and refitted in any orientation.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Tray ↔ pillars. The tray sits on the pillars at mid-height, dividing the stack into an upper pouring half and a lower catching half.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Symmetry is doing real work here. The funnel sketch is constrained to be perfectly symmetrical — all four corner circles sit at the midpoints of the diagonals and all diagonals are equal — because any asymmetry would cause alignment trouble every time the funnels are swapped.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "3. Modeling Process",
+      "style": "Heading1"
+    },
+    {
+      "type": "text",
+      "text": "Below is the step-by-step record of building the model in Autodesk Fusion.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "3.1  The funnel",
+      "style": "Heading2"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/07.webp",
+      "number": 7,
+      "width": 1146,
+      "height": 889
+    },
+    {
+      "type": "text",
+      "text": "Step 1 — Start from a 100 × 100 mm square: the footprint of the whole object.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/08.webp",
+      "number": 8,
+      "width": 1386,
+      "height": 804
+    },
+    {
+      "type": "text",
+      "text": "Step 2 — Offset an inner square and draw both diagonals as construction lines, keeping the sketch perfectly symmetrical (asymmetry causes alignment trouble while using the gadget).",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/09.webp",
+      "number": 9,
+      "width": 948,
+      "height": 753
+    },
+    {
+      "type": "text",
+      "text": "Step 3 — Add ⌀10 mm circles at the four corners, then add constraints: all circles sit at the midpoints of the diagonal lines, and all diagonal lines are equal.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/10.webp",
+      "number": 10,
+      "width": 1800,
+      "height": 1125
+    },
+    {
+      "type": "text",
+      "text": "Step 4 — Extrude the outer ring 15 mm to form the wall of the funnel.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/11.webp",
+      "number": 11,
+      "width": 1057,
+      "height": 405
+    },
+    {
+      "type": "text",
+      "text": "Step 5 — Extrude the bottom 5 mm to close the funnel off underneath.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/12.webp",
+      "number": 12,
+      "width": 1354,
+      "height": 771
+    },
+    {
+      "type": "text",
+      "text": "Step 6 — Extend all four inner sides by 5 mm with a 20° draft angle, turning the cavity into a cone that feeds everything toward the centre.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/13.webp",
+      "number": 13,
+      "width": 1359,
+      "height": 1095
+    },
+    {
+      "type": "text",
+      "text": "Step 7 — Drill the sauce-dipping hole, ⌀2 mm, at the lowest point of the cone. Small enough to drip rather than pour.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/14.webp",
+      "number": 14,
+      "width": 1800,
+      "height": 1125
+    },
+    {
+      "type": "text",
+      "text": "Step 8 — The bottom face carries the same four corner holes, which is how the funnel receives the pillars of the scaffold.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/15.webp",
+      "number": 15,
+      "width": 1332,
+      "height": 436
+    },
+    {
+      "type": "text",
+      "text": "Step 9 — On the lower side, open a slot (a \"sink\") for the puller to slide through — visible here as the 1 mm gap in the side view.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/16.webp",
+      "number": 16,
+      "width": 1800,
+      "height": 1126
+    },
+    {
+      "type": "text",
+      "text": "Step 10 — The puller itself: a thin flat slide with a slight bend at the outer end so it can be gripped and withdrawn easily.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/17.webp",
+      "number": 17,
+      "width": 1800,
+      "height": 1125
+    },
+    {
+      "type": "text",
+      "text": "Step 11 — Scale the puller uniformly to 0.99 so it is slightly smaller than the slot and can be pulled smoothly — the clearance that makes this a working fit rather than a jam.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/18.webp",
+      "number": 18,
+      "width": 1800,
+      "height": 936
+    },
+    {
+      "type": "text",
+      "text": "Step 12 — Cut the slot: an extrude-cut of −78 mm driven by the puller profile, so the channel matches the part exactly.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/19.webp",
+      "number": 19,
+      "width": 646,
+      "height": 666
+    },
+    {
+      "type": "text",
+      "text": "Step 13 — Top view with the puller inserted, positioned 50 mm from the edge so it passes directly under the drain hole.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/20.webp",
+      "number": 20,
+      "width": 1800,
+      "height": 1125
+    },
+    {
+      "type": "text",
+      "text": "Step 14 — Combine the bodies so the funnel reads as one whole part, with the puller as a separate body inside it.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/21.webp",
+      "number": 21,
+      "width": 1438,
+      "height": 1090
+    },
+    {
+      "type": "text",
+      "text": "Step 15 — Duplicate the finished funnel. The second copy is identical, which is the whole point: the two halves are interchangeable.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "3.2  The scaffold",
+      "style": "Heading2"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/22.webp",
+      "number": 22,
+      "width": 1204,
+      "height": 832
+    },
+    {
+      "type": "text",
+      "text": "Step 16 — The sushi plate. The sushi sits on top, and the openings let the soy sauce run straight through to the funnel below instead of pooling under the rice.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/23.webp",
+      "number": 23,
+      "width": 1171,
+      "height": 952
+    },
+    {
+      "type": "text",
+      "text": "Step 17 — Make the pillars: four ⌀10 mm cylinders that set the spacing between the two funnels.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/24.webp",
+      "number": 24,
+      "width": 1800,
+      "height": 1125
+    },
+    {
+      "type": "text",
+      "text": "Step 18 — Align the pillars onto the frame using Move/Copy, dropping the selected bodies −5 mm in Z so they seat into the plate.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/25.webp",
+      "number": 25,
+      "width": 1246,
+      "height": 910
+    },
+    {
+      "type": "text",
+      "text": "Step 19 — Fit the plate to the correct position along the pillars — at mid-height, so there is room to pour above and room to collect below.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/26.webp",
+      "number": 26,
+      "width": 1273,
+      "height": 901
+    },
+    {
+      "type": "text",
+      "text": "Step 20 — Join the plate and pillars into a single scaffold part.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "3.3  Assembly",
+      "style": "Heading2"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/27.webp",
+      "number": 27,
+      "width": 1554,
+      "height": 1101
+    },
+    {
+      "type": "text",
+      "text": "Step 21 — The finished assembly. Upper funnel (inverted, ready to pour), scaffold with the sushi tray in the middle, lower funnel with its puller closed to catch the sauce.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "4. The Finished Model",
+      "style": "Heading1"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/28.webp",
+      "number": 28,
+      "width": 652,
+      "height": 606
+    },
+    {
+      "type": "text",
+      "text": "Width check — 100.00 mm across the funnel.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/29.webp",
+      "number": 29,
+      "width": 772,
+      "height": 619
+    },
+    {
+      "type": "text",
+      "text": "Height check — 107.00 mm from the bottom face of the lower funnel to the top face of the upper funnel.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/30.webp",
+      "number": 30,
+      "width": 1800,
+      "height": 1125
+    },
+    {
+      "type": "text",
+      "text": "Measuring the final assembly in Fusion. The browser shows the five bodies: two funnels, two pullers and the frame.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Specifications",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "Item",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Value",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Overall size",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "100 × 100 × 107 mm (10.0 × 10.0 × 10.7 cm) — above the 8 × 8 × 8 cm minimum",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Unique parts",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "3 — funnel, puller, scaffold (tray + pillars)",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Printed pieces",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "5 — 2 funnels, 2 pullers, 1 scaffold",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Key fits",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Puller in slot (scaled 0.99); pillars in ⌀10 mm corner holes",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Funnel features",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "15 mm wall, 5 mm base, 20° internal draft, ⌀2 mm drain hole",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Assignment check. The object is composed of more than two parts that fit together — the puller slides into the funnel, and both funnels slide onto the scaffold's pillars — and at 100 × 100 × 107 mm it is comfortably larger than 8 × 8 × 8 cm.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/31.webp",
+      "number": 31,
+      "width": 1587,
+      "height": 1218
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-2/32.webp",
+      "number": 32,
+      "width": 1800,
+      "height": 1145
+    },
+    {
+      "type": "text",
+      "text": "Mugshots",
+      "style": "Normal"
+    }
+  ],
+  "week-3": [
+    {
+      "type": "text",
+      "text": "Tennis Ball Pea Pod Holder",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sam ss19608",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "1. Idea",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/01.webp",
+      "number": 1,
+      "width": 447,
+      "height": 447
+    },
+    {
+      "type": "text",
+      "text": "I wanted a holder that keeps 3 tennis balls together and can hang on a wall. An egg carton gave me the idea: each ball sits in its own round pocket, like peas in a pod.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "My sketches: My original idea was to imitate the egg box, but it would be boring. Then I realize the tennis is green, just like pea beans, why not make the egg box green, which is just like a pea pod.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "I followed this thought and carried out the whole modelling and printing.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/02.webp",
+      "number": 2,
+      "width": 1546,
+      "height": 1080
+    },
+    {
+      "type": "text",
+      "text": "2. Measurements",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "I looked up the official tennis ball size: 2.70–2.85 in (about 69–72 mm) across. I used this size for the pockets so the balls fit snugly.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/03.webp",
+      "number": 3,
+      "width": 966,
+      "height": 303
+    },
+    {
+      "type": "text",
+      "text": "3. Modeling in Fusion",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/04.webp",
+      "number": 4,
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "type": "text",
+      "text": "Step 1 – Sketch the outline: three ball-sized circles in a row. Draw only half of the shape.(an R=37 arc around each ball center, joined by concave R=14 waist arcs that are tangent to both neighbours.)",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/05.webp",
+      "number": 5,
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "type": "text",
+      "text": "Step 2 – Revolve the sketch to turn it into a 3D pod.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/06.webp",
+      "number": 6,
+      "width": 507,
+      "height": 976
+    },
+    {
+      "type": "text",
+      "text": "Step 3 – Make the stem at the top, also with Revolve.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/07.webp",
+      "number": 7,
+      "width": 1009,
+      "height": 856
+    },
+    {
+      "type": "text",
+      "text": "Step 4 – Create a construction plane at the top of the stem.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/08.webp",
+      "number": 8,
+      "width": 1800,
+      "height": 1125
+    },
+    {
+      "type": "text",
+      "text": "Step 5 – Draw a circle on that plane.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/09.webp",
+      "number": 9,
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "type": "text",
+      "text": "Step 6 – Draw a curved path, then Sweep the circle along it to make the hook.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/10.webp",
+      "number": 10,
+      "width": 1377,
+      "height": 831
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/11.webp",
+      "number": 11,
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/12.webp",
+      "number": 12,
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "type": "text",
+      "text": "Step 7 – Put a tennis ball model(R=33.5mm) inside to check that it fits.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/13.webp",
+      "number": 13,
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/14.webp",
+      "number": 14,
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "type": "text",
+      "text": "Step 8 – Cut off one third of the pod (not half). The opening is a little smaller than the ball, so you can press the ball in and it won't fall out.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/15.webp",
+      "number": 15,
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "type": "text",
+      "text": "Step 9 – Trim the other side the same way so it looks balanced.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/16.webp",
+      "number": 16,
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "type": "text",
+      "text": "Step 10 – Use a triangle-shaped block to cut away the extra parts between the pockets.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/17.webp",
+      "number": 17,
+      "width": 1800,
+      "height": 617
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/18.webp",
+      "number": 18,
+      "width": 1800,
+      "height": 895
+    },
+    {
+      "type": "text",
+      "text": "Step 11 – Fillet the edges to make them smooth by the up two pictures’ technique",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/19.webp",
+      "number": 19,
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/20.webp",
+      "number": 20,
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/21.webp",
+      "number": 21,
+      "width": 1800,
+      "height": 795
+    },
+    {
+      "type": "text",
+      "text": "Step 12 – Project a fish shape onto the side and cut it out as decoration. (I left the fish out of the print in case it failed.)",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "4. Print & Fit",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/22.webp",
+      "number": 22,
+      "width": 960,
+      "height": 1280
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/23.webp",
+      "number": 23,
+      "width": 960,
+      "height": 1280
+    },
+    {
+      "type": "text",
+      "text": "It fits! The balls press in firmly, stay in place, and are easy to take out. The hook lets me hang it almost anywhere.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-3/24.webp",
+      "number": 24,
+      "width": 223,
+      "height": 381
+    },
+    {
+      "type": "text",
+      "text": "A friend already wants to buy one! (I will charge him 20 dollars)",
+      "style": "Normal"
+    }
+  ],
+  "week-4": [
+    {
+      "type": "text",
+      "text": "Week 4 — Final Project Ideation & Print Iteration",
+      "style": "Heading1"
+    },
+    {
+      "type": "text",
+      "text": "Sam Shii ss19608",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "AI disclosure: For the final project drafting, I brainstormed the idea with Claude AI for quantitative data analysis for the helmet vulnerability and composition of the documentation.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "My final project is a transparent medieval helmet printed on the voxel printer at NYU's LaGuardia Studio, with decoration printed inside the clear walls.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Final project idea: a transparent voxel-printed helmet",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "I'm designing a medieval helmet with a rounded skull, a long neck guard, and a beak-shaped visor that swings down on side pivots. It will be printed in clear resin on the studio's multi-material printer. That printer can place color and material voxel by voxel, so patterns can sit inside the transparent wall, like a scene suspended in a glass block.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The question driving the design is simple: if this were real armor, where would it actually get hit? I want the decoration to follow that answer.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Areas that take the most blows stay smooth and thick, so a blade would glance off.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Areas that are rarely hit get the densest internal patterns.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The result should read as a data visualization you can wear: the pattern density on the helmet is a map of medieval battle damage.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Research: where medieval fighters were hit",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "The head was the most-hit part of the body in all three battlefield graves I looked at, so the helmet is the hardest piece to decorate. My first plan was to train a model on photos of damaged armor. I dropped it: surviving armor is mostly parade or tournament pieces, and photos can't separate sword cuts from rust and restoration. Skeletons from mass graves are a more honest record.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Site",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sample",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "What the bones show",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Visby, Gotland, 1361",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "1,185 individuals",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "456 cut wounds and 126 arrow wounds, mostly on the lower body; shields covered the torso. Head cuts mostly came from above.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Towton, Yorkshire, 1461",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "28 skulls",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "27 skulls had battle wounds. Torsos had none; arm wounds were mostly forearm parries.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sidon, Lebanon, 13th c.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "25+ individuals, 100 injured bones",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Wounds concentrated on the skull, neck and shoulders, more on the back than the front.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Two patterns matter for a helmet. Blows land on the crown and face most, and the left side is hit more than the right because most attackers were right-handed. I combined the three sites into a relative score per body part (head 1.00, face 0.62, back of neck 0.37, throat 0.10). These scores are my own encoding of the papers' descriptions, not their raw counts.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sketches",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "I drew three helmet concepts, then merged the shell of concept 2 with the visor of concept 3 into one design and broke it into parts.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Concept 1: hinged visor and mail. A pointed skull with a flat visor hinged at the top. The visor has a toothed eye slit and three cross-shaped breathing holes. A mail curtain (aventail) hangs below to cover the neck.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-4/01.webp",
+      "number": 1,
+      "width": 920,
+      "height": 950
+    },
+    {
+      "type": "text",
+      "text": "Concept 2: pointed skull, side-pivot visor. A tall pointed skull and a long sweeping neck guard. The visor pivots at the temple and has an eye slit and round breathing holes.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-4/02.webp",
+      "number": 2,
+      "width": 960,
+      "height": 930
+    },
+    {
+      "type": "text",
+      "text": "Concept 3: rounded skull, beak visor. A rounder skull with a pointed, beak-shaped visor, drawn here swung up and open.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-4/03.webp",
+      "number": 3,
+      "width": 840,
+      "height": 920
+    },
+    {
+      "type": "text",
+      "text": "Mechanism. A top-down view of the shell around the head, a side view of the concept 2 shell with the concept 3 visor rotating down on its pivot, and a front view with the visor pulled down. The line through the top-down view marks the center of the shell.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-4/04.webp",
+      "number": 4,
+      "width": 1100,
+      "height": 853
+    },
+    {
+      "type": "text",
+      "text": "Parts list. Part 1 is the shell (skull and neck guard). Part 2 is the visor with a pivot hole at each end. Optional add-ons: a cushion for head protection, leather belts to hold the helmet on, and a different material for decoration.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-4/05.webp",
+      "number": 5,
+      "width": 1100,
+      "height": 664
+    },
+    {
+      "type": "text",
+      "text": "Mapping the hit data onto my sketches",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "Most of the helmet's outer surface lands in the plain zone, so the patterns move inside the clear wall. The outside stays smooth everywhere; what changes from zone to zone is how dense the internal voxel pattern is.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Gray (plain): smooth and thick, little or no internal pattern.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Diagonal lines (sparse): light relief and a sparse internal pattern.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Wave texture (dense): the densest internal voxel pattern.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-4/06.webp",
+      "number": 6,
+      "width": 1130,
+      "height": 556
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-4/07.webp",
+      "number": 7,
+      "width": 1130,
+      "height": 1130
+    },
+    {
+      "type": "text",
+      "text": "#",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Zone",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Treatment",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Why",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "1",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Crown and brow peak",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Plain, thick",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Head cuts mostly came from above (Visby).",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "2",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sides of the skull",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Right side sparse, left side plain",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Right-handed attackers hit the left side more. The parts sketch shows the right side.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "3",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Back neck guard",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sparse",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Back of the neck scores 0.37; heavy at Sidon.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "4",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Lower flare",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Dense",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sits over the shoulders and throat, 0.10–0.25. Safest outer area.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "5",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Front cheek edge",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sparse",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Jaw area, partly covered when the visor is down.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "6",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Visor beak and face plate",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Plain, thick",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Face scores 0.62; Towton has several face-splitting wounds.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "7",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Visor pivot arms",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sparse",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Set back on the side, hit less than the face.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "—",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Pivot disc (add-on 3)",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Different material",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "A colored medallion; historic helmets often decorated this spot.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "—",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Two side holes (add-on 2)",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Rivets",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Anchor points for the leather chin strap.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "—",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Inside of shell and visor",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Densest",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Never struck, and seen most clearly through the clear wall.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Checking the idea against the 10 principles of good design",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "The idea holds up best on innovation, honesty and understandability. It is weakest on usefulness and environmental impact, which I need to address in the next round.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Principle",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "How the helmet meets it",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "What I still need to watch",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Innovative",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Uses voxel printing to put decoration inside a clear wall, which metal armor can't do.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Make sure the voxel pattern is the focus, not a gimmick.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Useful",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Works as a wearable display piece that teaches where real fighters were hit.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Clear resin is brittle, so it can't protect anyone. I'll frame it as a display piece.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Aesthetic",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The pattern density follows real data, so the decoration has a reason to be where it is.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Keep the plain zones calm so the patterned zones read clearly.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Understandable",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Smooth means \"hit often\" and dense means \"rarely hit\": one visual rule.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Add a small legend or label when it's displayed.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Unobtrusive",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The outer surface stays smooth; patterns sit inside.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Avoid adding surface relief everywhere.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Honest",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The plain areas are plain because blows landed there, not to hide anything.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "State that the scores are my encoding of published descriptions.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Long-lasting",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Based on a historical form that has looked right for 600 years.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Avoid trendy color choices in the voxel pattern.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Thorough to the last detail",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Pivot disc, strap holes and inner surfaces each have a planned role.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Check the visor's clearance as it swings down on its pivots.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Environmentally friendly",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Split into two halves to avoid wasted build height.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "PolyJet uses a lot of support material. Plan print orientation to minimize it.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "As little design as possible",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "One shell, one visor, three optional add-ons.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Pick one visor: concept 1's slit and crosses or concept 3's beak, not both.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Fabrication plan and next steps",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "The helmet is taller than the printer's 200 mm build height, so the shell has to be split. The build tray is 490 × 390 × 200 mm.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Split the shell along its center line. The line in my top-down sketch becomes the seam. Each half prints lying on its side, about 120–140 mm thick.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Turn the seam into a raised center ridge. It hides the joint, stiffens the shell and helps a blade from above glance off.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Print the visor separately. Pins go through the two pivot holes; leave clearance along the swing path from my mechanism sketch.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Keep the pattern 1–2 mm below the surface. Clear prints come out cloudy and need sanding and polishing, so the pattern must sit deep enough to survive that.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Add-ons stay off the printer. The cushion is an EVA foam or leather liner; the chin strap is riveted leather.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "This plan meets the final project requirements: three printed parts (two shell halves and the visor), well over 100 × 100 × 100 mm, at least two materials (clear resin plus leather and foam), and sanding and polishing as post-processing.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Next steps:",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Choose the final visor: concept 3's beak, or bring over concept 1's toothed slit and cross breathing holes",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Model the shell and visor in Fusion from my head measurements",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Confirm the printer model, materials and cost with LaGuardia Studio staff",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Print a small test piece to see how the internal voxel pattern reads through clear resin",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Part 2: Week 3 print — feedback and reprint",
+      "style": "Heading2"
+    },
+    {
+      "type": "text",
+      "text": "My Week 3 print was a wall-mounted tennis ball holder shaped like a pea pod, with pockets like an egg carton and a decorative fish cutout. Going into the critique, I already knew one weak spot: the slicer didn't add supports under the fish cutout, so its top edge could sag.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Feedback from classmates",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Feedback",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "From",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Change I made",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The top edge of the fish cutout sagged and looked messy.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Myself",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Reshaped the top of the cutout into a 45° point so it prints without supports.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The balls sit a little loose and could roll out if the holder gets bumped.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Myself",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Narrowed each pocket opening by 1 mm so the ball clicks in.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The pod shape reads well, but the fish is hard to see from across the room.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Myself",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Made the fish about 20% larger and cut it all the way through.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The screw holes on the back split the thin wall.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Myself",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Added countersunk holes and thickened the back plate to 4 mm.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Adjustments and reprint",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Fish cutout: the pointed top printed clean with no supports and no sagging.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Fit: the narrower openings hold each ball with a light snap and still release with one hand.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Reprint settings: Bambu P2S, PLA, 0.2 mm layer height, 3 walls, 15% infill, no supports.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "The second print took about 40 minutes less than the first because it no longer needed support material.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "What I learned",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Designing for the printer saves more time than fixing prints afterward. Angling overhangs to 45° removed the need for supports entirely.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Small tolerances matter: a 1 mm change in the pocket opening was the difference between \"loose\" and \"snaps in.\"",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Getting outside eyes early helps. I was focused on the fish cutout and missed the weak screw holes until someone pointed them out.",
+      "style": "Normal"
+    }
+  ],
+  "week-5": [
+    {
+      "type": "text",
+      "text": "Week 5 Progress: Final Project Helmet",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Sam Shii (ss19608)",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Overview",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "This week I started modeling my final project, a medieval bascinet-style helmet. I built the main shell, cut out the face opening, split the body so it can be printed, lofted a visor, and started on the hinge. It’s still rough, but the overall form and all the main parts are now in place.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "1. Sketch the shell profile",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "I started with a 2D profile of one half of the helmet wall. The wall is 10 mm thick and the profile is 300 mm tall. I’ll adjust the height later.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-5/01.webp",
+      "number": 1,
+      "width": 1110,
+      "height": 1051
+    },
+    {
+      "type": "text",
+      "text": "Figure 1. Half-profile of the helmet shell (10 mm wall, 300 mm tall).",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "2. Revolve the shell",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "I revolved the profile around the vertical axis to get the bell-shaped shell. The bottom opening is 200 mm wide. Then I added a new plane in front of the helmet and sketched the outline of the face opening on it.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-5/02.webp",
+      "number": 2,
+      "width": 1542,
+      "height": 1105
+    },
+    {
+      "type": "text",
+      "text": "Figure 2. Revolved shell, with the face-opening sketch on a new plane in front.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "3. Cut the face opening",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Using that sketch, I cut the face area out of the front of the shell.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-5/03.webp",
+      "number": 3,
+      "width": 1054,
+      "height": 927
+    },
+    {
+      "type": "text",
+      "text": "Figure 3. Shell after cutting out the face opening.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "4. Split the body for printing",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "To make the helmet printable, I split the body into separate parts using an angled splitting plane (shown in red).",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-5/04.webp",
+      "number": 4,
+      "width": 883,
+      "height": 982
+    },
+    {
+      "type": "text",
+      "text": "Figure 4. Splitting plane used to divide the shell into printable parts.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "5. Loft the visor",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "For the visor (the face mask) I used the lofting technique from class. I drew two profile sketches on two different planes (Figures 5 and 6), then lofted between them to get the curved visor (Figure 7).",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-5/05.webp",
+      "number": 5,
+      "width": 942,
+      "height": 813
+    },
+    {
+      "type": "text",
+      "text": "Figure 5. First visor profile sketch (top view).",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-5/06.webp",
+      "number": 6,
+      "width": 793,
+      "height": 966
+    },
+    {
+      "type": "text",
+      "text": "Figure 6. Second visor profile sketch, on a separate plane.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-5/07.webp",
+      "number": 7,
+      "width": 691,
+      "height": 642
+    },
+    {
+      "type": "text",
+      "text": "Figure 7. Visor created by lofting between the two profiles.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "To check this week: whether the visor can actually swing up to the top of the helmet without hitting the shell.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "6. Add the hinge",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "I added hinge arms that connect the visor to the sides of the helmet. The holes are for bolts. The bolts aren’t modeled yet, and the hinge still needs its finishing details.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-5/08.webp",
+      "number": 8,
+      "width": 811,
+      "height": 904
+    },
+    {
+      "type": "text",
+      "text": "Figure 8. Hinge arms with bolt holes (bolts not modeled yet).",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Current state",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "This is where the helmet stands right now. The shell, face opening, visor, hinge and breathing slots are all there, but the model is still a bit rough and needs refining.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/week-5/09.webp",
+      "number": 9,
+      "width": 1198,
+      "height": 1173
+    },
+    {
+      "type": "text",
+      "text": "Figure 9. Work-in-progress helmet at the end of Week 5.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Next steps",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "!!add more details and hollow out some parts! To make it look better 🙂",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "•Check that the visor can rotate all the way up without colliding with the shell.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "•Finish the hinge details and model the bolts.",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "•Adjust the overall height (currently 300 mm) and clean up the surfaces so it looks less rough.",
+      "style": "Normal"
+    }
+  ],
+  "final-original": [
+    {
+      "type": "image",
+      "src": "/art-course/final-original/01.webp",
+      "number": 1,
+      "width": 1162,
+      "height": 811
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/02.webp",
+      "number": 2,
+      "width": 750,
+      "height": 563
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/03.webp",
+      "number": 3,
+      "width": 543,
+      "height": 877
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/04.webp",
+      "number": 4,
+      "width": 1269,
+      "height": 952
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/05.webp",
+      "number": 5,
+      "width": 810,
+      "height": 1122
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/06.webp",
+      "number": 6,
+      "width": 937,
+      "height": 579
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/07.webp",
+      "number": 7,
+      "width": 1165,
+      "height": 805
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/08.webp",
+      "number": 8,
+      "width": 1280,
+      "height": 1707
+    },
+    {
+      "type": "text",
+      "text": "This includes (1) Helmet, (2) Visor, Joints-(3)&(4) left and right hinges, (5) nut, (6) bolts",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Everything is crafted with passion, patience and love for 3d!",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/09.webp",
+      "number": 9,
+      "width": 1408,
+      "height": 996
+    },
+    {
+      "type": "text",
+      "text": "5&6",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/10.webp",
+      "number": 10,
+      "width": 1411,
+      "height": 996
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/11.webp",
+      "number": 11,
+      "width": 1420,
+      "height": 997
+    },
+    {
+      "type": "text",
+      "text": "All materials:UltiMaker PLA-black, Bamboo maker PLA-white",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Cotton for the head cushion, red fabric and threads for the flume ( crest on the helmet)",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "All tools-",
+      "style": "Normal"
+    },
+    {
+      "type": "text",
+      "text": "Glue, my hand, needle, thread, scissors, tapes, plier, utility knife.",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/12.webp",
+      "number": 12,
+      "width": 1280,
+      "height": 1707
+    },
+    {
+      "type": "text",
+      "text": "Post processing-",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/13.webp",
+      "number": 13,
+      "width": 1280,
+      "height": 1707
+    },
+    {
+      "type": "text",
+      "text": "Sanding!",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/14.webp",
+      "number": 14,
+      "width": 1141,
+      "height": 807
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/15.webp",
+      "number": 15,
+      "width": 1280,
+      "height": 1707
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/16.webp",
+      "number": 16,
+      "width": 960,
+      "height": 1280
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/17.webp",
+      "number": 17,
+      "width": 1497,
+      "height": 936
+    },
+    {
+      "type": "text",
+      "text": "Some details worth mentioning",
+      "style": "Normal"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/18.webp",
+      "number": 18,
+      "width": 1800,
+      "height": 922
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/19.webp",
+      "number": 19,
+      "width": 1146,
+      "height": 1000
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/20.webp",
+      "number": 20,
+      "width": 1426,
+      "height": 1089
+    },
+    {
+      "type": "text",
+      "text": "For better connection",
+      "style": "ListParagraph"
+    },
+    {
+      "type": "text",
+      "text": "How I embossed! Without using emboss which is harder",
+      "style": "ListParagraph"
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/21.webp",
+      "number": 21,
+      "width": 967,
+      "height": 916
+    },
+    {
+      "type": "image",
+      "src": "/art-course/final-original/22.webp",
+      "number": 22,
+      "width": 1164,
+      "height": 792
+    }
+  ]
+}

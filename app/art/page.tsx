@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { artProjects } from '@/lib/art-projects'
+import ArtPointerEffects from './ArtPointerEffects'
 import styles from './art.module.css'
 
 export const metadata = {
@@ -13,6 +14,7 @@ export default function ArtPage() {
   const finalProject = artProjects[5]
   return (
     <main className={styles.page} id="top">
+      <ArtPointerEffects />
       <header className={styles.nav}>
         <Link className={styles.logo} href="/art">SAM / ART</Link>
         <nav aria-label="Art navigation">
@@ -24,7 +26,7 @@ export default function ArtPage() {
       </header>
 
       <section className={styles.hero}>
-        <svg className={styles.ribbon} viewBox="0 0 1440 1100" preserveAspectRatio="none" aria-hidden="true">
+        <svg className={styles.ribbon} id="art-ribbon" viewBox="0 0 1440 1100" preserveAspectRatio="none" aria-hidden="true">
           <defs>
             <linearGradient id="artRibbonGradient" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0" stopColor="#ef4b31" />
@@ -32,7 +34,10 @@ export default function ArtPage() {
               <stop offset="1" stopColor="#43170d" />
             </linearGradient>
           </defs>
-          <path d={RIBBON_PATH} />
+          <g className={styles.ribbonFlow}>
+            <path className={styles.ribbonMain} d={RIBBON_PATH} />
+            <path className={styles.ribbonSheen} d={RIBBON_PATH} />
+          </g>
         </svg>
         <div className={styles.heroCopy}>
           <p className={styles.eyebrow}>PERSONAL ARCHIVE · FUSION 360 · 2026</p>
@@ -44,7 +49,7 @@ export default function ArtPage() {
           </div>
         </div>
         <div className={styles.heroMedia}>
-          <img src="/art-course/final/model-view.png" alt="Fusion 360 ornate hinged helmet model" />
+          <img src="/art-course/final-original/06.webp" alt="Fusion model of the ornate hinged helmet" />
           <span>FEATURED / ORNATE HINGED HELMET</span>
         </div>
         <div className={styles.ticker} aria-hidden="true">DRAW / MODEL / TEST / REFINE</div>
@@ -53,7 +58,7 @@ export default function ArtPage() {
       <section className={styles.introBand}>
         <p>FOR THE REVIEWER</p>
         <h2>Start with a week.<br />See the evidence.</h2>
-        <p>Cards open a focused page with a short explanation, selected images, the full process gallery and the original files. The final project includes technical drawings and browser-viewable STL parts.</p>
+        <p>Each week opens to a focused explanation, then the complete source document with every picture in order. The final project includes physical print photos, drawings and browser-viewable parts.</p>
       </section>
 
       <section className={styles.gallery} id="weeks">
@@ -69,7 +74,8 @@ export default function ArtPage() {
             <Link className={styles.projectCard} href={`/art/${project.slug}`} key={project.slug}>
               <div className={styles.projectImage}>
                 <img src={project.cover} alt={project.coverAlt} loading="lazy" />
-                <span>VIEW PROJECT ↗</span>
+                <span className={styles.weekBadge}>WEEK {index + 1}</span>
+                <span className={styles.projectHover} aria-hidden="true">WEEK {index + 1}<small>VIEW PROJECT ↗</small></span>
               </div>
               <div className={styles.projectCaption}>
                 <span>{String(index + 1).padStart(2, '0')} / {project.eyebrow.split(' / ')[1]}</span>
@@ -88,7 +94,7 @@ export default function ArtPage() {
           <h2>Ornate<br />Hinged Helmet.</h2>
           <p>{finalProject.summary}</p>
           <div className={styles.finalStats}>
-            <span><strong>04</strong> printable bodies</span>
+            <span><strong>06</strong> documented components</span>
             <span><strong>111</strong> Fusion steps</span>
             <span><strong>112.5 × 137.6 × 142.3</strong> mm CAD assembly</span>
           </div>
@@ -105,7 +111,7 @@ export default function ArtPage() {
             <p className={styles.eyebrow}>03 / ASSIGNMENT CHECK</p>
             <h2>What the files<br />can show.</h2>
           </div>
-          <p>This index distinguishes documented work from work that still needs physical evidence.</p>
+          <p>Each page links the original documents and shows the images in their source order.</p>
         </div>
         <div className={styles.checkRows}>
           {artProjects.map((project) => {
@@ -120,7 +126,7 @@ export default function ArtPage() {
             )
           })}
         </div>
-        <p className={styles.auditNote}>Final project: the Fusion model, dimensions, sketches and drawings are documented. Physical printing, a second real material and finishing have not yet been completed in the supplied record.</p>
+        <p className={styles.auditNote}>The final project documentation includes the assembled print, fabric details, bolts, technical drawings and sanding notes.</p>
       </section>
 
       <aside className={styles.otherWork}>
@@ -133,6 +139,9 @@ export default function ArtPage() {
         <strong>Made to be examined.</strong>
         <Link href="/">Return to the solar system ↗</Link>
       </footer>
+      <section className={styles.foliageOnly} id="foliage" aria-hidden="true">
+        <canvas id="art-foliage-canvas" className={styles.palmCanvas} />
+      </section>
     </main>
   )
 }

@@ -7,6 +7,8 @@ import shutil
 import xml.etree.ElementTree as ET
 
 from PIL import Image, ImageOps, ImageDraw
+from docx import Document
+from docx.oxml.ns import qn
 
 HERE = Path(__file__).resolve().parents[1]
 SOURCE = HERE.parent / "网页制作需求i"
@@ -18,6 +20,7 @@ DOCS = {
     "week-3": SOURCE / "week 3" / "week3_process_documentation.docx",
     "week-4": SOURCE / "week 4" / "Week4_Final_Project_Ideation (3).docx",
     "week-5": SOURCE / "week 5" / "week5_progress_documentation (1).docx",
+    "final-original": SOURCE / "intro to 3d modelling final project" / "documentation.docx",
 }
 NS = {
     "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
@@ -72,11 +75,37 @@ def contact_sheet(slug, images):
     board.save(CONTACT / f"{slug}.jpg", quality=80)
 
 
+def document_blocks(slug, path, images):
+    """Keep every paragraph and embedded picture in the source document order."""
+    document = Document(path)
+    blocks = []
+    image_index = 0
+    for paragraph in document.element.body.iter(qn("w:p")):
+        text = "".join(node.text or "" for node in paragraph.iter(qn("w:t"))).strip()
+        properties = paragraph.find(qn("w:pPr"))
+        style_element = properties.find(qn("w:pStyle")) if properties is not None else None
+        style = style_element.get(qn("w:val")) if style_element is not None else "Normal"
+        if text:
+            blocks.append({"type": "text", "text": text, "style": style})
+        for blip in paragraph.iter(qn("a:blip")):
+            if image_index >= len(images):
+                raise RuntimeError(f"Too many images in {slug}")
+            image_index += 1
+            picture = images[image_index - 1]
+            blocks.append({"type": "image", "src": picture["src"], "number": image_index,
+                           "width": picture["width"], "height": picture["height"]})
+    if image_index != len(images):
+        raise RuntimeError(f"Image count mismatch in {slug}: {image_index} != {len(images)}")
+    return blocks
+
+
 def main():
     manifest = {}
+    records = {}
     for slug, path in DOCS.items():
         images = extract_doc(slug, path)
         manifest[slug] = images
+        records[slug] = document_blocks(slug, path, images)
         contact_sheet(slug, images)
         print(slug, len(images))
     final_dir = SOURCE / "final project fusion" / "final_documentation"
@@ -97,6 +126,14 @@ def main():
         (final_dir / "current_model_view.png", "model-view.png"),
     ]:
         shutil.copy2(src, final_out / name)
+    original_final = SOURCE / "intro to 3d modelling final project"
+    for src, name in [
+        (original_final / "documentation.docx", "original-documentation.docx"),
+        (original_final / "helmet.pdf", "helmet-drawing.pdf"),
+        (original_final / "nut.pdf", "nut-drawing.pdf"),
+        (original_final / "bolt view.pdf", "bolt-view.pdf"),
+    ]:
+        shutil.copy2(src, final_out / name)
     # The source STL meshes are shown as browser-viewable models. Their origins
     # are recentered in the viewer so that each independent export can rotate.
     shutil.copy2(Path.home() / "Downloads" / "Pea pod customized.stl", TARGET / "week-3" / "model.stl")
@@ -111,7 +148,13 @@ def main():
         (models / "hinge right.stl", "hinge-right.stl"),
     ]:
         shutil.copy2(src, final_out / name)
+    for src, name in [
+        (models / "bolts.stl", "bolt.stl"),
+        (final_dir / "bolttt.stl", "bolt-detail.stl"),
+    ]:
+        shutil.copy2(src, final_out / name)
     (HERE / "lib" / "art-image-manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    (HERE / "lib" / "art-document-content.json").write_text(json.dumps(records, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 if __name__ == "__main__":
